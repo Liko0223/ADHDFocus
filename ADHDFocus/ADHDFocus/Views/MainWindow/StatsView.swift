@@ -61,38 +61,21 @@ struct StatsView: View {
                 StatCard(icon: "flame.fill", title: "连续天数", value: "\(streakDays)", unit: "天", color: .red)
             }
 
-            // Block details
+            // Block details (last 20)
             if !todayBlockEvents.isEmpty {
+                let recentEvents = Array(todayBlockEvents.sorted(by: { $0.timestamp > $1.timestamp }).prefix(20))
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("拦截记录")
-                        .font(.headline)
+                    HStack {
+                        Text("拦截记录")
+                            .font(.headline)
+                        Spacer()
+                        Text("最近 \(min(todayBlockEvents.count, 20)) 条")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
 
-                    ForEach(todayBlockEvents.sorted(by: { $0.timestamp > $1.timestamp })) { event in
-                        HStack(spacing: 10) {
-                            Image(systemName: event.type == .app ? "app.badge.fill" : "globe")
-                                .foregroundStyle(.orange)
-                                .frame(width: 20)
-
-                            if event.type == .app, let appPath = NSWorkspace.shared.urlForApplication(withBundleIdentifier: event.target)?.path {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: appPath))
-                                    .resizable()
-                                    .frame(width: 16, height: 16)
-                            }
-
-                            Text(appDisplayName(event.target, type: event.type))
-                                .font(.body)
-
-                            Spacer()
-
-                            Text(event.modeName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-
-                            Text(event.timestamp, style: .time)
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(.tertiary)
-                        }
-                        .padding(.vertical, 4)
+                    ForEach(recentEvents) { event in
+                        BlockEventRow(event: event)
                     }
                 }
                 .padding(16)
@@ -116,21 +99,6 @@ struct StatsView: View {
             .buttonStyle(.plain)
         }
         .padding(24)
-    }
-
-    private func appDisplayName(_ target: String, type: BlockEventType) -> String {
-        if type == .url { return target }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: target) {
-            let plistURL = url.appendingPathComponent("Contents/Info.plist")
-            if let data = try? Data(contentsOf: plistURL),
-               let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] {
-                return (plist["CFBundleDisplayName"] as? String)
-                    ?? (plist["CFBundleName"] as? String)
-                    ?? url.deletingPathExtension().lastPathComponent
-            }
-            return url.deletingPathExtension().lastPathComponent
-        }
-        return target
     }
 
     private func clearAllData() {
@@ -168,5 +136,39 @@ struct StatCard: View {
         .padding(16)
         .background(.quaternary.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct BlockEventRow: View {
+    let event: BlockEvent
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: event.type == .app ? "app.badge.fill" : "globe")
+                .foregroundStyle(.orange)
+                .frame(width: 20)
+
+            if event.type == .app, let info = AppInfoCache.shared.info(for: event.target) {
+                Image(nsImage: info.icon)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                Text(info.name)
+                    .font(.body)
+            } else {
+                Text(event.target)
+                    .font(.body)
+            }
+
+            Spacer()
+
+            Text(event.modeName)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text(event.timestamp, style: .time)
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.vertical, 4)
     }
 }

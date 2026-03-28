@@ -308,7 +308,7 @@ struct ModeEditorView: View {
 
 // MARK: - App Info Cache
 
-private final class AppInfoCache {
+final class AppInfoCache {
     static let shared = AppInfoCache()
     private var cache: [String: (name: String, icon: NSImage)] = [:]
 
