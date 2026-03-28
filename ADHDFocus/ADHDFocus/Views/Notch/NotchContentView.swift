@@ -45,21 +45,7 @@ struct NotchContentView: View {
 
     // Collapsed: idle = just character side, active = both sides
     private var collapsedWidth: CGFloat {
-        if manager.isActive {
-            return manager.notchWidth + sideExtension * 2
-        } else {
-            return manager.notchWidth + sideExtension + 16 // left side + small right padding
-        }
-    }
-
-    // Collapsed offset so character stays in same position
-    // When idle (narrower), shift right so left edge stays same
-    private var collapsedOffsetX: CGFloat {
-        if manager.isActive {
-            return 0
-        } else {
-            return -(sideExtension - 16) / 2
-        }
+        manager.notchWidth + sideExtension * 2
     }
 
     private var currentWidth: CGFloat {
@@ -108,7 +94,8 @@ struct NotchContentView: View {
                 .clipped()
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
-            .offset(x: manager.isExpanded ? 0 : collapsedOffsetX)
+
+
         }
         .animation(panelAnimation, value: manager.isExpanded)
         .animation(panelAnimation, value: manager.isActive)
