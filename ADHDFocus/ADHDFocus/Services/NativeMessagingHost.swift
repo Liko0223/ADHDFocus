@@ -11,7 +11,9 @@ final class NativeMessagingHost {
     }
 
     static func encodeMessage(_ message: [String: Any]) -> Data {
-        let jsonData = try! JSONSerialization.data(withJSONObject: message)
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: message) else {
+            return Data([0, 0, 0, 0]) // empty message
+        }
         var length = UInt32(jsonData.count).littleEndian
         var result = Data(bytes: &length, count: 4)
         result.append(jsonData)

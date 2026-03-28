@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import SwiftData
 
-@Observable
+@MainActor @Observable
 final class NotchManager {
     private var panel: NotchPanel?
     private var syncTimer: Timer?
@@ -33,6 +33,10 @@ final class NotchManager {
     }
 
     func setup() {
+        guard modelContainer != nil else {
+            print("NotchManager: modelContainer not set, skipping setup")
+            return
+        }
         // Prefer the screen with a notch (built-in display)
         let screen = NSScreen.screens.first(where: { $0.hasNotch }) ?? NSScreen.main
         guard let screen else { return }

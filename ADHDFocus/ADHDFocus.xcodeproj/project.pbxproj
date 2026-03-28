@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,7 +24,6 @@
 		66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737297A491D3C5EFF831C48F /* BlockEvent.swift */; };
 		6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */; };
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
-		7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */; };
 		825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */; };
 		8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4E2708F04FCFD597D87E5 /* DNDController.swift */; };
 		9E6EDDF9B999836981134F40 /* ModeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8244A72B60B1D487102FD /* ModeEditorView.swift */; };
@@ -61,7 +60,6 @@
 		027EECF7F4B4E7868E5E93B8 /* NotchPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchPanel.swift; sourceTree = "<group>"; };
 		03860CDD9D664BA3071789D1 /* SpriteSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheetView.swift; sourceTree = "<group>"; };
 		0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroTimer.swift; sourceTree = "<group>"; };
-		10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADHDFocusTests.swift; sourceTree = "<group>"; };
 		122ACD82DE885656995FED88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1C24AEBA827F04F1A5B9C711 /* NSScreen+Notch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Notch.swift"; sourceTree = "<group>"; };
 		1C3366F2338DAA700B20DE37 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
@@ -143,7 +141,6 @@
 		48FE88FC9BDBB9489E392250 /* ADHDFocusTests */ = {
 			isa = PBXGroup;
 			children = (
-				10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */,
 				E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */,
 				32E03D9382FE46707E4D9468 /* FocusModeTests.swift */,
 				81F33C2AEC569E649128EC6C /* NativeMessagingTests.swift */,
@@ -306,7 +303,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1430;
 			};
 			buildConfigurationList = 597A6EF6265FE2705A4791B4 /* Build configuration list for PBXProject "ADHDFocus" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -318,6 +315,7 @@
 			);
 			mainGroup = B8D4A9781550004C2F211ADA;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -378,7 +376,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */,
 				B03AADD164764EBE3972E306 /* FocusEngineTests.swift in Sources */,
 				530F7110B538BE7C060F731F /* FocusModeTests.swift in Sources */,
 				0070570DDACDB4D1A45D047A /* NativeMessagingTests.swift in Sources */,
@@ -402,7 +399,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -422,7 +418,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -471,11 +466,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -489,7 +482,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
@@ -503,7 +495,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ADHDFocus/ADHDFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ADHDFocus/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -525,7 +516,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ADHDFocus/ADHDFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ADHDFocus/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -574,11 +564,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -599,7 +587,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;

@@ -16,6 +16,12 @@ final class FocusEngine {
     var onPomodoroPhaseChange: ((PomodoroPhase) -> Void)?
 
     func activate(mode: FocusMode) {
+        // Deactivate previous mode if any (prevents timer leak)
+        if activeMode != nil {
+            pomodoroTimer?.stop()
+            pomodoroTimer = nil
+            onModeDeactivated?()
+        }
         activeMode = mode
         sessionStartedAt = Date()
 

@@ -28,7 +28,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     override init() {
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        container = try! ModelContainer(for: schema, configurations: [config])
+        do {
+            container = try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            // If store is corrupted, fall back to in-memory
+            print("SwiftData store error: \(error). Using in-memory store.")
+            let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            container = try! ModelContainer(for: schema, configurations: [memConfig])
+        }
         super.init()
         seedDefaultModesIfNeeded()
     }
