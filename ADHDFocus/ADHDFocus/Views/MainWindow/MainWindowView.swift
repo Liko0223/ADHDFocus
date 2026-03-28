@@ -19,12 +19,36 @@ struct MainWindowView: View {
     var engine: FocusEngine
 
     var body: some View {
-        NavigationSplitView {
-            List(MainTab.allCases, id: \.self, selection: $selectedTab) { tab in
-                Label(tab.rawValue, systemImage: tab.icon)
+        HStack(spacing: 0) {
+            // Sidebar
+            VStack(spacing: 4) {
+                ForEach(MainTab.allCases, id: \.self) { tab in
+                    Button {
+                        selectedTab = tab
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: tab.icon)
+                                .frame(width: 20)
+                            Text(tab.rawValue)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(selectedTab == tab ? Color.accentColor.opacity(0.15) : Color.clear)
+                        .foregroundStyle(selectedTab == tab ? .primary : .secondary)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
+                }
+                Spacer()
             }
-            .navigationSplitViewColumnWidth(min: 140, ideal: 160)
-        } detail: {
+            .padding(12)
+            .frame(width: 140)
+            .background(.bar)
+
+            Divider()
+
+            // Content
             switch selectedTab {
             case .modes:
                 ModeListView(engine: engine)
@@ -34,6 +58,6 @@ struct MainWindowView: View {
                 SettingsView()
             }
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .frame(minWidth: 800, minHeight: 520)
     }
 }

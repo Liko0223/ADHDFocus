@@ -10,159 +10,186 @@ struct ModeEditorView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Basic info
-                GroupBox("基本信息") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            TextField("图标", text: $mode.icon)
-                                .frame(width: 50)
-                            TextField("名称", text: $mode.name)
-                        }
+            VStack(alignment: .leading, spacing: 0) {
+                // Header
+                HStack(spacing: 12) {
+                    Text(mode.icon)
+                        .font(.largeTitle)
+                    VStack(alignment: .leading, spacing: 2) {
+                        TextField("模式名称", text: $mode.name)
+                            .font(.title2.weight(.semibold))
+                            .textFieldStyle(.plain)
                         TextField("统计标签", text: $mode.statsTag)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .textFieldStyle(.plain)
                     }
-                    .padding(8)
                 }
+                .padding(.bottom, 24)
 
-                // App rules
-                GroupBox("应用规则") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("允许的应用")
-                                .font(.caption.weight(.medium))
-                            Spacer()
-                            Button("选择应用") {
-                                showAllowedAppPicker = true
+                // Sections
+                editorSection("应用规则") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        // Allowed apps
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Label("允许的应用", systemImage: "checkmark.circle")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.green)
+                                Spacer()
+                                Button {
+                                    showAllowedAppPicker = true
+                                } label: {
+                                    Label("选择", systemImage: "plus.circle")
+                                        .font(.caption)
+                                }
+                                .buttonStyle(.borderless)
                             }
-                            .controlSize(.small)
+                            appChipList(items: $mode.allowedApps)
                         }
-                        appChipList(items: $mode.allowedApps)
 
                         Divider()
 
-                        HStack {
-                            Text("禁止的应用")
-                                .font(.caption.weight(.medium))
-                            Spacer()
-                            Button("选择应用") {
-                                showBlockedAppPicker = true
+                        // Blocked apps
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Label("禁止的应用", systemImage: "xmark.circle")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.red)
+                                Spacer()
+                                Button {
+                                    showBlockedAppPicker = true
+                                } label: {
+                                    Label("选择", systemImage: "plus.circle")
+                                        .font(.caption)
+                                }
+                                .buttonStyle(.borderless)
                             }
-                            .controlSize(.small)
+                            appChipList(items: $mode.blockedApps)
                         }
-                        appChipList(items: $mode.blockedApps)
 
                         Divider()
 
-                        Picker("未列出的应用", selection: $mode.defaultAppPolicy) {
-                            Text("允许").tag(AppPolicy.allow)
-                            Text("提醒").tag(AppPolicy.remind)
-                            Text("禁止").tag(AppPolicy.block)
-                        }
-                    }
-                    .padding(8)
-                }
-
-                // URL rules
-                GroupBox("浏览器规则") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("允许的网站")
-                            .font(.caption.weight(.medium))
-                        urlListEditor(
-                            items: $mode.allowedURLs,
-                            newItem: $newAllowedURL,
-                            placeholder: "dribbble.com"
-                        )
-
-                        Divider()
-
-                        Text("禁止的网站")
-                            .font(.caption.weight(.medium))
-                        urlListEditor(
-                            items: $mode.blockedURLs,
-                            newItem: $newBlockedURL,
-                            placeholder: "weibo.com"
-                        )
-
-                        Divider()
-
-                        Picker("未列出的网站", selection: $mode.defaultURLPolicy) {
-                            Text("允许").tag(AppPolicy.allow)
-                            Text("提醒").tag(AppPolicy.remind)
-                            Text("禁止").tag(AppPolicy.block)
-                        }
-                    }
-                    .padding(8)
-                }
-
-                // Restriction strategy
-                GroupBox("限制策略") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Picker("严格程度", selection: $mode.strictness) {
-                            Text("温和提醒").tag(Strictness.remind)
-                            Text("强制退出").tag(Strictness.forceQuit)
-                            Text("延迟允许").tag(Strictness.delayAllow)
-                        }
                         HStack {
-                            Text("冷却期（分钟）")
-                            TextField("0", value: $mode.cooldownMinutes, format: .number)
-                                .frame(width: 60)
+                            Text("未列出的应用")
+                                .font(.subheadline)
+                            Spacer()
+                            Picker("", selection: $mode.defaultAppPolicy) {
+                                Text("允许").tag(AppPolicy.allow)
+                                Text("提醒").tag(AppPolicy.remind)
+                                Text("禁止").tag(AppPolicy.block)
+                            }
+                            .labelsHidden()
+                            .frame(width: 100)
                         }
                     }
-                    .padding(8)
                 }
 
-                // Pomodoro config
-                GroupBox("番茄钟") {
-                    VStack(alignment: .leading, spacing: 12) {
+                editorSection("浏览器规则") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("允许的网站", systemImage: "checkmark.circle")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.green)
+                            urlListEditor(
+                                items: $mode.allowedURLs,
+                                newItem: $newAllowedURL,
+                                placeholder: "dribbble.com"
+                            )
+                        }
+
+                        Divider()
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("禁止的网站", systemImage: "xmark.circle")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.red)
+                            urlListEditor(
+                                items: $mode.blockedURLs,
+                                newItem: $newBlockedURL,
+                                placeholder: "weibo.com"
+                            )
+                        }
+
+                        Divider()
+
                         HStack {
-                            Text("工作时长（分钟）")
-                            TextField("25", value: Binding(
+                            Text("未列出的网站")
+                                .font(.subheadline)
+                            Spacer()
+                            Picker("", selection: $mode.defaultURLPolicy) {
+                                Text("允许").tag(AppPolicy.allow)
+                                Text("提醒").tag(AppPolicy.remind)
+                                Text("禁止").tag(AppPolicy.block)
+                            }
+                            .labelsHidden()
+                            .frame(width: 100)
+                        }
+                    }
+                }
+
+                // Pomodoro + Strategy side by side
+                HStack(alignment: .top, spacing: 16) {
+                    editorSection("番茄钟") {
+                        VStack(spacing: 10) {
+                            formRow("工作", minutes: Binding(
                                 get: { mode.workDuration / 60 },
                                 set: { mode.workDuration = $0 * 60 }
-                            ), format: .number)
-                            .frame(width: 60)
-                        }
-                        HStack {
-                            Text("休息时长（分钟）")
-                            TextField("5", value: Binding(
+                            ))
+                            formRow("休息", minutes: Binding(
                                 get: { mode.breakDuration / 60 },
                                 set: { mode.breakDuration = $0 * 60 }
-                            ), format: .number)
-                            .frame(width: 60)
-                        }
-                        HStack {
-                            Text("长休息时长（分钟）")
-                            TextField("15", value: Binding(
+                            ))
+                            formRow("长休息", minutes: Binding(
                                 get: { mode.longBreakDuration / 60 },
                                 set: { mode.longBreakDuration = $0 * 60 }
-                            ), format: .number)
-                            .frame(width: 60)
-                        }
-                        HStack {
-                            Text("每几轮后长休息")
-                            TextField("4", value: $mode.longBreakInterval, format: .number)
-                                .frame(width: 60)
-                        }
-                        if mode.workDuration == 0 {
-                            Text("番茄钟已禁用（工作时长为 0）")
-                                .font(.caption)
-                                .foregroundStyle(.orange)
+                            ))
+                            HStack {
+                                Text("轮数")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                TextField("4", value: $mode.longBreakInterval, format: .number)
+                                    .frame(width: 50)
+                                    .textFieldStyle(.roundedBorder)
+                                    .multilineTextAlignment(.center)
+                            }
+                            if mode.workDuration == 0 {
+                                Label("番茄钟已禁用", systemImage: "pause.circle")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
                         }
                     }
-                    .padding(8)
-                }
 
-                // Environment
-                GroupBox("环境配置") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Toggle("自动开启勿扰模式", isOn: $mode.enableDND)
-                        Toggle("自动隐藏 Dock", isOn: $mode.hideDock)
+                    editorSection("环境与策略") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Toggle("勿扰模式", isOn: $mode.enableDND)
+                                .font(.subheadline)
+                            Toggle("隐藏 Dock", isOn: $mode.hideDock)
+                                .font(.subheadline)
+
+                            Divider()
+
+                            HStack {
+                                Text("拦截方式")
+                                    .font(.subheadline)
+                                Spacer()
+                                Picker("", selection: $mode.strictness) {
+                                    Text("提醒").tag(Strictness.remind)
+                                    Text("强制退出").tag(Strictness.forceQuit)
+                                    Text("延迟允许").tag(Strictness.delayAllow)
+                                }
+                                .labelsHidden()
+                                .frame(width: 100)
+                            }
+                        }
                     }
-                    .padding(8)
                 }
             }
-            .padding(20)
+            .padding(24)
         }
+        .background(.background)
         .sheet(isPresented: $showAllowedAppPicker) {
             AppPickerView(title: "选择允许的应用", selectedBundleIDs: $mode.allowedApps)
         }
@@ -171,12 +198,54 @@ struct ModeEditorView: View {
         }
     }
 
+    // MARK: - Section wrapper
+
+    @ViewBuilder
+    private func editorSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.primary)
+
+            content()
+                .padding(16)
+                .background(.background)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+        }
+        .padding(.bottom, 20)
+    }
+
+    // MARK: - Form row for time
+
+    private func formRow(_ label: String, minutes: Binding<Int>) -> some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Spacer()
+            TextField("", value: minutes, format: .number)
+                .frame(width: 50)
+                .textFieldStyle(.roundedBorder)
+                .multilineTextAlignment(.center)
+            Text("分钟")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        }
+    }
+
+    // MARK: - App chips
+
     @ViewBuilder
     private func appChipList(items: Binding<[String]>) -> some View {
         if items.wrappedValue.isEmpty {
-            Text("未选择任何应用")
+            Text("未选择")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+                .padding(.vertical, 4)
         } else {
             FlowLayout(spacing: 6) {
                 ForEach(items.wrappedValue, id: \.self) { bundleID in
@@ -188,40 +257,52 @@ struct ModeEditorView: View {
         }
     }
 
+    // MARK: - URL list
+
     @ViewBuilder
     private func urlListEditor(items: Binding<[String]>, newItem: Binding<String>, placeholder: String) -> some View {
-        ForEach(items.wrappedValue, id: \.self) { item in
-            HStack {
-                Text(item)
-                    .font(.caption.monospaced())
-                Spacer()
-                Button {
-                    items.wrappedValue.removeAll { $0 == item }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+        if !items.wrappedValue.isEmpty {
+            FlowLayout(spacing: 6) {
+                ForEach(items.wrappedValue, id: \.self) { item in
+                    HStack(spacing: 4) {
+                        Text(item)
+                            .font(.caption)
+                        Button {
+                            items.wrappedValue.removeAll { $0 == item }
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.quaternary.opacity(0.5))
+                    .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
             }
         }
-        HStack {
+        HStack(spacing: 8) {
             TextField(placeholder, text: newItem)
-                .font(.caption.monospaced())
+                .textFieldStyle(.roundedBorder)
+                .font(.caption)
                 .onSubmit {
-                    let value = newItem.wrappedValue.trimmingCharacters(in: .whitespaces)
-                    if !value.isEmpty && !items.wrappedValue.contains(value) {
-                        items.wrappedValue.append(value)
-                        newItem.wrappedValue = ""
-                    }
+                    addURL(items: items, newItem: newItem)
                 }
             Button("添加") {
-                let value = newItem.wrappedValue.trimmingCharacters(in: .whitespaces)
-                if !value.isEmpty && !items.wrappedValue.contains(value) {
-                    items.wrappedValue.append(value)
-                    newItem.wrappedValue = ""
-                }
+                addURL(items: items, newItem: newItem)
             }
+            .controlSize(.small)
             .disabled(newItem.wrappedValue.trimmingCharacters(in: .whitespaces).isEmpty)
+        }
+    }
+
+    private func addURL(items: Binding<[String]>, newItem: Binding<String>) {
+        let value = newItem.wrappedValue.trimmingCharacters(in: .whitespaces)
+        if !value.isEmpty && !items.wrappedValue.contains(value) {
+            items.wrappedValue.append(value)
+            newItem.wrappedValue = ""
         }
     }
 }

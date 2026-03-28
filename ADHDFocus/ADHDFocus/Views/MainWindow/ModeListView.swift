@@ -8,48 +8,58 @@ struct ModeListView: View {
     var engine: FocusEngine
 
     var body: some View {
-        NavigationSplitView {
-            List(modes, selection: $selectedMode) { mode in
-                HStack(spacing: 10) {
-                    Text(mode.icon)
-                        .font(.title2)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(mode.name)
-                            .font(.body.weight(.medium))
-                        Text("\(mode.allowedApps.count) 个允许应用")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+        HStack(spacing: 0) {
+            // Mode list
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 2) {
+                        ForEach(modes) { mode in
+                            ModeRowView(
+                                mode: mode,
+                                isSelected: selectedMode?.id == mode.id,
+                                isActive: engine.activeMode?.id == mode.id
+                            )
+                            .onTapGesture {
+                                selectedMode = mode
+                            }
+                        }
                     }
-                    Spacer()
-                    if engine.activeMode?.id == mode.id {
-                        Circle()
-                            .fill(.green)
-                            .frame(width: 8, height: 8)
-                    }
+                    .padding(8)
                 }
-                .padding(.vertical, 4)
-                .tag(mode)
-            }
-            .navigationSplitViewColumnWidth(min: 200, ideal: 220)
-            .safeAreaInset(edge: .bottom) {
-                HStack {
+
+                Divider()
+
+                HStack(spacing: 8) {
                     Button(action: addMode) {
                         Image(systemName: "plus")
                     }
+                    .buttonStyle(.borderless)
                     Button(action: deleteSelectedMode) {
                         Image(systemName: "minus")
                     }
+                    .buttonStyle(.borderless)
                     .disabled(selectedMode == nil)
                     Spacer()
                 }
-                .padding(8)
-                .background(.bar)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
             }
-        } detail: {
+            .frame(width: 200)
+            .background(.background)
+
+            Divider()
+
+            // Editor
             if let mode = selectedMode {
                 ModeEditorView(mode: mode)
+                    .id(mode.id)
             } else {
-                ContentUnavailableView("选择一个模式", systemImage: "rectangle.stack", description: Text("从左侧列表中选择模式进行编辑"))
+                ContentUnavailableView(
+                    "选择一个模式",
+                    systemImage: "rectangle.stack",
+                    description: Text("从左侧列表中选择模式进行编辑")
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
@@ -72,5 +82,35 @@ struct ModeListView: View {
         }
         modelContext.delete(mode)
         selectedMode = nil
+    }
+}
+
+struct ModeRowView: View {
+    let mode: FocusMode
+    let isSelected: Bool
+    let isActive: Bool
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(mode.icon)
+                .font(.title3)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(mode.name)
+                    .font(.body.weight(.medium))
+                Text("\(mode.allowedApps.count) 个允许应用")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            if isActive {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 8, height: 8)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(isSelected ? Color.accentColor.opacity(0.12) : Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
