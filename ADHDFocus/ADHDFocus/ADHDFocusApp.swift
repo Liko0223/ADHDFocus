@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AppKit
 
 @main
 struct ADHDFocusApp: App {
@@ -34,6 +35,12 @@ struct ADHDFocusApp: App {
 
     private func setupEngine() {
         guard appMonitor == nil else { return }
+
+        // Request accessibility permission if not granted
+        if !AXIsProcessTrusted() {
+            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+            AXIsProcessTrustedWithOptions(options)
+        }
 
         NotificationManager.shared.requestPermission()
 
