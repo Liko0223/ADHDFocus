@@ -7,7 +7,7 @@ struct ADHDFocusApp: App {
     @State private var engine = FocusEngine()
     @State private var appMonitor: AppMonitor?
     @State private var currentSession: FocusSession?
-    @State private var nativeMessagingHost: NativeMessagingHost?
+    @State private var rulesServer: RulesServer?
 
     let container: ModelContainer
     private let dndController = DNDController()
@@ -47,8 +47,10 @@ struct ADHDFocusApp: App {
         let monitor = AppMonitor(engine: engine, modelContext: container.mainContext)
         appMonitor = monitor
 
-        let messagingHost = NativeMessagingHost(engine: engine)
-        nativeMessagingHost = messagingHost
+        // Start local HTTP server for Chrome Extension
+        let server = RulesServer(engine: engine)
+        server.start()
+        rulesServer = server
 
         engine.onModeActivated = { mode in
             monitor.startMonitoring()
@@ -57,7 +59,6 @@ struct ADHDFocusApp: App {
             let session = FocusSession(modeID: mode.id, modeName: mode.name, statsTag: mode.statsTag)
             container.mainContext.insert(session)
             currentSession = session
-            messagingHost.sendRulesUpdate()
         }
 
         let ctx = container.mainContext
@@ -72,12 +73,10 @@ struct ADHDFocusApp: App {
                 try? ctx.save()
             }
             currentSession = nil
-            messagingHost.sendRulesUpdate()
         }
 
         engine.onPomodoroPhaseChange = { phase in
             NotificationManager.shared.sendPomodoroNotification(phase: phase)
-            messagingHost.sendRulesUpdate()
         }
     }
 

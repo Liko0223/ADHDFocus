@@ -1,25 +1,19 @@
-const NATIVE_HOST = "com.lilinke.adhdfocus";
+const RULES_URL = "http://localhost:52836/rules";
+const POLL_INTERVAL = 2000;
+
 let currentRules = null;
-let nativePort = null;
 
-function connectToNativeHost() {
-  nativePort = chrome.runtime.connectNative(NATIVE_HOST);
-
-  nativePort.onMessage.addListener((message) => {
-    if (message.type === "rules_update") {
-      currentRules = message.data;
-      chrome.storage.local.set({ rules: currentRules });
-    }
-  });
-
-  nativePort.onDisconnect.addListener(() => {
-    nativePort = null;
+async function fetchRules() {
+  try {
+    const response = await fetch(RULES_URL);
+    const rules = await response.json();
+    currentRules = rules;
+    chrome.storage.local.set({ rules: currentRules });
+  } catch (e) {
+    // App not running
     currentRules = null;
     chrome.storage.local.set({ rules: null });
-    setTimeout(connectToNativeHost, 5000);
-  });
-
-  nativePort.postMessage({ type: "get_rules" });
+  }
 }
 
 function isURLBlocked(url, rules) {
@@ -43,22 +37,34 @@ function isURLBlocked(url, rules) {
   return rules.defaultPolicy === "block";
 }
 
+// Block on navigation
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   if (details.frameId !== 0) return;
-
-  const rules = currentRules;
-  if (isURLBlocked(details.url, rules)) {
-    const params = new URLSearchParams({
-      url: details.url,
-      modeName: rules.modeName || "",
-      remainingSeconds: String(rules.remainingSeconds || 0),
-      allowedSites: (rules.allowedURLs || []).join(",")
-    });
-    chrome.tabs.update(details.tabId, {
-      url: chrome.runtime.getURL("blocked.html") + "?" + params.toString()
-    });
+  if (isURLBlocked(details.url, currentRules)) {
+    redirectToBlocked(details.tabId, details.url);
   }
 });
+
+// Also check when tab finishes loading (catches SPA / typed URLs)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status !== "complete" || !tab.url) return;
+  if (tab.url.startsWith("chrome") || tab.url.startsWith("chrome-extension")) return;
+  if (isURLBlocked(tab.url, currentRules)) {
+    redirectToBlocked(tabId, tab.url);
+  }
+});
+
+function redirectToBlocked(tabId, url) {
+  const params = new URLSearchParams({
+    url: url,
+    modeName: currentRules.modeName || "",
+    remainingSeconds: String(currentRules.remainingSeconds || 0),
+    allowedSites: (currentRules.allowedURLs || []).join(",")
+  });
+  chrome.tabs.update(tabId, {
+    url: chrome.runtime.getURL("blocked.html") + "?" + params.toString()
+  });
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "get_rules") {
@@ -66,8 +72,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-connectToNativeHost();
+// Start polling
+fetchRules();
+setInterval(fetchRules, POLL_INTERVAL);
 
+// Load cached rules on startup
 chrome.storage.local.get("rules", (result) => {
   if (result.rules) currentRules = result.rules;
 });
