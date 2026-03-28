@@ -148,6 +148,9 @@ struct CompanionSceneView: View {
         drawCharacter(context: context, x: charX, y: charY, px: px,
                       state: state, facingRight: walkDirection > 0, t: t,
                       isJumping: isJumping, jumpProgress: jumpProgress)
+
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Ready~ 💤", px: px, t: t)
     }
 
     // MARK: - Scene: Working (default cozy workspace)
@@ -201,8 +204,8 @@ struct CompanionSceneView: View {
         fillPx(context: context, x: charX + px * 2.5, y: leftHandY, size: px * 0.8, color: handColor)
         fillPx(context: context, x: charX + px * 4, y: rightHandY, size: px * 0.8, color: handColor)
 
-        // Thinking dots near character
-        drawThinkingDots(context: context, x: charX - px * 2, y: charY - px * 3, px: px, t: t)
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Focusing 🎯", px: px, t: t)
     }
 
     // MARK: - Scene: Design Studio (深度设计)
@@ -358,6 +361,9 @@ struct CompanionSceneView: View {
         let handCol = Color(red: 0.98, green: 0.86, blue: 0.72).opacity(0.9)
         fillPx(context: context, x: charX + px * 2, y: paintArmY, width: px, height: px, color: armColor)
         fillPx(context: context, x: charX + px * 3, y: paintArmY - px * 0.3, width: px * 0.8, height: px * 0.8, color: handCol)
+
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Designing ✨", px: px, t: t)
     }
 
     // MARK: - Scene: Research Library (调研灵感)
@@ -464,6 +470,9 @@ struct CompanionSceneView: View {
         // Page (flips)
         let pageX = charX + px * (pageFlip == 0 ? 2.0 : 2.8)
         fillPx(context: context, x: pageX, y: bookY + px * 0.2, width: px * 1, height: px * 1.4, color: Color(red: 0.92, green: 0.88, blue: 0.80))
+
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Exploring 🔍", px: px, t: t)
 
         // Ambient warm glow from reading
         context.fill(
@@ -586,6 +595,9 @@ struct CompanionSceneView: View {
         drawCharacter(context: context, x: charX, y: charY, px: px,
                       state: state, facingRight: true, t: t,
                       isJumping: false, jumpProgress: 0)
+
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Chatting 💬", px: px, t: t)
     }
 
     // MARK: - Scene: Writer's Desk (写作整理)
@@ -725,6 +737,9 @@ struct CompanionSceneView: View {
         let writeHandY = charY + px * 5
         let handCol = Color(red: 0.98, green: 0.86, blue: 0.72).opacity(0.9)
         fillPx(context: context, x: writeHandX, y: writeHandY, width: px * 0.8, height: px * 0.8, color: handCol)
+
+        // Speech bubble
+        drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Writing ✍️", px: px, t: t)
     }
 
     // MARK: - Scene: Resting (bright garden)
@@ -1109,6 +1124,41 @@ struct CompanionSceneView: View {
                 with: .color(Color(red: 0.8, green: 0.72, blue: 0.98).opacity(dotAlpha))
             )
         }
+    }
+
+    // MARK: - Speech bubble
+
+    private func drawSpeechBubble(context: GraphicsContext, x: CGFloat, y: CGFloat, text: String, px: CGFloat, t: Double) {
+        // Gentle float animation
+        let floatY = y + sin(t * 1.5) * 1.5
+
+        let textWidth = CGFloat(text.count) * px * 1.6 + px * 3
+        let bubbleH = px * 4
+        let bubbleX = x - textWidth / 2
+        let bubbleY = floatY - bubbleH
+
+        // Bubble background (rounded rect)
+        let bubbleRect = CGRect(x: bubbleX, y: bubbleY, width: textWidth, height: bubbleH)
+        context.fill(
+            Path(roundedRect: bubbleRect, cornerRadius: px),
+            with: .color(.white.opacity(0.92))
+        )
+
+        // Tail (small triangle pointing down)
+        var tail = Path()
+        tail.move(to: CGPoint(x: x - px, y: bubbleY + bubbleH))
+        tail.addLine(to: CGPoint(x: x, y: bubbleY + bubbleH + px * 1.5))
+        tail.addLine(to: CGPoint(x: x + px, y: bubbleY + bubbleH))
+        tail.closeSubpath()
+        context.fill(tail, with: .color(.white.opacity(0.92)))
+
+        // Text
+        let resolvedText = context.resolve(
+            Text(text)
+                .font(.system(size: px * 2.2, weight: .medium, design: .rounded))
+                .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.3))
+        )
+        context.draw(resolvedText, at: CGPoint(x: x, y: bubbleY + bubbleH / 2), anchor: .center)
     }
 
     // MARK: - Scene elements: Resting
