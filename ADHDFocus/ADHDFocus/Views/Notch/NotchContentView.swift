@@ -118,7 +118,7 @@ struct NotchContentView: View {
 
     private var collapsedBar: some View {
         HStack(spacing: 0) {
-            // Left: character (always same position)
+            // Left: character
             TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
                 let bob = BobAnimation.bobOffset(
                     at: timeline.date,
@@ -142,10 +142,10 @@ struct NotchContentView: View {
             Spacer()
                 .frame(minWidth: manager.isExpanded ? 20 : manager.notchWidth)
 
-            // Right: timer (only when active) — tap to pause/resume
-            if manager.isActive {
-                let isPaused = manager.engine?.pomodoroTimer?.isPaused == true
-                Group {
+            // Right: timer or idle text
+            Group {
+                if manager.isActive {
+                    let isPaused = manager.engine?.pomodoroTimer?.isPaused == true
                     if manager.remainingSeconds > 0 {
                         HStack(spacing: 2) {
                             if isPaused {
@@ -171,9 +171,13 @@ struct NotchContentView: View {
                             .fill(.green)
                             .frame(width: 6, height: 6)
                     }
+                } else {
+                    Text(idleGreeting)
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.4))
                 }
-                .frame(width: sideExtension)
             }
+            .frame(width: sideExtension)
         }
     }
 
@@ -301,6 +305,19 @@ struct NotchContentView: View {
             .padding(.horizontal, 14)
             .padding(.top, 12)
             .padding(.bottom, 16)
+        }
+    }
+
+    private var idleGreeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<6: return "😴 Sleep~"
+        case 6..<9: return "🌅 Morning!"
+        case 9..<12: return "☀️ Ready~"
+        case 12..<14: return "🍱 Lunch?"
+        case 14..<18: return "☕ Go go!"
+        case 18..<21: return "🌙 Evening"
+        default: return "✨ Relax~"
         }
     }
 
