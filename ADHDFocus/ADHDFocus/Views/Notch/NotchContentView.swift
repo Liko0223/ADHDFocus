@@ -64,36 +64,38 @@ struct NotchContentView: View {
         GeometryReader { geo in
             let centerX = geo.size.width / 2
 
-            VStack(spacing: 0) {
-                Spacer()
-
-                ZStack(alignment: .top) {
-                    // Black background
-                    RoundedRectangle(cornerRadius: manager.isExpanded ? cornerRadius : 0)
-                        .fill(.black)
-                        .frame(width: currentWidth, height: currentHeight)
-                        .shadow(color: .black.opacity(manager.isExpanded ? 0.5 : 0), radius: 20)
-
-                    VStack(spacing: 0) {
-                        // Top bar (always visible): character left, timer right
-                        collapsedBar
-                            .frame(height: manager.notchHeight)
-                            .onTapGesture {
-                                manager.toggleExpanded()
-                            }
-
-                        // Expanded content
-                        if manager.isExpanded {
-                            expandedContent
-                                .frame(width: currentWidth)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                        }
-                    }
-                    .frame(width: currentWidth)
-                }
+            ZStack(alignment: .top) {
+                // Black background
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: manager.isExpanded ? cornerRadius : 0,
+                    bottomTrailingRadius: manager.isExpanded ? cornerRadius : 0,
+                    topTrailingRadius: 0
+                )
+                .fill(.black)
                 .frame(width: currentWidth, height: currentHeight)
-                .position(x: centerX, y: geo.size.height - currentHeight / 2)
+                .shadow(color: .black.opacity(manager.isExpanded ? 0.5 : 0), radius: 20)
+
+                VStack(spacing: 0) {
+                    // Top bar: character left, timer right
+                    collapsedBar
+                        .frame(height: manager.notchHeight)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            manager.toggleExpanded()
+                        }
+
+                    // Expanded content
+                    if manager.isExpanded {
+                        expandedContent
+                            .frame(width: currentWidth)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+                }
+                .frame(width: currentWidth)
             }
+            .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
+            .offset(x: 0, y: 0)
         }
         .animation(panelAnimation, value: manager.isExpanded)
     }
