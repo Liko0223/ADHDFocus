@@ -33,16 +33,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Start as accessory app (no dock icon, no main window)
+        NSApp.setActivationPolicy(.accessory)
         setupEngine()
-
-        // Hide main window on launch — notch is the primary UI
-        DispatchQueue.main.async {
-            for window in NSApp.windows {
-                if window.title == "ADHD Focus" {
-                    window.close()
-                }
-            }
-        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

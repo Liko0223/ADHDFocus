@@ -106,14 +106,7 @@ struct NotchContentView: View {
                     }
                 }
                 .frame(width: currentWidth, height: currentHeight)
-                .clipShape(
-                    NotchShape(
-                        topCornerRadius: topCornerRadius,
-                        bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
-                        notchHeight: manager.notchHeight,
-                        isExpanded: manager.isExpanded
-                    )
-                )
+                .clipped()
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
             .offset(x: manager.isExpanded ? 0 : collapsedOffsetX)
@@ -255,6 +248,7 @@ struct NotchContentView: View {
                     Spacer()
 
                     Button {
+                        NSApp.setActivationPolicy(.regular)
                         openWindow(id: "main")
                         NSApp.activate(ignoringOtherApps: true)
                         manager.collapse()
@@ -339,7 +333,7 @@ struct NotchShape: Shape {
     }
 }
 
-// MARK: - Pixel Companion
+// MARK: - Pixel Companion (matches scene character style)
 
 struct PixelCompanionView: View {
     let state: CompanionState
@@ -347,37 +341,65 @@ struct PixelCompanionView: View {
     var body: some View {
         Canvas { context, size in
             let s = min(size.width, size.height)
-            let px = s / 8
+            let px = s / 10
 
             let bodyColor: Color = {
                 switch state {
-                case .idle: return Color(red: 0.55, green: 0.36, blue: 0.96)
-                case .working: return Color(red: 0.35, green: 0.78, blue: 0.98)
-                case .resting: return Color(red: 0.27, green: 0.85, blue: 0.45)
-                case .blocked: return Color(red: 0.98, green: 0.35, blue: 0.35)
+                case .idle: return Color(red: 0.52, green: 0.32, blue: 0.92)
+                case .working: return Color(red: 0.28, green: 0.65, blue: 0.95)
+                case .resting: return Color(red: 0.25, green: 0.82, blue: 0.42)
+                case .blocked: return Color(red: 0.95, green: 0.28, blue: 0.28)
                 }
             }()
+            let skinColor = Color(red: 0.98, green: 0.86, blue: 0.72)
+            let eyeColor = Color(red: 0.18, green: 0.14, blue: 0.25)
 
-            for row in 0...2 {
-                for col in 2...5 { drawPixel(context: context, col: col, row: row, size: px, color: bodyColor.opacity(0.9)) }
+            let cx = s / 2  // center x
+            let startY = px  // top padding
+
+            // Head (round: 5 wide, 4 tall, corners clipped)
+            let headPixels: [(Int, Int)] = [
+                (1,0),(2,0),(3,0),
+                (0,1),(1,1),(2,1),(3,1),(4,1),
+                (0,2),(1,2),(2,2),(3,2),(4,2),
+                (1,3),(2,3),(3,3),
+            ]
+            for (hc, hr) in headPixels {
+                let hx = cx - px * 2.5 + CGFloat(hc) * px
+                let hy = startY + CGFloat(hr) * px
+                context.fill(Path(CGRect(x: hx, y: hy, width: px, height: px)), with: .color(skinColor))
             }
-            drawPixel(context: context, col: 3, row: 1, size: px, color: .white)
-            drawPixel(context: context, col: 4, row: 1, size: px, color: .white)
-            for row in 3...5 {
-                for col in 2...5 { drawPixel(context: context, col: col, row: row, size: px, color: bodyColor) }
+
+            // Eyes
+            let eyeLX = cx - px * 1.1
+            let eyeRX = cx + px * 0.3
+            let eyeY = startY + px * 1.2
+            context.fill(Path(ellipseIn: CGRect(x: eyeLX, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
+            context.fill(Path(ellipseIn: CGRect(x: eyeRX, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
+
+            // Rosy cheeks
+            if state == .idle || state == .resting {
+                let rosy = Color(red: 0.95, green: 0.60, blue: 0.60).opacity(0.45)
+                context.fill(Path(ellipseIn: CGRect(x: cx - px * 1.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
+                context.fill(Path(ellipseIn: CGRect(x: cx + px * 0.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
             }
-            for row in 3...4 {
-                drawPixel(context: context, col: 1, row: row, size: px, color: bodyColor.opacity(0.7))
-                drawPixel(context: context, col: 6, row: row, size: px, color: bodyColor.opacity(0.7))
+
+            // Body (4 wide, 3 tall)
+            for row in 0..<3 {
+                for col in 0..<4 {
+                    let bx = cx - px * 2 + CGFloat(col) * px
+                    let by = startY + px * 4 + CGFloat(row) * px
+                    context.fill(Path(CGRect(x: bx, y: by, width: px, height: px)), with: .color(bodyColor))
+                }
             }
-            for col in 2...5 { drawPixel(context: context, col: col, row: 6, size: px, color: bodyColor.opacity(0.6)) }
+
+            // Arms
+            context.fill(Path(CGRect(x: cx - px * 3, y: startY + px * 4.5, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
+            context.fill(Path(CGRect(x: cx + px * 2, y: startY + px * 4.5, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
+
+            // Legs
+            context.fill(Path(CGRect(x: cx - px * 1.5, y: startY + px * 7, width: px, height: px * 1.2)), with: .color(bodyColor.opacity(0.6)))
+            context.fill(Path(CGRect(x: cx + px * 0.5, y: startY + px * 7, width: px, height: px * 1.2)), with: .color(bodyColor.opacity(0.6)))
         }
-    }
-
-    private func drawPixel(context: GraphicsContext, col: Int, row: Int, size: CGFloat, color: Color) {
-        context.fill(
-            Path(CGRect(x: CGFloat(col) * size, y: CGFloat(row) * size, width: size, height: size)),
-            with: .color(color)
-        )
     }
 }

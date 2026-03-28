@@ -50,7 +50,7 @@ final class NotchManager {
             notchWidth = 200
         }
 
-        // Start with full-width panel (tall enough for expanded state)
+        // Panel starts from the very top of the screen, tall enough for expanded state
         let maxPanelHeight = expandedHeight + notchHeight
         let panelFrame = NSRect(
             x: screenFrame.origin.x,
@@ -58,6 +58,8 @@ final class NotchManager {
             width: screenFrame.width,
             height: maxPanelHeight
         )
+        // Note: panel top = screenFrame.maxY - maxPanelHeight
+        // Content is top-aligned, scene fills from y=0 of the content
 
         let panel = NotchPanel(contentRect: panelFrame)
 
