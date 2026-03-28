@@ -431,6 +431,20 @@ struct PixelCompanionView: View {
             p(context, cx + px * 1.5, hy + px * 2.1, px * 0.8, px * 0.12, darkFur.opacity(0.3))
             p(context, cx - px * 2.2, hy + px * 2.5, px * 0.7, px * 0.12, darkFur.opacity(0.25))
             p(context, cx + px * 1.5, hy + px * 2.5, px * 0.7, px * 0.12, darkFur.opacity(0.25))
+
+            // Typing paws when working
+            if state == .working {
+                let pawY = hy + px * 3.2
+                let frame = Int(time * 6) % 2
+                let leftPawY = pawY + (frame == 0 ? -px * 0.4 : px * 0.2)
+                let rightPawY = pawY + (frame == 0 ? px * 0.2 : -px * 0.4)
+                // Left paw
+                p(context, cx - px * 2, leftPawY, px * 1.2, px * 0.8, white)
+                p(context, cx - px * 1.8, leftPawY + px * 0.1, px * 0.3, px * 0.3, nose.opacity(0.3))
+                // Right paw
+                p(context, cx + px * 0.8, rightPawY, px * 1.2, px * 0.8, white)
+                p(context, cx + px * 1.0, rightPawY + px * 0.1, px * 0.3, px * 0.3, nose.opacity(0.3))
+            }
         }
     }
 
