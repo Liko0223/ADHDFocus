@@ -31,7 +31,9 @@ final class NotchManager {
     }
 
     func setup() {
-        guard let screen = NSScreen.main else { return }
+        // Prefer the screen with a notch (built-in display)
+        let screen = NSScreen.screens.first(where: { $0.hasNotch }) ?? NSScreen.main
+        guard let screen else { return }
 
         let screenFrame = screen.frame
         screenWidth = screenFrame.width
