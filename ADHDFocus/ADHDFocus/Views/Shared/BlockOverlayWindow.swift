@@ -1,25 +1,126 @@
 import AppKit
 import SwiftUI
+import CoreGraphics
 
-final class BlockOverlayWindow: NSPanel {
+// Manages multiple overlay panels, one per window of the blocked app
+final class BlockOverlayManager {
+    private var overlays: [CGWindowID: BlockOverlayPanel] = [:]
     private var pollTimer: Timer?
-    private var blockedBundleID: String?
+    private var blockedApp: NSRunningApplication?
+    private var modeName: String = ""
+    private var remainingSeconds: Int = 0
 
-    init(blockedApp: NSRunningApplication, modeName: String, remainingSeconds: Int) {
-        self.blockedBundleID = blockedApp.bundleIdentifier
+    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int) {
+        dismissAll()
+        self.blockedApp = app
+        self.modeName = modeName
+        self.remainingSeconds = remainingSeconds
 
-        // Cover the entire screen
-        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
+        updateOverlays()
 
+        // Poll to track window movement/resize and new windows
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in
+            self?.updateOverlays()
+        }
+    }
+
+    func dismissAll() {
+        pollTimer?.invalidate()
+        pollTimer = nil
+        for (_, overlay) in overlays {
+            overlay.orderOut(nil)
+        }
+        overlays.removeAll()
+        blockedApp = nil
+    }
+
+    private func updateOverlays() {
+        guard let app = blockedApp, !app.isTerminated else {
+            dismissAll()
+            return
+        }
+
+        // If blocked app is no longer active, dismiss overlays
+        if NSWorkspace.shared.frontmostApplication?.processIdentifier != app.processIdentifier {
+            dismissAll()
+            return
+        }
+
+        let pid = app.processIdentifier
+        let windowInfoList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+
+        var activeWindowIDs = Set<CGWindowID>()
+
+        for info in windowInfoList {
+            guard let windowPID = info[kCGWindowOwnerPID as String] as? pid_t,
+                  windowPID == pid,
+                  let windowID = info[kCGWindowNumber as String] as? CGWindowID,
+                  let boundsDict = info[kCGWindowBounds as String] as? [String: CGFloat],
+                  let layer = info[kCGWindowLayer as String] as? Int,
+                  layer == 0  // Only normal windows (layer 0)
+            else { continue }
+
+            let cgX = boundsDict["X"] ?? 0
+            let cgY = boundsDict["Y"] ?? 0
+            let width = boundsDict["Width"] ?? 0
+            let height = boundsDict["Height"] ?? 0
+
+            // Skip tiny windows (toolbars, popups)
+            if width < 100 || height < 100 { continue }
+
+            // Convert CG coordinates (top-left origin) to NS coordinates (bottom-left origin)
+            let screenHeight = NSScreen.screens.first?.frame.height ?? 1080
+            let nsY = screenHeight - cgY - height
+            let frame = NSRect(x: cgX, y: nsY, width: width, height: height)
+
+            activeWindowIDs.insert(windowID)
+
+            if let existing = overlays[windowID] {
+                // Update position if window moved
+                existing.setFrame(frame, display: false)
+            } else {
+                // Create new overlay for this window
+                let panel = BlockOverlayPanel(
+                    frame: frame,
+                    appName: app.localizedName ?? "应用",
+                    modeName: modeName,
+                    remainingSeconds: remainingSeconds,
+                    onGoBack: { [weak self] in
+                        self?.goBackToWork()
+                    }
+                )
+                panel.orderFrontRegardless()
+                overlays[windowID] = panel
+            }
+        }
+
+        // Remove overlays for windows that no longer exist
+        for (windowID, overlay) in overlays where !activeWindowIDs.contains(windowID) {
+            overlay.orderOut(nil)
+            overlays.removeValue(forKey: windowID)
+        }
+    }
+
+    private func goBackToWork() {
+        let app = blockedApp
+        dismissAll()
+        // Hide the blocked app and activate ours
+        app?.hide()
+        NSApp.activate(ignoringOtherApps: true)
+    }
+}
+
+// Individual overlay panel for one window
+final class BlockOverlayPanel: NSPanel {
+    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, onGoBack: @escaping () -> Void) {
         super.init(
-            contentRect: screenFrame,
+            contentRect: frame,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
 
-        // Above everything, captures input
-        level = .screenSaver
+        level = .floating
         isOpaque = false
         backgroundColor = .clear
         hasShadow = false
@@ -28,54 +129,15 @@ final class BlockOverlayWindow: NSPanel {
         isMovable = false
 
         let content = BlockOverlayContent(
-            appName: blockedApp.localizedName ?? "应用",
+            appName: appName,
             modeName: modeName,
             remainingSeconds: remainingSeconds,
-            onGoBack: { [weak self] in
-                self?.goBackToWork()
-            }
+            onGoBack: onGoBack
         )
         contentView = NSHostingView(rootView: content)
-
-        // Keep checking: if user somehow switched away, dismiss
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in
-            guard let self, let bundleID = self.blockedBundleID else { return }
-            let frontApp = NSWorkspace.shared.frontmostApplication
-            // If the blocked app is no longer frontmost (user clicked "go back"), dismiss
-            if frontApp?.bundleIdentifier != bundleID && frontApp?.bundleIdentifier != "com.lilinke.ADHDFocus" {
-                self.dismiss()
-            }
-        }
     }
 
-    private func goBackToWork() {
-        dismiss()
-        // Activate our own app to pull focus away from the blocked app
-        NSApp.activate(ignoringOtherApps: true)
-        // Also hide the blocked app
-        if let bundleID = blockedBundleID {
-            for app in NSWorkspace.shared.runningApplications {
-                if app.bundleIdentifier == bundleID {
-                    app.hide()
-                    break
-                }
-            }
-        }
-    }
-
-    func dismiss() {
-        pollTimer?.invalidate()
-        pollTimer = nil
-        orderOut(nil)
-    }
-
-    deinit {
-        pollTimer?.invalidate()
-    }
-
-    // Prevent the panel from ever losing key status while shown
     override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
 }
 
 struct BlockOverlayContent: View {
@@ -86,21 +148,19 @@ struct BlockOverlayContent: View {
 
     var body: some View {
         ZStack {
-            // Full-screen dark backdrop
-            Color.black.opacity(0.75)
-                .ignoresSafeArea()
+            // Semi-transparent backdrop matching the window
+            Color.black.opacity(0.7)
 
-            // Center card
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 Text("🚫")
-                    .font(.system(size: 56))
+                    .font(.system(size: 40))
 
                 Text("\(appName) 暂时不可用")
-                    .font(.title.weight(.semibold))
+                    .font(.title3.weight(.semibold))
                     .foregroundStyle(.white)
 
                 Text("当前处于「\(modeName)」模式")
-                    .font(.title3)
+                    .font(.body)
                     .foregroundStyle(.white.opacity(0.7))
 
                 if remainingSeconds > 0 {
@@ -114,7 +174,7 @@ struct BlockOverlayContent: View {
                             .foregroundStyle(.purple)
                             .fontWeight(.bold)
                     }
-                    .font(.body)
+                    .font(.subheadline)
                 }
 
                 Button {
@@ -123,24 +183,13 @@ struct BlockOverlayContent: View {
                     Text("回到工作")
                         .font(.body.weight(.medium))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 32)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 10)
                         .background(.purple)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 8)
             }
-            .padding(48)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(.white.opacity(0.1), lineWidth: 1)
-            )
         }
     }
 }

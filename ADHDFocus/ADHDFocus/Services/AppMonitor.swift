@@ -7,7 +7,7 @@ final class AppMonitor {
     private let modelContext: ModelContext
     private var launchObservation: NSObjectProtocol?
     private var activationObservation: NSObjectProtocol?
-    private var overlayWindow: BlockOverlayWindow?
+    private let overlayManager = BlockOverlayManager()
 
     private let exemptApps = Set([
         "com.lilinke.ADHDFocus",
@@ -60,7 +60,7 @@ final class AppMonitor {
         }
         launchObservation = nil
         activationObservation = nil
-        dismissOverlay()
+        overlayManager.dismissAll()
     }
 
     private func checkRunningApps() {
@@ -85,24 +85,11 @@ final class AppMonitor {
         modelContext.insert(event)
         try? modelContext.save()
 
-        // Show overlay instead of killing the app
-        showOverlay(for: app)
-    }
-
-    private func showOverlay(for app: NSRunningApplication) {
-        dismissOverlay()
-
-        let overlay = BlockOverlayWindow(
-            blockedApp: app,
+        // Show per-window overlays
+        overlayManager.showOverlays(
+            for: app,
             modeName: engine.activeMode?.name ?? "",
             remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
         )
-        overlay.makeKeyAndOrderFront(nil)
-        overlayWindow = overlay
-    }
-
-    private func dismissOverlay() {
-        overlayWindow?.dismiss()
-        overlayWindow = nil
     }
 }
