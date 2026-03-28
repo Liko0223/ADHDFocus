@@ -29,9 +29,9 @@ struct MainWindowView: View {
             case .modes:
                 ModeListView(engine: engine)
             case .stats:
-                Text("统计 — Coming Soon")
+                StatsView()
             case .settings:
-                Text("设置 — Coming Soon")
+                SettingsView()
             }
         }
         .frame(minWidth: 700, minHeight: 500)
