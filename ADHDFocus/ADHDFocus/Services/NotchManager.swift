@@ -12,28 +12,33 @@ final class NotchManager {
     var remainingSeconds: Int = 0
     var isActive: Bool = false
 
-    // Geometry for the view
     var notchWidth: CGFloat = 200
     var notchHeight: CGFloat = 38
+    var screenWidth: CGFloat = 1440
 
     func setup() {
         guard let screen = NSScreen.main else { return }
 
         let screenFrame = screen.frame
+        screenWidth = screenFrame.width
 
         if screen.hasNotch {
             let ns = screen.notchSize
             notchWidth = ns.width
             notchHeight = ns.height
+        } else {
+            // No notch — use menu bar height
+            let menuBarHeight = screenFrame.maxY - screen.visibleFrame.maxY
+            notchHeight = max(menuBarHeight, 24)
+            notchWidth = 200
         }
 
-        // Panel spans full screen width, height = notch area + extra for character to peek above
-        let panelHeight: CGFloat = notchHeight + 20
+        // Panel exactly covers the menu bar area, full width
         let panelFrame = NSRect(
             x: screenFrame.origin.x,
-            y: screenFrame.maxY - panelHeight,
+            y: screenFrame.maxY - notchHeight,
             width: screenFrame.width,
-            height: panelHeight
+            height: notchHeight
         )
 
         let panel = NotchPanel(contentRect: panelFrame)
@@ -48,7 +53,6 @@ final class NotchManager {
         panel.orderFrontRegardless()
         self.panel = panel
 
-        // Sync timer display every second
         syncTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self, let engine = self.engine else { return }
             self.remainingSeconds = engine.pomodoroTimer?.remainingSeconds ?? 0
@@ -89,7 +93,8 @@ struct NotchObservingView: View {
             remainingSeconds: manager.remainingSeconds,
             isActive: manager.isActive,
             notchWidth: manager.notchWidth,
-            notchHeight: manager.notchHeight
+            notchHeight: manager.notchHeight,
+            screenWidth: manager.screenWidth
         )
     }
 }
