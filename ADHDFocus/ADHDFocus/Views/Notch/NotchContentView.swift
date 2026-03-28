@@ -43,9 +43,9 @@ struct NotchContentView: View {
     var notchHeight: CGFloat
     var screenWidth: CGFloat
 
-    // How much to extend on each side of the notch
     private let sideExtension: CGFloat = 80
-    private let cornerRadius: CGFloat = 12
+    private let cornerRadius: CGFloat = 14
+    private let characterSize: CGFloat = 28
 
     private var totalWidth: CGFloat {
         notchWidth + sideExtension * 2
@@ -54,71 +54,58 @@ struct NotchContentView: View {
     var body: some View {
         GeometryReader { geo in
             let centerX = geo.size.width / 2
-            let panelX = centerX - totalWidth / 2
 
-            // Black background extending from notch
-            ZStack(alignment: .top) {
-                // Black shape that seamlessly extends from the notch
-                NotchExtensionShape(
-                    notchWidth: notchWidth,
-                    totalWidth: totalWidth,
-                    height: geo.size.height,
-                    cornerRadius: cornerRadius
-                )
-                .fill(.black)
-                .frame(width: totalWidth, height: geo.size.height)
-                .position(x: centerX, y: geo.size.height / 2)
+            ZStack {
+                // Black background extending from notch
+                NotchExtensionShape(cornerRadius: cornerRadius)
+                    .fill(.black)
+                    .frame(width: totalWidth, height: geo.size.height)
+                    .position(x: centerX, y: geo.size.height / 2)
 
-                // Content on the black area
-                HStack(spacing: 0) {
-                    // Left side: mode info
-                    if isActive, let name = modeName {
-                        Text(name)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.8))
-                            .frame(width: sideExtension - 8)
-                    } else {
-                        Color.clear.frame(width: sideExtension - 8)
-                    }
-
-                    // Center: notch area (empty — hardware blocks this)
-                    // Character sits at the bottom edge of this area
-                    ZStack {
-                        // Pixel character at the bottom center of notch
-                        TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
-                            let bob = BobAnimation.bobOffset(
-                                at: timeline.date,
-                                duration: companionState.bobDuration,
-                                amplitude: companionState.bobAmplitude
-                            )
-                            let sway = BobAnimation.swayDegrees(
-                                at: timeline.date,
-                                duration: 2.5,
-                                amplitude: companionState.swayAmplitude
-                            )
-
-                            PixelCompanionView(state: companionState)
-                                .frame(width: 20, height: 20)
-                                .offset(y: bob)
-                                .rotationEffect(.degrees(sway))
-                        }
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                        .padding(.bottom, 2)
-                    }
-                    .frame(width: notchWidth)
-
-                    // Right side: timer
-                    if isActive, remainingSeconds > 0 {
-                        Text(formatTime(remainingSeconds))
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.purple)
-                            .frame(width: sideExtension - 8)
-                    } else {
-                        Color.clear.frame(width: sideExtension - 8)
-                    }
+                // Left: mode name (in the menu bar strip, to the left of notch)
+                if isActive, let name = modeName {
+                    Text(name)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .position(
+                            x: centerX - notchWidth / 2 - sideExtension / 2,
+                            y: notchHeight / 2
+                        )
                 }
-                .frame(width: totalWidth, height: geo.size.height)
-                .position(x: centerX, y: geo.size.height / 2)
+
+                // Right: timer (in the menu bar strip, to the right of notch)
+                if isActive, remainingSeconds > 0 {
+                    Text(formatTime(remainingSeconds))
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.purple)
+                        .position(
+                            x: centerX + notchWidth / 2 + sideExtension / 2,
+                            y: notchHeight / 2
+                        )
+                }
+
+                // Character: below the notch, peeking out
+                TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
+                    let bob = BobAnimation.bobOffset(
+                        at: timeline.date,
+                        duration: companionState.bobDuration,
+                        amplitude: companionState.bobAmplitude
+                    )
+                    let sway = BobAnimation.swayDegrees(
+                        at: timeline.date,
+                        duration: 2.5,
+                        amplitude: companionState.swayAmplitude
+                    )
+
+                    PixelCompanionView(state: companionState)
+                        .frame(width: characterSize, height: characterSize)
+                        .offset(y: bob)
+                        .rotationEffect(.degrees(sway))
+                        .position(
+                            x: centerX,
+                            y: notchHeight + characterSize / 2 - 4
+                        )
+                }
             }
         }
     }
@@ -130,45 +117,36 @@ struct NotchContentView: View {
     }
 }
 
-// Shape that extends seamlessly from the notch with rounded bottom corners
 struct NotchExtensionShape: Shape {
-    let notchWidth: CGFloat
-    let totalWidth: CGFloat
-    let height: CGFloat
     let cornerRadius: CGFloat
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
+        let cr = cornerRadius
 
-        let sideWidth = (totalWidth - notchWidth) / 2
-
-        // Start at top-left
+        // Top-left to top-right (flat top, merges with system notch)
         path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
 
-        // Top edge (straight — connects to system notch)
-        path.addLine(to: CGPoint(x: totalWidth, y: 0))
-
-        // Right edge down to bottom-right corner
-        path.addLine(to: CGPoint(x: totalWidth, y: height - cornerRadius))
+        // Right side down
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height - cr))
 
         // Bottom-right corner
         path.addQuadCurve(
-            to: CGPoint(x: totalWidth - cornerRadius, y: height),
-            control: CGPoint(x: totalWidth, y: height)
+            to: CGPoint(x: rect.width - cr, y: rect.height),
+            control: CGPoint(x: rect.width, y: rect.height)
         )
 
         // Bottom edge
-        path.addLine(to: CGPoint(x: cornerRadius, y: height))
+        path.addLine(to: CGPoint(x: cr, y: rect.height))
 
         // Bottom-left corner
         path.addQuadCurve(
-            to: CGPoint(x: 0, y: height - cornerRadius),
-            control: CGPoint(x: 0, y: height)
+            to: CGPoint(x: 0, y: rect.height - cr),
+            control: CGPoint(x: 0, y: rect.height)
         )
 
-        // Left edge back to top
         path.closeSubpath()
-
         return path
     }
 }
@@ -183,48 +161,48 @@ struct PixelCompanionView: View {
 
             let bodyColor: Color = {
                 switch state {
-                case .idle: return Color(red: 0.55, green: 0.36, blue: 0.96)    // purple
-                case .working: return Color(red: 0.35, green: 0.78, blue: 0.98) // cyan
-                case .resting: return Color(red: 0.27, green: 0.85, blue: 0.45) // green
-                case .blocked: return Color(red: 0.98, green: 0.35, blue: 0.35) // red
+                case .idle: return Color(red: 0.55, green: 0.36, blue: 0.96)
+                case .working: return Color(red: 0.35, green: 0.78, blue: 0.98)
+                case .resting: return Color(red: 0.27, green: 0.85, blue: 0.45)
+                case .blocked: return Color(red: 0.98, green: 0.35, blue: 0.35)
                 }
             }()
 
             // Head (rows 0-2, cols 2-5)
             for row in 0...2 {
                 for col in 2...5 {
-                    fillPixel(context: context, col: col, row: row, px: px, color: bodyColor.opacity(0.9))
+                    drawPixel(context: context, col: col, row: row, size: px, color: bodyColor.opacity(0.9))
                 }
             }
 
-            // Eyes (row 1, cols 3 and 4)
-            fillPixel(context: context, col: 3, row: 1, px: px, color: .white)
-            fillPixel(context: context, col: 4, row: 1, px: px, color: .white)
+            // Eyes
+            drawPixel(context: context, col: 3, row: 1, size: px, color: .white)
+            drawPixel(context: context, col: 4, row: 1, size: px, color: .white)
 
             // Body (rows 3-5, cols 2-5)
             for row in 3...5 {
                 for col in 2...5 {
-                    fillPixel(context: context, col: col, row: row, px: px, color: bodyColor)
+                    drawPixel(context: context, col: col, row: row, size: px, color: bodyColor)
                 }
             }
 
-            // Arms (rows 3-4, cols 1 and 6)
+            // Arms
             for row in 3...4 {
-                fillPixel(context: context, col: 1, row: row, px: px, color: bodyColor.opacity(0.7))
-                fillPixel(context: context, col: 6, row: row, px: px, color: bodyColor.opacity(0.7))
+                drawPixel(context: context, col: 1, row: row, size: px, color: bodyColor.opacity(0.7))
+                drawPixel(context: context, col: 6, row: row, size: px, color: bodyColor.opacity(0.7))
             }
 
-            // Legs (row 6, cols 2-3 and 4-5)
-            fillPixel(context: context, col: 2, row: 6, px: px, color: bodyColor.opacity(0.6))
-            fillPixel(context: context, col: 3, row: 6, px: px, color: bodyColor.opacity(0.6))
-            fillPixel(context: context, col: 4, row: 6, px: px, color: bodyColor.opacity(0.6))
-            fillPixel(context: context, col: 5, row: 6, px: px, color: bodyColor.opacity(0.6))
+            // Legs
+            drawPixel(context: context, col: 2, row: 6, size: px, color: bodyColor.opacity(0.6))
+            drawPixel(context: context, col: 3, row: 6, size: px, color: bodyColor.opacity(0.6))
+            drawPixel(context: context, col: 4, row: 6, size: px, color: bodyColor.opacity(0.6))
+            drawPixel(context: context, col: 5, row: 6, size: px, color: bodyColor.opacity(0.6))
         }
     }
 
-    private func fillPixel(context: GraphicsContext, col: Int, row: Int, px: CGFloat, color: Color) {
+    private func drawPixel(context: GraphicsContext, col: Int, row: Int, size: CGFloat, color: Color) {
         context.fill(
-            Path(CGRect(x: CGFloat(col) * px, y: CGFloat(row) * px, width: px, height: px)),
+            Path(CGRect(x: CGFloat(col) * size, y: CGFloat(row) * size, width: size, height: size)),
             with: .color(color)
         )
     }

@@ -33,12 +33,14 @@ final class NotchManager {
             notchWidth = 200
         }
 
-        // Panel exactly covers the menu bar area, full width
+        // Panel extends below the notch so character can peek out
+        let extraBelow: CGFloat = 32  // space for character below notch
+        let panelHeight = notchHeight + extraBelow
         let panelFrame = NSRect(
             x: screenFrame.origin.x,
-            y: screenFrame.maxY - notchHeight,
+            y: screenFrame.maxY - panelHeight,
             width: screenFrame.width,
-            height: notchHeight
+            height: panelHeight
         )
 
         let panel = NotchPanel(contentRect: panelFrame)
