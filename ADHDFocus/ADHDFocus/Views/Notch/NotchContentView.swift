@@ -37,13 +37,38 @@ struct NotchContentView: View {
     @Query(sort: \FocusMode.sortOrder) private var modes: [FocusMode]
     @Environment(\.openWindow) private var openWindow
 
+    // Fixed side extension — character always at the same position
     private let sideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
     private let expandedPanelHeight: CGFloat = 380
-    private let cornerRadius: CGFloat = 16
+    private let bottomCornerRadius: CGFloat = 16
+    private let topCornerRadius: CGFloat = 10  // outward curve radius
 
-    private var collapsedTotalWidth: CGFloat {
-        manager.notchWidth + sideExtension * 2
+    // Collapsed: idle = just character side, active = both sides
+    private var collapsedWidth: CGFloat {
+        if manager.isActive {
+            return manager.notchWidth + sideExtension * 2
+        } else {
+            return manager.notchWidth + sideExtension + 16 // left side + small right padding
+        }
+    }
+
+    // Collapsed offset so character stays in same position
+    // When idle (narrower), shift right so left edge stays same
+    private var collapsedOffsetX: CGFloat {
+        if manager.isActive {
+            return 0
+        } else {
+            return -(sideExtension - 16) / 2
+        }
+    }
+
+    private var currentWidth: CGFloat {
+        manager.isExpanded ? max(expandedWidth, manager.notchWidth + 40) : collapsedWidth
+    }
+
+    private var currentHeight: CGFloat {
+        manager.isExpanded ? manager.notchHeight + expandedPanelHeight : manager.notchHeight
     }
 
     private var panelAnimation: Animation {
@@ -52,40 +77,29 @@ struct NotchContentView: View {
             : .spring(response: 0.3, dampingFraction: 1.0)
     }
 
-    private var currentWidth: CGFloat {
-        manager.isExpanded ? max(expandedWidth, manager.notchWidth + 40) : collapsedTotalWidth
-    }
-
-    private var currentHeight: CGFloat {
-        manager.isExpanded ? manager.notchHeight + expandedPanelHeight : manager.notchHeight
-    }
-
     var body: some View {
         GeometryReader { geo in
-            let centerX = geo.size.width / 2
-
             ZStack(alignment: .top) {
-                // Black background
-                UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: manager.isExpanded ? cornerRadius : 0,
-                    bottomTrailingRadius: manager.isExpanded ? cornerRadius : 0,
-                    topTrailingRadius: 0
+                // Black background with notch-style shape
+                NotchShape(
+                    topCornerRadius: topCornerRadius,
+                    bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
+                    notchHeight: manager.notchHeight,
+                    isExpanded: manager.isExpanded
                 )
                 .fill(.black)
                 .frame(width: currentWidth, height: currentHeight)
-                .shadow(color: .black.opacity(manager.isExpanded ? 0.5 : 0), radius: 20)
+                .shadow(color: .black.opacity(manager.isExpanded ? 0.4 : 0), radius: 16)
 
                 VStack(spacing: 0) {
-                    // Top bar: character left, timer right
+                    // Top bar
                     collapsedBar
-                        .frame(height: manager.notchHeight)
+                        .frame(width: currentWidth, height: manager.notchHeight)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             manager.toggleExpanded()
                         }
 
-                    // Expanded content
                     if manager.isExpanded {
                         expandedContent
                             .frame(width: currentWidth)
@@ -95,16 +109,17 @@ struct NotchContentView: View {
                 .frame(width: currentWidth)
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
-            .offset(x: 0, y: 0)
+            .offset(x: manager.isExpanded ? 0 : collapsedOffsetX)
         }
         .animation(panelAnimation, value: manager.isExpanded)
+        .animation(panelAnimation, value: manager.isActive)
     }
 
     // MARK: - Collapsed bar
 
     private var collapsedBar: some View {
         HStack(spacing: 0) {
-            // Left: character
+            // Left: character (always same position)
             TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
                 let bob = BobAnimation.bobOffset(
                     at: timeline.date,
@@ -124,25 +139,25 @@ struct NotchContentView: View {
             }
             .frame(width: sideExtension)
 
-            // Center: notch space (hardware blocks this)
+            // Center: notch gap
             Spacer()
-                .frame(width: manager.notchWidth)
+                .frame(minWidth: manager.isExpanded ? 20 : manager.notchWidth)
 
-            // Right: timer or status
-            Group {
-                if manager.isActive, manager.remainingSeconds > 0 {
-                    Text(formatTime(manager.remainingSeconds))
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(.purple)
-                } else if manager.isActive {
-                    Circle()
-                        .fill(.green)
-                        .frame(width: 6, height: 6)
-                } else {
-                    EmptyView()
+            // Right: timer (only when active)
+            if manager.isActive {
+                Group {
+                    if manager.remainingSeconds > 0 {
+                        Text(formatTime(manager.remainingSeconds))
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.purple)
+                    } else {
+                        Circle()
+                            .fill(.green)
+                            .frame(width: 6, height: 6)
+                    }
                 }
+                .frame(width: sideExtension)
             }
-            .frame(width: sideExtension)
         }
     }
 
@@ -150,12 +165,9 @@ struct NotchContentView: View {
 
     private var expandedContent: some View {
         VStack(spacing: 16) {
-            // Status header
             if manager.isActive, let name = manager.modeName {
                 HStack {
-                    Circle()
-                        .fill(.green)
-                        .frame(width: 8, height: 8)
+                    Circle().fill(.green).frame(width: 8, height: 8)
                     Text(name)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.white)
@@ -170,7 +182,6 @@ struct NotchContentView: View {
                 .padding(.top, 12)
             }
 
-            // Mode grid
             VStack(alignment: .leading, spacing: 8) {
                 Text(manager.isActive ? "切换模式" : "选择模式")
                     .font(.caption)
@@ -183,8 +194,7 @@ struct NotchContentView: View {
                             manager.activateMode(mode)
                         } label: {
                             HStack(spacing: 8) {
-                                Text(mode.icon)
-                                    .font(.body)
+                                Text(mode.icon).font(.body)
                                 Text(mode.name)
                                     .font(.caption)
                                     .foregroundStyle(.white)
@@ -216,17 +226,14 @@ struct NotchContentView: View {
 
             Spacer()
 
-            // Bottom actions
             HStack(spacing: 12) {
                 if manager.isActive {
                     Button {
                         manager.deactivateMode()
                     } label: {
                         HStack(spacing: 4) {
-                            Image(systemName: "stop.fill")
-                                .font(.caption2)
-                            Text("结束专注")
-                                .font(.caption)
+                            Image(systemName: "stop.fill").font(.caption2)
+                            Text("结束专注").font(.caption)
                         }
                         .foregroundStyle(.red)
                         .padding(.horizontal, 12)
@@ -245,10 +252,8 @@ struct NotchContentView: View {
                     manager.collapse()
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: "gearshape")
-                            .font(.caption2)
-                        Text("设置")
-                            .font(.caption)
+                        Image(systemName: "gearshape").font(.caption2)
+                        Text("设置").font(.caption)
                     }
                     .foregroundStyle(.white.opacity(0.6))
                     .padding(.horizontal, 12)
@@ -267,6 +272,62 @@ struct NotchContentView: View {
         let m = seconds / 60
         let s = seconds % 60
         return String(format: "%02d:%02d", m, s)
+    }
+}
+
+// MARK: - Notch Shape with outward top corners
+
+struct NotchShape: Shape {
+    let topCornerRadius: CGFloat
+    let bottomCornerRadius: CGFloat
+    let notchHeight: CGFloat
+    let isExpanded: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let tcr = topCornerRadius
+        let bcr = bottomCornerRadius
+
+        // Start at top-left, with outward curve
+        // The outward curve goes: straight down from top, then curves inward
+        path.move(to: CGPoint(x: 0, y: 0))
+
+        // Top-left outward corner: curve goes from (0,0) → (tcr, tcr)
+        // Control point at (0, tcr) creates outward bulge
+        path.addQuadCurve(
+            to: CGPoint(x: tcr, y: tcr),
+            control: CGPoint(x: 0, y: tcr)
+        )
+
+        // Left edge down to bottom-left
+        path.addLine(to: CGPoint(x: tcr, y: rect.height - bcr))
+
+        // Bottom-left inward corner
+        path.addQuadCurve(
+            to: CGPoint(x: tcr + bcr, y: rect.height),
+            control: CGPoint(x: tcr, y: rect.height)
+        )
+
+        // Bottom edge
+        path.addLine(to: CGPoint(x: rect.width - tcr - bcr, y: rect.height))
+
+        // Bottom-right inward corner
+        path.addQuadCurve(
+            to: CGPoint(x: rect.width - tcr, y: rect.height - bcr),
+            control: CGPoint(x: rect.width - tcr, y: rect.height)
+        )
+
+        // Right edge up
+        path.addLine(to: CGPoint(x: rect.width - tcr, y: tcr))
+
+        // Top-right outward corner
+        path.addQuadCurve(
+            to: CGPoint(x: rect.width, y: 0),
+            control: CGPoint(x: rect.width, y: tcr)
+        )
+
+        path.closeSubpath()
+        return path
     }
 }
 
@@ -290,26 +351,18 @@ struct PixelCompanionView: View {
             }()
 
             for row in 0...2 {
-                for col in 2...5 {
-                    drawPixel(context: context, col: col, row: row, size: px, color: bodyColor.opacity(0.9))
-                }
+                for col in 2...5 { drawPixel(context: context, col: col, row: row, size: px, color: bodyColor.opacity(0.9)) }
             }
             drawPixel(context: context, col: 3, row: 1, size: px, color: .white)
             drawPixel(context: context, col: 4, row: 1, size: px, color: .white)
-
             for row in 3...5 {
-                for col in 2...5 {
-                    drawPixel(context: context, col: col, row: row, size: px, color: bodyColor)
-                }
+                for col in 2...5 { drawPixel(context: context, col: col, row: row, size: px, color: bodyColor) }
             }
             for row in 3...4 {
                 drawPixel(context: context, col: 1, row: row, size: px, color: bodyColor.opacity(0.7))
                 drawPixel(context: context, col: 6, row: row, size: px, color: bodyColor.opacity(0.7))
             }
-            drawPixel(context: context, col: 2, row: 6, size: px, color: bodyColor.opacity(0.6))
-            drawPixel(context: context, col: 3, row: 6, size: px, color: bodyColor.opacity(0.6))
-            drawPixel(context: context, col: 4, row: 6, size: px, color: bodyColor.opacity(0.6))
-            drawPixel(context: context, col: 5, row: 6, size: px, color: bodyColor.opacity(0.6))
+            for col in 2...5 { drawPixel(context: context, col: col, row: 6, size: px, color: bodyColor.opacity(0.6)) }
         }
     }
 
