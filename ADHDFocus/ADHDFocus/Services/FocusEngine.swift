@@ -19,8 +19,8 @@ final class FocusEngine {
         // Deactivate previous mode if any (prevents timer leak)
         if activeMode != nil {
             pomodoroTimer?.stop()
-            pomodoroTimer = nil
             onModeDeactivated?()
+            pomodoroTimer = nil
         }
         activeMode = mode
         sessionStartedAt = Date()
@@ -46,10 +46,11 @@ final class FocusEngine {
 
     func deactivate() {
         pomodoroTimer?.stop()
+        // Call back BEFORE clearing state so callers can read timer/mode data
+        onModeDeactivated?()
         pomodoroTimer = nil
         activeMode = nil
         sessionStartedAt = nil
-        onModeDeactivated?()
     }
 
     func shouldBlockApp(bundleID: String) -> Bool {
