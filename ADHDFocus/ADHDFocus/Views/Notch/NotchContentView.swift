@@ -142,7 +142,7 @@ struct NotchContentView: View {
             Spacer()
                 .frame(minWidth: manager.isExpanded ? 20 : manager.notchWidth)
 
-            // Right: timer (only when active)
+            // Right: timer (only when active) — tap to pause/resume
             if manager.isActive {
                 let isPaused = manager.engine?.pomodoroTimer?.isPaused == true
                 Group {
@@ -151,11 +151,19 @@ struct NotchContentView: View {
                             if isPaused {
                                 Text("⏸")
                                     .font(.system(size: 8))
+                                    .foregroundStyle(.white.opacity(0.5))
                             }
                             Text(formatTime(manager.remainingSeconds))
                                 .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .foregroundStyle(.purple)
-                                .opacity(isPaused ? 0.5 : 1.0)
+                                .foregroundStyle(.white.opacity(isPaused ? 0.5 : 0.9))
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if isPaused {
+                                manager.engine?.pomodoroTimer?.resume()
+                            } else {
+                                manager.engine?.pomodoroTimer?.pause()
+                            }
                         }
                     } else {
                         Circle()
