@@ -345,9 +345,7 @@ struct PixelCompanionView: View {
 
             let bodyColor: Color = {
                 switch state {
-                case .idle: return Color(red: 0.52, green: 0.32, blue: 0.92)
-                case .working: return Color(red: 0.28, green: 0.65, blue: 0.95)
-                case .resting: return Color(red: 0.25, green: 0.82, blue: 0.42)
+                case .idle, .working, .resting: return Color(red: 0.28, green: 0.65, blue: 0.95)
                 case .blocked: return Color(red: 0.95, green: 0.28, blue: 0.28)
                 }
             }()

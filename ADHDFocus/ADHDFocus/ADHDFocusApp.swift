@@ -48,11 +48,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupEngine() {
-        if !AXIsProcessTrusted() {
-            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
-            AXIsProcessTrustedWithOptions(options)
-        }
-
         NotificationManager.shared.requestPermission()
 
         // Setup notch companion

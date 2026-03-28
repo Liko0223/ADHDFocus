@@ -664,10 +664,10 @@ struct CompanionSceneView: View {
         let skinColor = Color(red: 0.98, green: 0.86, blue: 0.72)
 
         switch state {
-        case .idle:    bodyColor = Color(red: 0.52, green: 0.32, blue: 0.92)
-        case .working: bodyColor = Color(red: 0.28, green: 0.65, blue: 0.95)
-        case .resting: bodyColor = Color(red: 0.25, green: 0.82, blue: 0.42)
-        case .blocked: bodyColor = Color(red: 0.95, green: 0.28, blue: 0.28)
+        case .idle, .working, .resting:
+            bodyColor = Color(red: 0.28, green: 0.65, blue: 0.95)
+        case .blocked:
+            bodyColor = Color(red: 0.95, green: 0.28, blue: 0.28)
         }
 
         let walkFrame = Int(t * 5) % 2
