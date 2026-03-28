@@ -43,9 +43,8 @@ struct NotchContentView: View {
     var notchHeight: CGFloat
     var screenWidth: CGFloat
 
-    private let sideExtension: CGFloat = 80
-    private let cornerRadius: CGFloat = 14
-    private let characterSize: CGFloat = 28
+    private let sideExtension: CGFloat = 70
+    private let characterSize: CGFloat = 22
 
     private var totalWidth: CGFloat {
         notchWidth + sideExtension * 2
@@ -54,56 +53,49 @@ struct NotchContentView: View {
     var body: some View {
         GeometryReader { geo in
             let centerX = geo.size.width / 2
+            let barCenterY = geo.size.height / 2
 
             ZStack {
-                // Black background extending from notch
-                NotchExtensionShape(cornerRadius: cornerRadius)
+                // Black background
+                RoundedRectangle(cornerRadius: 0)
                     .fill(.black)
                     .frame(width: totalWidth, height: geo.size.height)
-                    .position(x: centerX, y: geo.size.height / 2)
+                    .position(x: centerX, y: barCenterY)
 
-                // Left: mode name (in the menu bar strip, to the left of notch)
-                if isActive, let name = modeName {
-                    Text(name)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.8))
-                        .position(
-                            x: centerX - notchWidth / 2 - sideExtension / 2,
-                            y: notchHeight / 2
+                // Left of notch: character + timer
+                HStack(spacing: 6) {
+                    // Character
+                    TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
+                        let bob = BobAnimation.bobOffset(
+                            at: timeline.date,
+                            duration: companionState.bobDuration,
+                            amplitude: companionState.bobAmplitude
                         )
-                }
+                        let sway = BobAnimation.swayDegrees(
+                            at: timeline.date,
+                            duration: 2.5,
+                            amplitude: companionState.swayAmplitude
+                        )
 
-                // Right: timer (in the menu bar strip, to the right of notch)
+                        PixelCompanionView(state: companionState)
+                            .frame(width: characterSize, height: characterSize)
+                            .offset(y: bob)
+                            .rotationEffect(.degrees(sway))
+                    }
+                }
+                .position(
+                    x: centerX - notchWidth / 2 - sideExtension / 2,
+                    y: barCenterY
+                )
+
+                // Right of notch: timer
                 if isActive, remainingSeconds > 0 {
                     Text(formatTime(remainingSeconds))
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundStyle(.purple)
                         .position(
                             x: centerX + notchWidth / 2 + sideExtension / 2,
-                            y: notchHeight / 2
-                        )
-                }
-
-                // Character: below the notch, peeking out
-                TimelineView(.animation(minimumInterval: 1.0 / 24)) { timeline in
-                    let bob = BobAnimation.bobOffset(
-                        at: timeline.date,
-                        duration: companionState.bobDuration,
-                        amplitude: companionState.bobAmplitude
-                    )
-                    let sway = BobAnimation.swayDegrees(
-                        at: timeline.date,
-                        duration: 2.5,
-                        amplitude: companionState.swayAmplitude
-                    )
-
-                    PixelCompanionView(state: companionState)
-                        .frame(width: characterSize, height: characterSize)
-                        .offset(y: bob)
-                        .rotationEffect(.degrees(sway))
-                        .position(
-                            x: centerX,
-                            y: notchHeight + characterSize / 2 - 4
+                            y: barCenterY
                         )
                 }
             }
@@ -114,40 +106,6 @@ struct NotchContentView: View {
         let m = seconds / 60
         let s = seconds % 60
         return String(format: "%02d:%02d", m, s)
-    }
-}
-
-struct NotchExtensionShape: Shape {
-    let cornerRadius: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let cr = cornerRadius
-
-        // Top-left to top-right (flat top, merges with system notch)
-        path.move(to: CGPoint(x: 0, y: 0))
-        path.addLine(to: CGPoint(x: rect.width, y: 0))
-
-        // Right side down
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height - cr))
-
-        // Bottom-right corner
-        path.addQuadCurve(
-            to: CGPoint(x: rect.width - cr, y: rect.height),
-            control: CGPoint(x: rect.width, y: rect.height)
-        )
-
-        // Bottom edge
-        path.addLine(to: CGPoint(x: cr, y: rect.height))
-
-        // Bottom-left corner
-        path.addQuadCurve(
-            to: CGPoint(x: 0, y: rect.height - cr),
-            control: CGPoint(x: 0, y: rect.height)
-        )
-
-        path.closeSubpath()
-        return path
     }
 }
 
