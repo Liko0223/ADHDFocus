@@ -34,6 +34,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupEngine()
+
+        // Hide main window on launch — notch is the primary UI
+        DispatchQueue.main.async {
+            for window in NSApp.windows {
+                if window.title == "ADHD Focus" {
+                    window.close()
+                }
+            }
+        }
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
     }
 
     private func setupEngine() {
