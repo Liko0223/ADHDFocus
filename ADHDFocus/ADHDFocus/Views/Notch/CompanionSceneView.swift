@@ -233,6 +233,77 @@ struct CompanionSceneView: View {
             with: .color(Color(red: 0.24, green: 0.16, blue: 0.10))
         )
 
+        // Small window (top-right) showing moonlight
+        let winDX = size.width * 0.85
+        let winDY: CGFloat = 6
+        fillPx(context: context, x: winDX, y: winDY, width: px * 4, height: px * 4, color: Color(red: 0.05, green: 0.05, blue: 0.18))
+        // Window frame
+        fillPx(context: context, x: winDX - px * 0.3, y: winDY - px * 0.3, width: px * 4.6, height: px * 0.3, color: Color(red: 0.50, green: 0.35, blue: 0.20))
+        fillPx(context: context, x: winDX - px * 0.3, y: winDY + px * 4, width: px * 4.6, height: px * 0.3, color: Color(red: 0.50, green: 0.35, blue: 0.20))
+        fillPx(context: context, x: winDX - px * 0.3, y: winDY, width: px * 0.3, height: px * 4.3, color: Color(red: 0.50, green: 0.35, blue: 0.20))
+        fillPx(context: context, x: winDX + px * 4, y: winDY, width: px * 0.3, height: px * 4.3, color: Color(red: 0.50, green: 0.35, blue: 0.20))
+        // Moon in window
+        context.fill(
+            Path(ellipseIn: CGRect(x: winDX + px * 0.5, y: winDY + px * 0.5, width: px * 1.8, height: px * 1.8)),
+            with: .color(Color(red: 0.95, green: 0.92, blue: 0.70).opacity(0.85))
+        )
+        // Star in window
+        let wStarB = (sin(t * 2.1) + 1) / 2 * 0.5 + 0.4
+        fillPx(context: context, x: winDX + px * 2.8, y: winDY + px * 2.2, width: px * 0.35, height: px * 0.35, color: Color.white.opacity(wStarB))
+        fillPx(context: context, x: winDX + px * 1.8, y: winDY + px * 3.0, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(wStarB * 0.7))
+        // Moonlight glow from window onto wall
+        context.fill(
+            Path(ellipseIn: CGRect(x: winDX - px * 2, y: winDY + px * 2, width: px * 8, height: px * 6)),
+            with: .color(Color(red: 0.70, green: 0.80, blue: 0.95).opacity(0.04))
+        )
+
+        // Ceiling lamp (center-top) with warm glow
+        let ceilLampX = size.width * 0.50
+        let ceilFlick = 0.88 + sin(t * 1.3) * 0.06
+        // Cord
+        fillPx(context: context, x: ceilLampX - px * 0.2, y: 0, width: px * 0.4, height: px * 3, color: Color(red: 0.35, green: 0.28, blue: 0.20))
+        // Shade
+        fillPx(context: context, x: ceilLampX - px * 2, y: px * 3, width: px * 4, height: px * 1.8, color: Color(red: 0.70, green: 0.52, blue: 0.25))
+        fillPx(context: context, x: ceilLampX - px * 1.4, y: px * 2.5, width: px * 2.8, height: px * 0.5, color: Color(red: 0.62, green: 0.44, blue: 0.20))
+        // Bulb
+        context.fill(
+            Path(ellipseIn: CGRect(x: ceilLampX - px * 0.5, y: px * 4.5, width: px * 1.2, height: px * 0.9)),
+            with: .color(Color(red: 0.99, green: 0.92, blue: 0.60).opacity(ceilFlick))
+        )
+        // Wide warm glow cone
+        context.fill(
+            Path(ellipseIn: CGRect(x: ceilLampX - px * 9, y: px * 5, width: px * 18, height: px * 12)),
+            with: .color(Color(red: 0.98, green: 0.82, blue: 0.45).opacity(0.06 * ceilFlick))
+        )
+
+        // Framed pixel paintings on right wall (2 small frames)
+        let frame1X = size.width * 0.88
+        let frame1Y = groundY - px * 14
+        // Frame 1 border + content (landscape painting)
+        fillPx(context: context, x: frame1X, y: frame1Y, width: px * 4, height: px * 3, color: Color(red: 0.42, green: 0.28, blue: 0.14))
+        fillPx(context: context, x: frame1X + px * 0.4, y: frame1Y + px * 0.4, width: px * 3.2, height: px * 2.2, color: Color(red: 0.30, green: 0.50, blue: 0.70))
+        fillPx(context: context, x: frame1X + px * 0.4, y: frame1Y + px * 1.6, width: px * 3.2, height: px * 1.0, color: Color(red: 0.20, green: 0.42, blue: 0.18))
+        // Frame 2 (abstract colors) — above frame 1
+        let frame2Y = groundY - px * 9
+        fillPx(context: context, x: frame1X, y: frame2Y, width: px * 4, height: px * 2.5, color: Color(red: 0.42, green: 0.28, blue: 0.14))
+        fillPx(context: context, x: frame1X + px * 0.4, y: frame2Y + px * 0.4, width: px * 1.5, height: px * 1.7, color: Color(red: 0.80, green: 0.25, blue: 0.30))
+        fillPx(context: context, x: frame1X + px * 1.9 + px * 0.4, y: frame2Y + px * 0.4, width: px * 1.5, height: px * 1.7, color: Color(red: 0.25, green: 0.55, blue: 0.80))
+
+        // Paint splatters on the floor (small colored dots near easel area)
+        let floorSplatters: [(CGFloat, CGFloat, Color)] = [
+            (0.57, groundY - px * 0.5, Color(red: 0.85, green: 0.20, blue: 0.20).opacity(0.55)),
+            (0.60, groundY - px * 0.2, Color(red: 0.20, green: 0.50, blue: 0.85).opacity(0.50)),
+            (0.63, groundY - px * 0.6, Color(red: 0.90, green: 0.75, blue: 0.15).opacity(0.55)),
+            (0.55, groundY - px * 0.3, Color(red: 0.30, green: 0.70, blue: 0.35).opacity(0.45)),
+            (0.67, groundY - px * 0.1, Color(red: 0.75, green: 0.30, blue: 0.80).opacity(0.45)),
+        ]
+        for (nx, sy, sc) in floorSplatters {
+            context.fill(
+                Path(ellipseIn: CGRect(x: nx * size.width, y: sy, width: px * 0.7, height: px * 0.5)),
+                with: .color(sc)
+            )
+        }
+
         // Color swatches on wall (left side, small colored squares)
         let swatchColors: [Color] = [
             Color(red: 0.90, green: 0.30, blue: 0.30),
@@ -362,6 +433,21 @@ struct CompanionSceneView: View {
         fillPx(context: context, x: charX + px * 2, y: paintArmY, width: px, height: px, color: armColor)
         fillPx(context: context, x: charX + px * 3, y: paintArmY - px * 0.3, width: px * 0.8, height: px * 0.8, color: handCol)
 
+        // Paint dots on cat's paws (paint-covered feet)
+        let pawBaseY = charY + px * 6.5
+        context.fill(
+            Path(ellipseIn: CGRect(x: charX - px * 1.2, y: pawBaseY, width: px * 0.5, height: px * 0.4)),
+            with: .color(Color(red: 0.85, green: 0.20, blue: 0.20).opacity(0.70))
+        )
+        context.fill(
+            Path(ellipseIn: CGRect(x: charX - px * 0.5, y: pawBaseY + px * 0.1, width: px * 0.4, height: px * 0.3)),
+            with: .color(Color(red: 0.20, green: 0.50, blue: 0.85).opacity(0.65))
+        )
+        context.fill(
+            Path(ellipseIn: CGRect(x: charX + px * 0.7, y: pawBaseY, width: px * 0.5, height: px * 0.4)),
+            with: .color(Color(red: 0.90, green: 0.75, blue: 0.10).opacity(0.70))
+        )
+
         // Speech bubble
         drawSpeechBubble(context: context, x: charX, y: charY - px * 2, text: "Designing ✨", px: px, t: t)
     }
@@ -396,20 +482,104 @@ struct CompanionSceneView: View {
         // Right bookshelf (tall)
         drawTallBookshelf(context: context, x: size.width * 0.82, groundY: groundY, px: px, t: t)
 
-        // Small window with starlight (back wall center-right)
-        let winX = size.width * 0.70
-        let winY = groundY - px * 14
-        fillPx(context: context, x: winX, y: winY, width: px * 3, height: px * 3, color: Color(red: 0.06, green: 0.06, blue: 0.18))
+        // Small window with moon and stars (back wall center-right)
+        let winX = size.width * 0.66
+        let winY = groundY - px * 15
+        fillPx(context: context, x: winX, y: winY, width: px * 4.5, height: px * 4, color: Color(red: 0.05, green: 0.05, blue: 0.18))
         // Window frame
-        fillPx(context: context, x: winX - px * 0.3, y: winY - px * 0.3, width: px * 3.6, height: px * 0.3, color: Color(red: 0.50, green: 0.38, blue: 0.25))
-        fillPx(context: context, x: winX - px * 0.3, y: winY + px * 3, width: px * 3.6, height: px * 0.3, color: Color(red: 0.50, green: 0.38, blue: 0.25))
-        fillPx(context: context, x: winX - px * 0.3, y: winY - px * 0.3, width: px * 0.3, height: px * 3.6, color: Color(red: 0.50, green: 0.38, blue: 0.25))
-        fillPx(context: context, x: winX + px * 3, y: winY - px * 0.3, width: px * 0.3, height: px * 3.6, color: Color(red: 0.50, green: 0.38, blue: 0.25))
+        fillPx(context: context, x: winX - px * 0.3, y: winY - px * 0.3, width: px * 5.1, height: px * 0.3, color: Color(red: 0.50, green: 0.38, blue: 0.25))
+        fillPx(context: context, x: winX - px * 0.3, y: winY + px * 4, width: px * 5.1, height: px * 0.3, color: Color(red: 0.50, green: 0.38, blue: 0.25))
+        fillPx(context: context, x: winX - px * 0.3, y: winY - px * 0.3, width: px * 0.3, height: px * 4.6, color: Color(red: 0.50, green: 0.38, blue: 0.25))
+        fillPx(context: context, x: winX + px * 4.5, y: winY - px * 0.3, width: px * 0.3, height: px * 4.6, color: Color(red: 0.50, green: 0.38, blue: 0.25))
+        // Center divider
+        fillPx(context: context, x: winX + px * 2.1, y: winY, width: px * 0.3, height: px * 4, color: Color(red: 0.50, green: 0.38, blue: 0.25).opacity(0.7))
+        // Moon in window
+        context.fill(
+            Path(ellipseIn: CGRect(x: winX + px * 0.5, y: winY + px * 0.5, width: px * 1.5, height: px * 1.5)),
+            with: .color(Color(red: 0.95, green: 0.92, blue: 0.70).opacity(0.88))
+        )
         // Stars in window
         let winStarBright = (sin(t * 2.0) + 1) / 2 * 0.6 + 0.4
-        fillPx(context: context, x: winX + px * 0.5, y: winY + px * 0.5, width: px * 0.4, height: px * 0.4, color: Color.white.opacity(winStarBright))
-        fillPx(context: context, x: winX + px * 2.0, y: winY + px * 1.2, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(winStarBright * 0.7))
-        fillPx(context: context, x: winX + px * 1.2, y: winY + px * 2.2, width: px * 0.35, height: px * 0.35, color: Color.white.opacity(winStarBright * 0.8))
+        fillPx(context: context, x: winX + px * 2.8, y: winY + px * 0.6, width: px * 0.4, height: px * 0.4, color: Color.white.opacity(winStarBright))
+        fillPx(context: context, x: winX + px * 3.6, y: winY + px * 1.5, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(winStarBright * 0.7))
+        fillPx(context: context, x: winX + px * 0.8, y: winY + px * 2.4, width: px * 0.35, height: px * 0.35, color: Color.white.opacity(winStarBright * 0.8))
+        fillPx(context: context, x: winX + px * 3.2, y: winY + px * 3.0, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(winStarBright * 0.6))
+        // Moonlight glow from window
+        context.fill(
+            Path(ellipseIn: CGRect(x: winX - px * 2, y: winY + px * 2, width: px * 9, height: px * 6)),
+            with: .color(Color(red: 0.70, green: 0.80, blue: 0.95).opacity(0.04))
+        )
+
+        // Reading lamp on small side table (right of chair)
+        let lampRX = size.width * 0.62
+        let lampFlick = 0.88 + sin(t * 1.4) * 0.07
+        // Small table
+        fillPx(context: context, x: lampRX - px * 1.5, y: groundY - px * 3.5, width: px * 3, height: px * 0.8, color: Color(red: 0.38, green: 0.25, blue: 0.12))
+        fillPx(context: context, x: lampRX - px * 1, y: groundY - px * 2.7, width: px * 0.7, height: px * 2.7, color: Color(red: 0.32, green: 0.20, blue: 0.10))
+        fillPx(context: context, x: lampRX + px * 0.3, y: groundY - px * 2.7, width: px * 0.7, height: px * 2.7, color: Color(red: 0.32, green: 0.20, blue: 0.10))
+        // Lamp base
+        fillPx(context: context, x: lampRX - px * 1, y: groundY - px * 4.3, width: px * 2, height: px * 0.6, color: Color(red: 0.55, green: 0.45, blue: 0.28))
+        // Lamp stem
+        fillPx(context: context, x: lampRX - px * 0.2, y: groundY - px * 8.5, width: px * 0.4, height: px * 4.2, color: Color(red: 0.55, green: 0.45, blue: 0.28))
+        // Lamp shade (angled)
+        fillPx(context: context, x: lampRX - px * 1.8, y: groundY - px * 10, width: px * 3.5, height: px * 1.5, color: Color(red: 0.82, green: 0.62, blue: 0.28))
+        fillPx(context: context, x: lampRX - px * 1.2, y: groundY - px * 10.5, width: px * 2.2, height: px * 0.5, color: Color(red: 0.72, green: 0.52, blue: 0.22))
+        // Lamp bulb glow
+        context.fill(
+            Path(ellipseIn: CGRect(x: lampRX - px * 0.6, y: groundY - px * 9.8, width: px * 1.2, height: px * 0.8)),
+            with: .color(Color(red: 0.99, green: 0.92, blue: 0.60).opacity(lampFlick))
+        )
+        // Warm light cone on table/floor
+        context.fill(
+            Path(ellipseIn: CGRect(x: lampRX - px * 4, y: groundY - px * 5, width: px * 7, height: px * 3.5)),
+            with: .color(Color(red: 0.98, green: 0.82, blue: 0.45).opacity(0.08 * lampFlick))
+        )
+
+        // Floating dust particles in the lamp's light beam
+        let dustPositions: [(Double, Double, Double)] = [
+            (0.0, 0.3, 1.1), (1.2, 0.6, 0.7), (0.5, 0.8, 1.4),
+            (0.8, 0.4, 0.9), (1.6, 0.7, 1.2), (0.3, 0.5, 0.8),
+        ]
+        for (phase, nx, speed) in dustPositions {
+            let driftX = lampRX - px * 3 + CGFloat(nx) * px * 6
+            let driftProgress = (t * speed * 0.3 + phase).truncatingRemainder(dividingBy: 1.0)
+            let dy = groundY - px * 4 - CGFloat(driftProgress) * px * 7
+            let alpha = sin(driftProgress * .pi) * 0.35
+            context.fill(
+                Path(ellipseIn: CGRect(x: driftX + CGFloat(sin(t * speed + phase)) * px * 1.2, y: dy, width: px * 0.3, height: px * 0.3)),
+                with: .color(Color(red: 0.95, green: 0.90, blue: 0.75).opacity(alpha))
+            )
+        }
+
+        // Cup of tea with steam beside the lamp table
+        let teaCX = lampRX - px * 0.3
+        fillPx(context: context, x: teaCX, y: groundY - px * 5.3, width: px * 2, height: px * 1.8, color: Color(red: 0.85, green: 0.80, blue: 0.72))
+        fillPx(context: context, x: teaCX + px * 0.15, y: groundY - px * 5.5, width: px * 1.7, height: px * 0.4, color: Color(red: 0.60, green: 0.42, blue: 0.22))
+        fillPx(context: context, x: teaCX + px * 2.0, y: groundY - px * 5.0, width: px * 0.5, height: px * 0.8, color: Color(red: 0.85, green: 0.80, blue: 0.72))
+        // Tea steam
+        for si in 0..<2 {
+            let sp = (t * 0.7 + Double(si) * 0.5).truncatingRemainder(dividingBy: 1.0)
+            let sy = groundY - px * 5.3 - CGFloat(sp) * px * 3.5
+            let sx = teaCX + px * 0.8 + CGFloat(sin(sp * 3.14 + Double(si))) * px * 0.35
+            context.fill(
+                Path(CGRect(x: sx, y: sy, width: px * 0.35, height: px * 0.35)),
+                with: .color(Color.white.opacity((1.0 - sp) * 0.38))
+            )
+        }
+
+        // Stack of books on the floor left of the chair
+        let bookStackX = size.width * 0.32
+        let bookStackColors: [Color] = [
+            Color(red: 0.70, green: 0.20, blue: 0.20),
+            Color(red: 0.22, green: 0.48, blue: 0.70),
+            Color(red: 0.60, green: 0.52, blue: 0.12),
+        ]
+        for (bi, bc) in bookStackColors.enumerated() {
+            let bSX = bookStackX + CGFloat(bi % 2 == 0 ? 0 : px * 0.3)
+            let bSY = groundY - px * CGFloat(bi + 1) * 1.2
+            fillPx(context: context, x: bSX, y: bSY, width: px * 3, height: px * 1.0, color: bc)
+            fillPx(context: context, x: bSX, y: bSY, width: px * 3, height: px * 0.2, color: bc.opacity(0.5))
+        }
 
         // Comfy reading chair (center)
         let chairX = size.width * 0.45
@@ -504,6 +674,82 @@ struct CompanionSceneView: View {
         context.fill(
             Path(CGRect(x: 0, y: groundY + 2, width: size.width, height: size.height - groundY - 2)),
             with: .color(Color(red: 0.22, green: 0.16, blue: 0.10))
+        )
+
+        // Window on left wall showing outside silhouette
+        let cafeWinX: CGFloat = size.width * 0.06
+        let cafeWinY: CGFloat = groundY - px * 15
+        fillPx(context: context, x: cafeWinX, y: cafeWinY, width: px * 5, height: px * 5, color: Color(red: 0.08, green: 0.10, blue: 0.20))
+        // Building silhouettes outside
+        fillPx(context: context, x: cafeWinX + px * 0.3, y: cafeWinY + px * 1.5, width: px * 1.2, height: px * 3.5, color: Color(red: 0.12, green: 0.14, blue: 0.28))
+        fillPx(context: context, x: cafeWinX + px * 1.8, y: cafeWinY + px * 0.5, width: px * 1.0, height: px * 4.5, color: Color(red: 0.10, green: 0.12, blue: 0.25))
+        fillPx(context: context, x: cafeWinX + px * 3.2, y: cafeWinY + px * 2.0, width: px * 1.5, height: px * 3.0, color: Color(red: 0.13, green: 0.15, blue: 0.30))
+        // Small lit windows in buildings
+        fillPx(context: context, x: cafeWinX + px * 0.6, y: cafeWinY + px * 2.0, width: px * 0.4, height: px * 0.4, color: Color(red: 0.95, green: 0.85, blue: 0.45).opacity(0.7))
+        fillPx(context: context, x: cafeWinX + px * 2.0, y: cafeWinY + px * 1.2, width: px * 0.4, height: px * 0.4, color: Color(red: 0.95, green: 0.85, blue: 0.45).opacity(0.6))
+        fillPx(context: context, x: cafeWinX + px * 3.5, y: cafeWinY + px * 2.5, width: px * 0.4, height: px * 0.4, color: Color(red: 0.95, green: 0.85, blue: 0.45).opacity(0.5))
+        // Moon
+        context.fill(
+            Path(ellipseIn: CGRect(x: cafeWinX + px * 3.5, y: cafeWinY + px * 0.4, width: px * 1.2, height: px * 1.2)),
+            with: .color(Color(red: 0.95, green: 0.92, blue: 0.70).opacity(0.75))
+        )
+        // Window frame
+        fillPx(context: context, x: cafeWinX - px * 0.3, y: cafeWinY - px * 0.3, width: px * 5.6, height: px * 0.3, color: Color(red: 0.48, green: 0.34, blue: 0.18))
+        fillPx(context: context, x: cafeWinX - px * 0.3, y: cafeWinY + px * 5, width: px * 5.6, height: px * 0.3, color: Color(red: 0.48, green: 0.34, blue: 0.18))
+        fillPx(context: context, x: cafeWinX - px * 0.3, y: cafeWinY - px * 0.3, width: px * 0.3, height: px * 5.6, color: Color(red: 0.48, green: 0.34, blue: 0.18))
+        fillPx(context: context, x: cafeWinX + px * 5, y: cafeWinY - px * 0.3, width: px * 0.3, height: px * 5.6, color: Color(red: 0.48, green: 0.34, blue: 0.18))
+
+        // Menu/chalkboard on right wall
+        let menuX = size.width * 0.84
+        let menuY = groundY - px * 15
+        fillPx(context: context, x: menuX, y: menuY, width: px * 5, height: px * 7, color: Color(red: 0.14, green: 0.22, blue: 0.18))
+        // Frame
+        fillPx(context: context, x: menuX - px * 0.3, y: menuY - px * 0.3, width: px * 5.6, height: px * 0.3, color: Color(red: 0.45, green: 0.30, blue: 0.15))
+        fillPx(context: context, x: menuX - px * 0.3, y: menuY + px * 7, width: px * 5.6, height: px * 0.3, color: Color(red: 0.45, green: 0.30, blue: 0.15))
+        fillPx(context: context, x: menuX - px * 0.3, y: menuY, width: px * 0.3, height: px * 7.3, color: Color(red: 0.45, green: 0.30, blue: 0.15))
+        fillPx(context: context, x: menuX + px * 5, y: menuY, width: px * 0.3, height: px * 7.3, color: Color(red: 0.45, green: 0.30, blue: 0.15))
+        // Text lines on menu
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 1.0, width: px * 4, height: px * 0.3, color: Color.white.opacity(0.50))
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 2.2, width: px * 3, height: px * 0.25, color: Color.white.opacity(0.35))
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 3.0, width: px * 3.5, height: px * 0.25, color: Color.white.opacity(0.35))
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 3.8, width: px * 2.5, height: px * 0.25, color: Color.white.opacity(0.35))
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 5.0, width: px * 3.8, height: px * 0.25, color: Color.white.opacity(0.30))
+        fillPx(context: context, x: menuX + px * 0.5, y: menuY + px * 5.8, width: px * 3.2, height: px * 0.25, color: Color.white.opacity(0.30))
+
+        // Potted plant on a small shelf (left wall, above window)
+        let plantSX = cafeWinX + px * 1.5
+        let plantSY = cafeWinY - px * 4
+        // Shelf
+        fillPx(context: context, x: cafeWinX - px * 0.5, y: plantSY, width: px * 5, height: px * 0.5, color: Color(red: 0.40, green: 0.28, blue: 0.15))
+        // Pot
+        fillPx(context: context, x: plantSX, y: plantSY - px * 2.2, width: px * 2, height: px * 2, color: Color(red: 0.65, green: 0.38, blue: 0.20))
+        // Plant leaves
+        context.fill(
+            Path(ellipseIn: CGRect(x: plantSX - px * 0.5, y: plantSY - px * 4.5, width: px * 3, height: px * 2.5)),
+            with: .color(Color(red: 0.22, green: 0.55, blue: 0.22))
+        )
+        context.fill(
+            Path(ellipseIn: CGRect(x: plantSX + px * 0.5, y: plantSY - px * 5.8, width: px * 2, height: px * 2)),
+            with: .color(Color(red: 0.28, green: 0.65, blue: 0.28))
+        )
+        // Stem
+        fillPx(context: context, x: plantSX + px * 0.8, y: plantSY - px * 3.5, width: px * 0.3, height: px * 1.5, color: Color(red: 0.22, green: 0.48, blue: 0.20))
+
+        // Second small table in background (depth, upper area)
+        let bgTableX = size.width * 0.78
+        let bgTableY = groundY - px * 4
+        context.fill(
+            Path(ellipseIn: CGRect(x: bgTableX - px * 2.5, y: bgTableY - px * 1.5, width: px * 5, height: px * 1.2)),
+            with: .color(Color(red: 0.40, green: 0.28, blue: 0.16).opacity(0.75))
+        )
+        fillPx(context: context, x: bgTableX - px * 0.4, y: bgTableY - px * 0.3, width: px * 0.8, height: px * 1.8, color: Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.75))
+        // Cup on bg table
+        fillPx(context: context, x: bgTableX - px * 0.8, y: bgTableY - px * 2.8, width: px * 1.0, height: px * 0.8, color: Color(red: 0.80, green: 0.75, blue: 0.65).opacity(0.65))
+        // Small extra steam from bg cup
+        let bgSteam = (t * 0.6).truncatingRemainder(dividingBy: 1.0)
+        context.fill(
+            Path(CGRect(x: bgTableX - px * 0.3, y: bgTableY - px * 3.3 - CGFloat(bgSteam) * px * 2, width: px * 0.3, height: px * 0.3)),
+            with: .color(Color.white.opacity((1.0 - bgSteam) * 0.28))
         )
 
         // Hanging light above table
@@ -625,22 +871,160 @@ struct CompanionSceneView: View {
             with: .color(Color(red: 0.20, green: 0.15, blue: 0.13))
         )
 
+        // Window (left wall) casting moonlight
+        let wWinX: CGFloat = size.width * 0.06
+        let wWinY: CGFloat = groundY - px * 15
+        fillPx(context: context, x: wWinX, y: wWinY, width: px * 4.5, height: px * 5, color: Color(red: 0.06, green: 0.06, blue: 0.18))
+        // Moon in window
+        context.fill(
+            Path(ellipseIn: CGRect(x: wWinX + px * 0.8, y: wWinY + px * 0.5, width: px * 2.2, height: px * 2.2)),
+            with: .color(Color(red: 0.95, green: 0.92, blue: 0.70).opacity(0.82))
+        )
+        // Stars
+        let wStarB = (sin(t * 1.8) + 1) / 2 * 0.5 + 0.4
+        fillPx(context: context, x: wWinX + px * 3.5, y: wWinY + px * 0.8, width: px * 0.35, height: px * 0.35, color: Color.white.opacity(wStarB))
+        fillPx(context: context, x: wWinX + px * 0.5, y: wWinY + px * 3.2, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(wStarB * 0.7))
+        fillPx(context: context, x: wWinX + px * 3.2, y: wWinY + px * 3.8, width: px * 0.3, height: px * 0.3, color: Color.white.opacity(wStarB * 0.6))
+        // Window frame
+        fillPx(context: context, x: wWinX - px * 0.3, y: wWinY - px * 0.3, width: px * 5.1, height: px * 0.3, color: Color(red: 0.42, green: 0.30, blue: 0.18))
+        fillPx(context: context, x: wWinX - px * 0.3, y: wWinY + px * 5, width: px * 5.1, height: px * 0.3, color: Color(red: 0.42, green: 0.30, blue: 0.18))
+        fillPx(context: context, x: wWinX - px * 0.3, y: wWinY - px * 0.3, width: px * 0.3, height: px * 5.6, color: Color(red: 0.42, green: 0.30, blue: 0.18))
+        fillPx(context: context, x: wWinX + px * 4.5, y: wWinY - px * 0.3, width: px * 0.3, height: px * 5.6, color: Color(red: 0.42, green: 0.30, blue: 0.18))
+        // Cross divider
+        fillPx(context: context, x: wWinX + px * 2.1, y: wWinY, width: px * 0.3, height: px * 5, color: Color(red: 0.42, green: 0.30, blue: 0.18).opacity(0.6))
+        // Soft moonlight glow from window onto floor
+        context.fill(
+            Path(ellipseIn: CGRect(x: wWinX - px, y: wWinY + px * 3, width: px * 8, height: px * 7)),
+            with: .color(Color(red: 0.70, green: 0.80, blue: 0.95).opacity(0.04))
+        )
+
+        // Background bookshelf (left)
+        let bsX = size.width * 0.05
+        let bsW = px * 7
+        let bsColor = Color(red: 0.32, green: 0.22, blue: 0.14)
+        fillPx(context: context, x: bsX, y: groundY - px * 14, width: px * 0.7, height: px * 14, color: bsColor)
+        fillPx(context: context, x: bsX + bsW, y: groundY - px * 14, width: px * 0.7, height: px * 14, color: bsColor)
+        fillPx(context: context, x: bsX, y: groundY - px * 14, width: bsW + px * 0.7, height: px * 0.6, color: bsColor)
+        for row in 0..<3 {
+            let sy = groundY - px * CGFloat(row * 4 + 4)
+            fillPx(context: context, x: bsX, y: sy, width: bsW + px * 0.7, height: px * 0.5, color: bsColor)
+        }
+        let bsBookColors: [Color] = [
+            Color(red: 0.65, green: 0.18, blue: 0.18), Color(red: 0.18, green: 0.45, blue: 0.65),
+            Color(red: 0.55, green: 0.48, blue: 0.12), Color(red: 0.28, green: 0.58, blue: 0.28),
+            Color(red: 0.52, green: 0.22, blue: 0.52), Color(red: 0.72, green: 0.42, blue: 0.15),
+        ]
+        for row in 0..<3 {
+            let sy = groundY - px * (CGFloat(row * 4) + 7.5)
+            var bx = bsX + px * 0.8
+            for bi in 0..<4 {
+                let bc = bsBookColors[(row * 4 + bi) % bsBookColors.count]
+                let bw = px * (bi % 2 == 0 ? 1.4 : 1.0)
+                let bh = px * CGFloat([2.8, 3.0, 2.5, 3.2][bi % 4])
+                fillPx(context: context, x: bx, y: sy + (px * 3.0 - bh), width: bw, height: bh, color: bc)
+                bx += bw + px * 0.25
+                if bx > bsX + bsW - px * 0.5 { break }
+            }
+        }
+
+        // Clock on wall (right area)
+        let clockX = size.width * 0.88
+        let clockY: CGFloat = groundY - px * 14
+        // Clock face
+        context.fill(
+            Path(ellipseIn: CGRect(x: clockX - px * 2, y: clockY, width: px * 4, height: px * 4)),
+            with: .color(Color(red: 0.88, green: 0.84, blue: 0.76))
+        )
+        // Clock ring
+        context.stroke(
+            Path(ellipseIn: CGRect(x: clockX - px * 2, y: clockY, width: px * 4, height: px * 4)),
+            with: .color(Color(red: 0.42, green: 0.28, blue: 0.14)),
+            lineWidth: px * 0.35
+        )
+        // Clock hands (move with time)
+        let clockCenterX = clockX
+        let clockCenterY = clockY + px * 2
+        let minuteAngle = t * 0.02 * .pi  // slow rotation
+        let hourAngle = t * 0.0017 * .pi
+        // Minute hand
+        let mhEndX = clockCenterX + CGFloat(sin(minuteAngle)) * px * 1.4
+        let mhEndY = clockCenterY - CGFloat(cos(minuteAngle)) * px * 1.4
+        var mhPath = Path()
+        mhPath.move(to: CGPoint(x: clockCenterX, y: clockCenterY))
+        mhPath.addLine(to: CGPoint(x: mhEndX, y: mhEndY))
+        context.stroke(mhPath, with: .color(Color(red: 0.25, green: 0.20, blue: 0.18)), lineWidth: px * 0.2)
+        // Hour hand
+        let hhEndX = clockCenterX + CGFloat(sin(hourAngle)) * px * 1.0
+        let hhEndY = clockCenterY - CGFloat(cos(hourAngle)) * px * 1.0
+        var hhPath = Path()
+        hhPath.move(to: CGPoint(x: clockCenterX, y: clockCenterY))
+        hhPath.addLine(to: CGPoint(x: hhEndX, y: hhEndY))
+        context.stroke(hhPath, with: .color(Color(red: 0.25, green: 0.20, blue: 0.18)), lineWidth: px * 0.28)
+
         // Small notes/papers pinned on wall behind
         let noteColors: [Color] = [
             Color(red: 0.95, green: 0.92, blue: 0.70),
             Color(red: 0.75, green: 0.88, blue: 0.95),
             Color(red: 0.95, green: 0.80, blue: 0.80),
             Color(red: 0.82, green: 0.95, blue: 0.80),
+            Color(red: 0.95, green: 0.90, blue: 0.75),
         ]
         let notePositions: [(CGFloat, CGFloat)] = [
-            (0.25, 0.15), (0.35, 0.12), (0.45, 0.18), (0.32, 0.25),
+            (0.32, 0.12), (0.42, 0.09), (0.52, 0.15), (0.38, 0.22), (0.48, 0.26),
         ]
         for (i, (nx, ny)) in notePositions.enumerated() {
             let noteX = nx * size.width
             let noteY = ny * size.height
-            fillPx(context: context, x: noteX, y: noteY, width: px * 2, height: px * 2.5, color: noteColors[i % noteColors.count].opacity(0.5))
+            // Slight tilt effect via different widths
+            let tiltOff = CGFloat(i % 2 == 0 ? 0 : px * 0.2)
+            fillPx(context: context, x: noteX + tiltOff, y: noteY, width: px * 2, height: px * 2.5, color: noteColors[i % noteColors.count].opacity(0.55))
             // Pin dot
-            fillPx(context: context, x: noteX + px * 0.7, y: noteY - px * 0.2, width: px * 0.5, height: px * 0.5, color: Color.red.opacity(0.6))
+            fillPx(context: context, x: noteX + px * 0.7 + tiltOff, y: noteY - px * 0.2, width: px * 0.5, height: px * 0.5, color: Color.red.opacity(0.65))
+            // Lines on note
+            fillPx(context: context, x: noteX + px * 0.25 + tiltOff, y: noteY + px * 0.6, width: px * 1.5, height: px * 0.15, color: Color(red: 0.50, green: 0.45, blue: 0.40).opacity(0.35))
+            fillPx(context: context, x: noteX + px * 0.25 + tiltOff, y: noteY + px * 1.1, width: px * 1.2, height: px * 0.15, color: Color(red: 0.50, green: 0.45, blue: 0.40).opacity(0.30))
+        }
+
+        // Desk lamp (left side of desk)
+        let dLampFlick = 0.86 + sin(t * 1.7) * 0.07
+        let dLampX = size.width * 0.60 - px * 5.5  // near desk left edge
+        let dLampGroundY = groundY
+        // Base
+        fillPx(context: context, x: dLampX - px * 1, y: dLampGroundY - px * 4.5, width: px * 2, height: px * 0.6, color: Color(red: 0.50, green: 0.42, blue: 0.28))
+        // Stem
+        fillPx(context: context, x: dLampX - px * 0.2, y: dLampGroundY - px * 8, width: px * 0.4, height: px * 3.5, color: Color(red: 0.50, green: 0.42, blue: 0.28))
+        // Head/shade
+        fillPx(context: context, x: dLampX - px * 2, y: dLampGroundY - px * 9.5, width: px * 3.5, height: px * 1.5, color: Color(red: 0.78, green: 0.58, blue: 0.25))
+        fillPx(context: context, x: dLampX - px * 1.4, y: dLampGroundY - px * 10, width: px * 2.2, height: px * 0.5, color: Color(red: 0.68, green: 0.50, blue: 0.20))
+        // Bulb
+        context.fill(
+            Path(ellipseIn: CGRect(x: dLampX - px * 0.5, y: dLampGroundY - px * 9.2, width: px * 1.0, height: px * 0.7)),
+            with: .color(Color(red: 0.99, green: 0.92, blue: 0.60).opacity(dLampFlick))
+        )
+        // Light cone on desk
+        context.fill(
+            Path(ellipseIn: CGRect(x: dLampX - px * 4, y: dLampGroundY - px * 5.5, width: px * 6.5, height: px * 2.5)),
+            with: .color(Color(red: 0.98, green: 0.82, blue: 0.45).opacity(0.09 * dLampFlick))
+        )
+
+        // Crumpled paper balls on the floor
+        let paperBalls: [(CGFloat, CGFloat)] = [
+            (size.width * 0.42, groundY - px * 0.5),
+            (size.width * 0.50, groundY - px * 0.4),
+            (size.width * 0.38, groundY - px * 0.6),
+            (size.width * 0.55, groundY - px * 0.3),
+        ]
+        for (pbx, pby) in paperBalls {
+            context.fill(
+                Path(ellipseIn: CGRect(x: pbx, y: pby, width: px * 1.2, height: px * 1.0)),
+                with: .color(Color(red: 0.88, green: 0.84, blue: 0.78).opacity(0.70))
+            )
+            // Crumple lines
+            context.stroke(
+                Path(ellipseIn: CGRect(x: pbx + px * 0.2, y: pby + px * 0.2, width: px * 0.7, height: px * 0.55)),
+                with: .color(Color(red: 0.65, green: 0.60, blue: 0.55).opacity(0.35)),
+                lineWidth: px * 0.12
+            )
         }
 
         // Clean writing desk (center-right)
