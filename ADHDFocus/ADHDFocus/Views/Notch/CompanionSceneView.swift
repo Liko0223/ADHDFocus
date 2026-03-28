@@ -47,7 +47,7 @@ struct CompanionSceneView: View {
             jumpTimer?.invalidate()
             blockedTimer?.invalidate()
         }
-        .onChange(of: state) { newState in
+        .onChange(of: state) { _, newState in
             if newState == .blocked {
                 startBlockedSequence()
             } else {
@@ -1331,7 +1331,6 @@ struct CompanionSceneView: View {
         }
 
         let walkFrame = Int(t * 5) % 2
-        let dir: CGFloat = facingRight ? 1 : -1
 
         // Shadow
         let shadowOpacity = isJumping ? 0.12 : 0.28
