@@ -2,24 +2,28 @@ import AppKit
 import SwiftUI
 
 final class BlockOverlayWindow: NSPanel {
-    private var trackingApp: NSRunningApplication?
     private var pollTimer: Timer?
+    private var blockedBundleID: String?
 
     init(blockedApp: NSRunningApplication, modeName: String, remainingSeconds: Int) {
-        self.trackingApp = blockedApp
+        self.blockedBundleID = blockedApp.bundleIdentifier
+
+        // Cover the entire screen
+        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
 
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 320),
-            styleMask: [.nonactivatingPanel, .fullSizeContentView],
+            contentRect: screenFrame,
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
 
-        // Float above everything
-        level = .floating
+        // Above everything, captures input
+        level = .screenSaver
         isOpaque = false
         backgroundColor = .clear
-        hasShadow = true
+        hasShadow = false
+        ignoresMouseEvents = false
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         isMovable = false
 
@@ -27,33 +31,33 @@ final class BlockOverlayWindow: NSPanel {
             appName: blockedApp.localizedName ?? "应用",
             modeName: modeName,
             remainingSeconds: remainingSeconds,
-            onDismiss: { [weak self] in
-                self?.dismiss()
+            onGoBack: { [weak self] in
+                self?.goBackToWork()
             }
         )
         contentView = NSHostingView(rootView: content)
 
-        positionOverApp(blockedApp)
-        startTrackingApp(blockedApp)
-    }
-
-    private func positionOverApp(_ app: NSRunningApplication) {
-        // Position in center of screen
-        if let screen = NSScreen.main {
-            let screenFrame = screen.visibleFrame
-            let x = screenFrame.midX - frame.width / 2
-            let y = screenFrame.midY - frame.height / 2
-            setFrameOrigin(NSPoint(x: x, y: y))
+        // Keep checking: if user somehow switched away, dismiss
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in
+            guard let self, let bundleID = self.blockedBundleID else { return }
+            let frontApp = NSWorkspace.shared.frontmostApplication
+            // If the blocked app is no longer frontmost (user clicked "go back"), dismiss
+            if frontApp?.bundleIdentifier != bundleID && frontApp?.bundleIdentifier != "com.lilinke.ADHDFocus" {
+                self.dismiss()
+            }
         }
     }
 
-    private func startTrackingApp(_ app: NSRunningApplication) {
-        // Dismiss overlay when the blocked app is no longer frontmost
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            if let trackingApp = self.trackingApp {
-                if trackingApp.isTerminated || !trackingApp.isActive {
-                    self.dismiss()
+    private func goBackToWork() {
+        dismiss()
+        // Activate our own app to pull focus away from the blocked app
+        NSApp.activate(ignoringOtherApps: true)
+        // Also hide the blocked app
+        if let bundleID = blockedBundleID {
+            for app in NSWorkspace.shared.runningApplications {
+                if app.bundleIdentifier == bundleID {
+                    app.hide()
+                    break
                 }
             }
         }
@@ -68,67 +72,75 @@ final class BlockOverlayWindow: NSPanel {
     deinit {
         pollTimer?.invalidate()
     }
+
+    // Prevent the panel from ever losing key status while shown
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
 }
 
 struct BlockOverlayContent: View {
     let appName: String
     let modeName: String
     let remainingSeconds: Int
-    let onDismiss: () -> Void
+    let onGoBack: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
-            Spacer()
+        ZStack {
+            // Full-screen dark backdrop
+            Color.black.opacity(0.75)
+                .ignoresSafeArea()
 
-            Text("🚫")
-                .font(.system(size: 48))
+            // Center card
+            VStack(spacing: 20) {
+                Text("🚫")
+                    .font(.system(size: 56))
 
-            Text("\(appName) 暂时不可用")
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
-
-            Text("当前处于「\(modeName)」模式")
-                .font(.body)
-                .foregroundStyle(.white.opacity(0.7))
-
-            if remainingSeconds > 0 {
-                let minutes = remainingSeconds / 60
-                let seconds = remainingSeconds % 60
-                HStack(spacing: 4) {
-                    Text("番茄钟剩余")
-                        .foregroundStyle(.white.opacity(0.5))
-                    Text(String(format: "%02d:%02d", minutes, seconds))
-                        .monospacedDigit()
-                        .foregroundStyle(.purple)
-                        .fontWeight(.semibold)
-                }
-                .font(.subheadline)
-            }
-
-            Button {
-                onDismiss()
-            } label: {
-                Text("回到工作")
-                    .font(.body.weight(.medium))
+                Text("\(appName) 暂时不可用")
+                    .font(.title.weight(.semibold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 10)
-                    .background(.purple)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            }
-            .buttonStyle(.plain)
 
-            Spacer()
+                Text("当前处于「\(modeName)」模式")
+                    .font(.title3)
+                    .foregroundStyle(.white.opacity(0.7))
+
+                if remainingSeconds > 0 {
+                    let minutes = remainingSeconds / 60
+                    let seconds = remainingSeconds % 60
+                    HStack(spacing: 4) {
+                        Text("番茄钟剩余")
+                            .foregroundStyle(.white.opacity(0.5))
+                        Text(String(format: "%02d:%02d", minutes, seconds))
+                            .monospacedDigit()
+                            .foregroundStyle(.purple)
+                            .fontWeight(.bold)
+                    }
+                    .font(.body)
+                }
+
+                Button {
+                    onGoBack()
+                } label: {
+                    Text("回到工作")
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 12)
+                        .background(.purple)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
+            }
+            .padding(48)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(.white.opacity(0.1), lineWidth: 1)
+            )
         }
-        .frame(width: 480, height: 320)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial)
-                .environment(\.colorScheme, .dark)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(.white.opacity(0.1), lineWidth: 1)
-        )
     }
 }
