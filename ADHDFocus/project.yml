@@ -1,0 +1,85 @@
+name: ADHDFocus
+options:
+  minimumXcodeGenVersion: "2.0"
+  deploymentTarget:
+    macOS: "14.0"
+  defaultConfig: Debug
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  ADHDFocus:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: ADHDFocus
+        excludes:
+          - "**/*.entitlements"
+    resources:
+      - path: ADHDFocus/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lilinke.ADHDFocus
+        PRODUCT_NAME: ADHDFocus
+        INFOPLIST_FILE: ADHDFocus/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ADHDFocus/ADHDFocus.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        SWIFT_VERSION: "5.9"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        COMBINE_HIDPI_IMAGES: YES
+    info:
+      path: ADHDFocus/Info.plist
+      properties:
+        CFBundleName: ADHDFocus
+        CFBundleDisplayName: ADHD Focus
+        CFBundleIdentifier: com.lilinke.ADHDFocus
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "1.0"
+        LSMinimumSystemVersion: "14.0"
+        LSUIElement: true
+        NSPrincipalClass: NSApplication
+        NSHumanReadableDescription: ADHD Focus helps you manage distractions and stay productive.
+        NSAccessibilityUsageDescription: ADHD Focus needs accessibility access to monitor active applications and help manage your focus.
+        NSAppleEventsUsageDescription: ADHD Focus uses Apple Events to communicate with other apps.
+    dependencies:
+      - sdk: SwiftData.framework
+      - sdk: SwiftUI.framework
+
+  ADHDFocusTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: ADHDFocusTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lilinke.ADHDFocusTests
+        SWIFT_VERSION: "5.9"
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/ADHDFocus.app/Contents/MacOS/ADHDFocus
+        BUNDLE_LOADER: $(TEST_HOST)
+    dependencies:
+      - target: ADHDFocus
+
+schemes:
+  ADHDFocus:
+    build:
+      targets:
+        ADHDFocus: all
+        ADHDFocusTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ADHDFocusTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
