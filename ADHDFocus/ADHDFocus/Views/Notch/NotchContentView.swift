@@ -166,7 +166,7 @@ struct NotchContentView: View {
     private var expandedContent: some View {
         VStack(spacing: 0) {
             // Scene fills from very top (including notch row) to mid panel
-            CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth)
+            CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth, focusModeName: manager.modeName)
                 .frame(height: manager.notchHeight + 120)
 
             // Controls below with consistent 12px spacing
