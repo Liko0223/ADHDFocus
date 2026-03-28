@@ -3,8 +3,11 @@ import UserNotifications
 
 final class NotificationManager {
     static let shared = NotificationManager()
+    private var permissionRequested = false
 
     func requestPermission() {
+        guard !permissionRequested else { return }
+        permissionRequested = true
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 

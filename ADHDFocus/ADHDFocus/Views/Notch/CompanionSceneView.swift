@@ -164,16 +164,24 @@ struct CompanionSceneView: View {
         // Warm table lamp (right of desk)
         drawDeskLamp(context: context, x: deskX + px * 5, groundY: groundY, px: px, t: t)
 
-        // Character sits near desk
+        // Character sits near desk — typing animation
         let charX = deskX - px * 6
-        let headBob = sin(t * 0.8) * 0.8
+        let headBob = sin(t * 1.2) * 0.6
         let charY = groundY - 32 + headBob
         drawCharacter(context: context, x: charX, y: charY, px: px,
                       state: state, facingRight: true, t: t,
                       isJumping: false, jumpProgress: 0)
 
+        // Typing hands animation (arms move up/down alternately)
+        let typingFrame = Int(t * 6) % 2
+        let leftHandY = charY + px * 5 + (typingFrame == 0 ? -px * 0.8 : px * 0.3)
+        let rightHandY = charY + px * 5 + (typingFrame == 0 ? px * 0.3 : -px * 0.8)
+        let handColor = Color(red: 0.98, green: 0.86, blue: 0.72).opacity(0.9)
+        fillPx(context: context, x: charX + px * 2.5, y: leftHandY, size: px * 0.8, color: handColor)
+        fillPx(context: context, x: charX + px * 4, y: rightHandY, size: px * 0.8, color: handColor)
+
         // Thinking dots near character
-        drawThinkingDots(context: context, x: charX + px * 4, y: charY - px * 2, px: px, t: t)
+        drawThinkingDots(context: context, x: charX - px * 2, y: charY - px * 3, px: px, t: t)
     }
 
     // MARK: - Scene: Resting (bright garden)
@@ -754,7 +762,8 @@ struct CompanionSceneView: View {
         }
 
         // --- Arms ---
-        let armSwingAmt: CGFloat = (state == .working) ? 0 : (walkFrame == 0 ? px * 0.6 : -px * 0.6)
+        let typingBounce: CGFloat = (state == .working) ? (Int(t * 6) % 2 == 0 ? -px * 0.5 : px * 0.3) : 0
+        let armSwingAmt: CGFloat = (state == .working) ? typingBounce : (walkFrame == 0 ? px * 0.6 : -px * 0.6)
         let armLY = y + px * 4 + armSwingAmt
         let armRY = y + px * 4 - armSwingAmt
         // Left arm
