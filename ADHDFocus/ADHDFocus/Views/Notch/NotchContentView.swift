@@ -144,11 +144,19 @@ struct NotchContentView: View {
 
             // Right: timer (only when active)
             if manager.isActive {
+                let isPaused = manager.engine?.pomodoroTimer?.isPaused == true
                 Group {
                     if manager.remainingSeconds > 0 {
-                        Text(formatTime(manager.remainingSeconds))
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.purple)
+                        HStack(spacing: 2) {
+                            if isPaused {
+                                Text("⏸")
+                                    .font(.system(size: 8))
+                            }
+                            Text(formatTime(manager.remainingSeconds))
+                                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                .foregroundStyle(.purple)
+                                .opacity(isPaused ? 0.5 : 1.0)
+                        }
                     } else {
                         Circle()
                             .fill(.green)
@@ -239,6 +247,27 @@ struct NotchContentView: View {
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background(Color.red.opacity(0.15))
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            if manager.engine?.pomodoroTimer?.isPaused == true {
+                                manager.engine?.pomodoroTimer?.resume()
+                            } else {
+                                manager.engine?.pomodoroTimer?.pause()
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: manager.engine?.pomodoroTimer?.isPaused == true ? "play.fill" : "pause.fill")
+                                    .font(.system(size: 8))
+                                Text(manager.engine?.pomodoroTimer?.isPaused == true ? "继续" : "暂停")
+                                    .font(.caption2)
+                            }
+                            .foregroundStyle(.white.opacity(0.7))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.white.opacity(0.1))
                             .clipShape(Capsule())
                         }
                         .buttonStyle(.plain)

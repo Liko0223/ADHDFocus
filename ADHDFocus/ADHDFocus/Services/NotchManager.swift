@@ -34,7 +34,6 @@ final class NotchManager {
 
     func setup() {
         guard modelContainer != nil else {
-            print("NotchManager: modelContainer not set, skipping setup")
             return
         }
         // Prefer the screen with a notch (built-in display)

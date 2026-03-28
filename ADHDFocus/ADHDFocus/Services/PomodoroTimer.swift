@@ -18,6 +18,7 @@ final class PomodoroTimer {
     private(set) var phase: PomodoroPhase = .idle
     private(set) var remainingSeconds: Int = 0
     private(set) var completedPomodoros: Int = 0
+    private(set) var isPaused: Bool = false
 
     private var timer: Timer?
 
@@ -30,7 +31,7 @@ final class PomodoroTimer {
     }
 
     var isRunning: Bool {
-        phase != .idle
+        phase != .idle && !isPaused
     }
 
     var progress: Double {
@@ -67,6 +68,20 @@ final class PomodoroTimer {
         timer = nil
         phase = .idle
         remainingSeconds = 0
+        isPaused = false
+    }
+
+    func pause() {
+        guard phase != .idle, !isPaused else { return }
+        timer?.invalidate()
+        timer = nil
+        isPaused = true
+    }
+
+    func resume() {
+        guard phase != .idle, isPaused else { return }
+        isPaused = false
+        startTimer()
     }
 
     func simulateTick(seconds: Int) {

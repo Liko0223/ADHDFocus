@@ -32,7 +32,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             container = try ModelContainer(for: schema, configurations: [config])
         } catch {
             // If store is corrupted, fall back to in-memory
-            print("SwiftData store error: \(error). Using in-memory store.")
+            _ = error // Using in-memory store as fallback
             let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             container = try! ModelContainer(for: schema, configurations: [memConfig])
         }
