@@ -1315,115 +1315,96 @@ struct CompanionSceneView: View {
         context.fill(Path(ellipseIn: CGRect(x: x + px * 0.15, y: groundY - px * 9.8, width: px * 0.9, height: px * 0.9)), with: .color(signFg))
     }
 
-    // MARK: - Character
+    // MARK: - Cat Character
 
     private func drawCharacter(context: GraphicsContext, x: CGFloat, y: CGFloat, px: CGFloat,
                                 state: CompanionState, facingRight: Bool, t: Double,
                                 isJumping: Bool, jumpProgress: CGFloat) {
-        let bodyColor: Color
-        let skinColor = Color(red: 0.98, green: 0.86, blue: 0.72)
-
-        switch state {
-        case .idle, .working, .resting:
-            bodyColor = Color(red: 0.28, green: 0.65, blue: 0.95)
-        case .blocked:
-            bodyColor = Color(red: 0.95, green: 0.28, blue: 0.28)
-        }
-
+        let furColor = Color(red: 0.95, green: 0.65, blue: 0.25) // orange tabby
+        let darkFur = Color(red: 0.75, green: 0.45, blue: 0.15)
+        let white = Color(red: 0.98, green: 0.96, blue: 0.92)
+        let eyeCol = Color(red: 0.15, green: 0.15, blue: 0.20)
+        let noseCol = Color(red: 0.90, green: 0.55, blue: 0.55)
         let walkFrame = Int(t * 5) % 2
 
         // Shadow
-        let shadowOpacity = isJumping ? 0.12 : 0.28
-        let shadowW: CGFloat = isJumping ? px * 5 : px * 6
+        let shadowOp = isJumping ? 0.12 : 0.25
+        let shadowW: CGFloat = isJumping ? px * 5 : px * 7
         context.fill(
-            Path(ellipseIn: CGRect(x: x - shadowW / 2, y: y + px * 8.2, width: shadowW, height: px * 1.2)),
-            with: .color(Color.black.opacity(shadowOpacity))
+            Path(ellipseIn: CGRect(x: x - shadowW / 2, y: y + px * 8, width: shadowW, height: px * 1.2)),
+            with: .color(Color.black.opacity(shadowOp))
         )
 
-        // --- Head (round, 5x5 pixel grid with rounded corners) ---
-        let headOffsets: [(Int, Int)] = [
-            (1,0),(2,0),(3,0),
-            (0,1),(1,1),(2,1),(3,1),(4,1),
-            (0,2),(1,2),(2,2),(3,2),(4,2),
-            (1,3),(2,3),(3,3),
-        ]
-        for (hcol, hrow) in headOffsets {
-            fillPx(context: context,
-                   x: x - px * 2 + CGFloat(hcol) * px,
-                   y: y + CGFloat(hrow) * px,
-                   size: px, color: skinColor)
+        // Ears
+        fillPx(context: context, x: x - px * 2.5, y: y - px * 0.5, size: px, color: furColor)
+        fillPx(context: context, x: x - px * 1.5, y: y - px * 0.5, size: px, color: furColor)
+        fillPx(context: context, x: x + px * 0.5, y: y - px * 0.5, size: px, color: furColor)
+        fillPx(context: context, x: x + px * 1.5, y: y - px * 0.5, size: px, color: furColor)
+        // Inner ears
+        fillPx(context: context, x: x - px * 2, y: y, width: px * 0.6, height: px * 0.5, color: noseCol.opacity(0.4))
+        fillPx(context: context, x: x + px * 1, y: y, width: px * 0.6, height: px * 0.5, color: noseCol.opacity(0.4))
+
+        // Head (5 wide, 3 tall)
+        for row in 0..<3 {
+            for col in 0..<5 {
+                fillPx(context: context, x: x - px * 2.5 + CGFloat(col) * px, y: y + px * 0.5 + CGFloat(row) * px, size: px, color: furColor)
+            }
         }
 
-        // --- Eyes ---
+        // White muzzle
+        fillPx(context: context, x: x - px * 1, y: y + px * 2, width: px * 2, height: px * 1.2, color: white)
+
+        // Eyes
+        let blinkCycle = t.truncatingRemainder(dividingBy: 3.5)
         if state == .working {
-            let eyeCol = Color(red: 0.18, green: 0.14, blue: 0.25)
-            if facingRight {
-                fillPx(context: context, x: x - px * 0.8, y: y + px, size: px * 0.6, color: eyeCol)
-                fillPx(context: context, x: x - px * 0.4, y: y + px * 1.4, size: px * 0.5, color: eyeCol)
-                fillPx(context: context, x: x + px * 0.6, y: y + px, size: px * 0.6, color: eyeCol)
-                fillPx(context: context, x: x + px * 1.0, y: y + px * 1.4, size: px * 0.5, color: eyeCol)
-            } else {
-                fillPx(context: context, x: x - px * 1.4, y: y + px * 1.4, size: px * 0.5, color: eyeCol)
-                fillPx(context: context, x: x - px * 1.0, y: y + px, size: px * 0.6, color: eyeCol)
-                fillPx(context: context, x: x + px * 0.2, y: y + px * 1.4, size: px * 0.5, color: eyeCol)
-                fillPx(context: context, x: x + px * 0.6, y: y + px, size: px * 0.6, color: eyeCol)
-            }
+            // Half-closed focused eyes
+            fillPx(context: context, x: x - px * 1.5, y: y + px * 1.2, width: px * 0.8, height: px * 0.3, color: eyeCol)
+            fillPx(context: context, x: x + px * 0.7, y: y + px * 1.2, width: px * 0.8, height: px * 0.3, color: eyeCol)
         } else if state == .blocked {
-            let eyeCol = Color(red: 0.15, green: 0.12, blue: 0.20)
-            context.fill(Path(ellipseIn: CGRect(x: x - px * 1.1, y: y + px * 0.8, width: px * 0.9, height: px * 0.9)), with: .color(eyeCol))
-            context.fill(Path(ellipseIn: CGRect(x: x + px * 0.5, y: y + px * 0.8, width: px * 0.9, height: px * 0.9)), with: .color(eyeCol))
+            // Wide startled eyes
+            context.fill(Path(ellipseIn: CGRect(x: x - px * 1.6, y: y + px * 0.9, width: px, height: px)), with: .color(eyeCol))
+            context.fill(Path(ellipseIn: CGRect(x: x + px * 0.6, y: y + px * 0.9, width: px, height: px)), with: .color(eyeCol))
         } else {
-            let eyeCol = Color(red: 0.18, green: 0.14, blue: 0.25)
-            let blinkCycle = t.truncatingRemainder(dividingBy: 4.0)
-            let eyeH: CGFloat = blinkCycle > 3.7 ? px * 0.2 : px * 0.7
-            let eyeLX: CGFloat = facingRight ? x - px * 0.9 : x - px * 0.9
-            let eyeRX: CGFloat = facingRight ? x + px * 0.5 : x + px * 0.5
-            context.fill(Path(ellipseIn: CGRect(x: eyeLX, y: y + px * 0.9, width: px * 0.7, height: eyeH)), with: .color(eyeCol))
-            context.fill(Path(ellipseIn: CGRect(x: eyeRX, y: y + px * 0.9, width: px * 0.7, height: eyeH)), with: .color(eyeCol))
-            if state == .idle || state == .resting {
-                let rosy = Color(red: 0.95, green: 0.60, blue: 0.60).opacity(0.45)
-                context.fill(Path(ellipseIn: CGRect(x: x - px * 1.7, y: y + px * 1.8, width: px * 1.0, height: px * 0.6)), with: .color(rosy))
-                context.fill(Path(ellipseIn: CGRect(x: x + px * 0.7, y: y + px * 1.8, width: px * 1.0, height: px * 0.6)), with: .color(rosy))
+            let eyeH: CGFloat = blinkCycle > 3.2 ? px * 0.15 : px * 0.7
+            context.fill(Path(ellipseIn: CGRect(x: x - px * 1.5, y: y + px * 1, width: px * 0.8, height: eyeH)), with: .color(eyeCol))
+            context.fill(Path(ellipseIn: CGRect(x: x + px * 0.7, y: y + px * 1, width: px * 0.8, height: eyeH)), with: .color(eyeCol))
+        }
+
+        // Nose
+        fillPx(context: context, x: x - px * 0.3, y: y + px * 2, width: px * 0.6, height: px * 0.4, color: noseCol)
+
+        // Whiskers
+        fillPx(context: context, x: x - px * 2.5, y: y + px * 2.3, width: px * 0.8, height: px * 0.15, color: darkFur.opacity(0.3))
+        fillPx(context: context, x: x + px * 1.7, y: y + px * 2.3, width: px * 0.8, height: px * 0.15, color: darkFur.opacity(0.3))
+
+        // Body (4 wide, 3 tall)
+        let bodyY = y + px * 3.5
+        for row in 0..<3 {
+            for col in 0..<4 {
+                fillPx(context: context, x: x - px * 2 + CGFloat(col) * px, y: bodyY + CGFloat(row) * px, size: px, color: furColor)
             }
         }
+        // Belly
+        fillPx(context: context, x: x - px * 0.5, y: bodyY + px * 0.5, width: px, height: px * 2, color: white.opacity(0.7))
 
-        // --- Body ---
-        let shirtOffsets: [(Int, Int)] = [
-            (0,0),(1,0),(2,0),(3,0),
-            (0,1),(1,1),(2,1),(3,1),
-            (0,2),(1,2),(2,2),(3,2),
-        ]
-        for (sc, sr) in shirtOffsets {
-            fillPx(context: context,
-                   x: x - px * 2 + CGFloat(sc) * px,
-                   y: y + px * 4 + CGFloat(sr) * px,
-                   size: px, color: bodyColor)
-        }
-
-        // --- Arms ---
-        let typingBounce: CGFloat = (state == .working) ? (Int(t * 6) % 2 == 0 ? -px * 0.5 : px * 0.3) : 0
-        let armSwingAmt: CGFloat = (state == .working) ? typingBounce : (walkFrame == 0 ? px * 0.6 : -px * 0.6)
-        let armLY = y + px * 4 + armSwingAmt
-        let armRY = y + px * 4 - armSwingAmt
-        fillPx(context: context, x: x - px * 3, y: armLY, size: px, color: bodyColor.opacity(0.85))
-        fillPx(context: context, x: x - px * 3, y: armLY + px, size: px, color: skinColor.opacity(0.85))
-        fillPx(context: context, x: x + px * 2, y: armRY, size: px, color: bodyColor.opacity(0.85))
-        fillPx(context: context, x: x + px * 2, y: armRY + px, size: px, color: skinColor.opacity(0.85))
-
-        // --- Legs ---
+        // Paws
+        let pawY = bodyY + px * 3
         if state == .working {
-            fillPx(context: context, x: x - px * 1.5, y: y + px * 7, size: px, color: bodyColor.opacity(0.75))
-            fillPx(context: context, x: x - px * 1.5, y: y + px * 8, size: px, color: bodyColor.opacity(0.65))
-            fillPx(context: context, x: x + px * 0.5, y: y + px * 7, size: px, color: bodyColor.opacity(0.75))
-            fillPx(context: context, x: x + px * 0.5, y: y + px * 8, size: px, color: bodyColor.opacity(0.65))
+            // Sitting paws
+            fillPx(context: context, x: x - px * 1.5, y: pawY, size: px, color: white)
+            fillPx(context: context, x: x + px * 0.5, y: pawY, size: px, color: white)
         } else {
-            let legL: CGFloat = walkFrame == 0 ? px * 0.7 : -px * 0.7
-            let legR: CGFloat = -legL
-            fillPx(context: context, x: x - px * 1.5 + legL * 0.4, y: y + px * 7, size: px, color: bodyColor.opacity(0.75))
-            fillPx(context: context, x: x - px * 1.5 + legL * 0.8, y: y + px * 8, size: px, color: bodyColor.opacity(0.65))
-            fillPx(context: context, x: x + px * 0.5 + legR * 0.4, y: y + px * 7, size: px, color: bodyColor.opacity(0.75))
-            fillPx(context: context, x: x + px * 0.5 + legR * 0.8, y: y + px * 8, size: px, color: bodyColor.opacity(0.65))
+            // Walking paws
+            let legOff: CGFloat = walkFrame == 0 ? px * 0.5 : -px * 0.5
+            fillPx(context: context, x: x - px * 1.5 + legOff, y: pawY, size: px, color: white)
+            fillPx(context: context, x: x + px * 0.5 - legOff, y: pawY, size: px, color: white)
         }
+
+        // Tail — animated wave
+        let tailDir: CGFloat = facingRight ? 1 : -1
+        let tailWave = sin(t * 3) * px * 0.8
+        fillPx(context: context, x: x + px * 2 * tailDir, y: bodyY + px + tailWave, size: px, color: furColor)
+        fillPx(context: context, x: x + px * 3 * tailDir, y: bodyY + px * 0.5 + tailWave * 0.5, size: px, color: darkFur)
     }
 
     private func fillPx(context: GraphicsContext, x: CGFloat, y: CGFloat, size: CGFloat, color: Color) {
