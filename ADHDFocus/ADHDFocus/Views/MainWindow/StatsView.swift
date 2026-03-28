@@ -4,17 +4,16 @@ import AppKit
 
 struct StatsView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var sessions: [FocusSession]
-    @Query private var blockEvents: [BlockEvent]
+    @Query(sort: \FocusSession.startedAt, order: .reverse) private var sessions: [FocusSession]
+    @Query(sort: \BlockEvent.timestamp, order: .reverse) private var blockEvents: [BlockEvent]
 
-    private var todaySessions: [FocusSession] {
-        let startOfDay = Calendar.current.startOfDay(for: Date())
-        return sessions.filter { $0.startedAt >= startOfDay }
-    }
+    @State private var todaySessions: [FocusSession] = []
+    @State private var todayBlockEvents: [BlockEvent] = []
 
-    private var todayBlockEvents: [BlockEvent] {
+    private func refreshTodayData() {
         let startOfDay = Calendar.current.startOfDay(for: Date())
-        return blockEvents.filter { $0.timestamp >= startOfDay }
+        todaySessions = sessions.filter { $0.startedAt >= startOfDay }
+        todayBlockEvents = Array(blockEvents.filter { $0.timestamp >= startOfDay }.prefix(50))
     }
 
     private var totalFocusMinutes: Int {
@@ -61,15 +60,15 @@ struct StatsView: View {
                 StatCard(icon: "flame.fill", title: "连续天数", value: "\(streakDays)", unit: "天", color: .red)
             }
 
-            // Block details (last 20)
+            // Block details (last 10)
             if !todayBlockEvents.isEmpty {
-                let recentEvents = Array(todayBlockEvents.sorted(by: { $0.timestamp > $1.timestamp }).prefix(20))
+                let recentEvents = Array(todayBlockEvents.prefix(10))
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("拦截记录")
                             .font(.headline)
                         Spacer()
-                        Text("最近 \(min(todayBlockEvents.count, 20)) 条")
+                        Text("最近 \(min(todayBlockEvents.count, 10)) 条")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
@@ -99,6 +98,9 @@ struct StatsView: View {
             .buttonStyle(.plain)
         }
         .padding(24)
+        .onAppear { refreshTodayData() }
+        .onChange(of: sessions.count) { _, _ in refreshTodayData() }
+        .onChange(of: blockEvents.count) { _, _ in refreshTodayData() }
     }
 
     private func clearAllData() {
