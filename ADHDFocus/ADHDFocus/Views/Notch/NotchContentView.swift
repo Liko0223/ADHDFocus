@@ -92,21 +92,28 @@ struct NotchContentView: View {
                 .shadow(color: .black.opacity(manager.isExpanded ? 0.4 : 0), radius: 16)
 
                 VStack(spacing: 0) {
-                    // Top bar
-                    collapsedBar
-                        .frame(width: currentWidth, height: manager.notchHeight)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            manager.toggleExpanded()
-                        }
-
                     if manager.isExpanded {
+                        // Expanded: scene starts from very top (behind notch), no top bar character
                         expandedContent
                             .frame(width: currentWidth)
                             .transition(.opacity.combined(with: .move(edge: .top)))
+                    } else {
+                        // Collapsed: character + timer bar
+                        collapsedBar
+                            .frame(width: currentWidth, height: manager.notchHeight)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                manager.toggleExpanded()
+                            }
                     }
                 }
                 .frame(width: currentWidth)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if manager.isExpanded {
+                        // tap on the scene area to collapse
+                    }
+                }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
             .offset(x: manager.isExpanded ? 0 : collapsedOffsetX)
@@ -165,13 +172,13 @@ struct NotchContentView: View {
 
     private var expandedContent: some View {
         VStack(spacing: 0) {
-            // Scene fills top half, edge to edge
+            // Scene fills from very top (including notch row) to mid panel
             CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth)
-                .frame(height: 140)
+                .frame(height: manager.notchHeight + 120)
 
-            // Controls below
-            VStack(spacing: 8) {
-                // Status + mode grid
+            // Controls below with consistent 12px spacing
+            VStack(spacing: 12) {
+                // Status row
                 HStack(spacing: 6) {
                     if manager.isActive, let name = manager.modeName {
                         Circle().fill(.green).frame(width: 6, height: 6)
@@ -190,9 +197,8 @@ struct NotchContentView: View {
                             .foregroundStyle(.purple)
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.top, 10)
 
+                // Mode grid
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
                     ForEach(modes) { mode in
                         Button {
@@ -226,7 +232,6 @@ struct NotchContentView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 14)
 
                 // Bottom bar
                 HStack(spacing: 10) {
@@ -263,9 +268,9 @@ struct NotchContentView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 14)
-                .padding(.bottom, 10)
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
         }
     }
 
