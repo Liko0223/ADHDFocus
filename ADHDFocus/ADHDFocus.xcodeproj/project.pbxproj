@@ -8,10 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		5278672FC29F753B837945F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 122ACD82DE885656995FED88 /* Assets.xcassets */; };
+		530F7110B538BE7C060F731F /* FocusModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E03D9382FE46707E4D9468 /* FocusModeTests.swift */; };
+		66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737297A491D3C5EFF831C48F /* BlockEvent.swift */; };
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
 		7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */; };
 		A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */; };
+		ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3366F2338DAA700B20DE37 /* FocusMode.swift */; };
 		C51AD3158530EF1F1646E234 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */; };
+		C88779099F32E060759E1BCE /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9170B6FB6E672FADA64DE /* FocusSession.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,10 +31,14 @@
 /* Begin PBXFileReference section */
 		10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADHDFocusTests.swift; sourceTree = "<group>"; };
 		122ACD82DE885656995FED88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1C3366F2338DAA700B20DE37 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
+		32E03D9382FE46707E4D9468 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
 		43F7F74BA8808BD2B22804A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53329645BA4D1D0255C861BA /* ADHDFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADHDFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		59CC9278C31AF28A754A5352 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADHDFocusApp.swift; sourceTree = "<group>"; };
+		737297A491D3C5EFF831C48F /* BlockEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEvent.swift; sourceTree = "<group>"; };
+		77C9170B6FB6E672FADA64DE /* FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSession.swift; sourceTree = "<group>"; };
 		7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
 		845249BDB9F7F2FD4941618F /* ADHDFocusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ADHDFocusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -52,6 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */,
+				32E03D9382FE46707E4D9468 /* FocusModeTests.swift */,
 			);
 			path = ADHDFocusTests;
 			sourceTree = "<group>";
@@ -65,11 +74,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		9233BE26AD8EB08AC9509D5B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				737297A491D3C5EFF831C48F /* BlockEvent.swift */,
+				1C3366F2338DAA700B20DE37 /* FocusMode.swift */,
+				77C9170B6FB6E672FADA64DE /* FocusSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		985BF55B049FC7A0F956DE69 /* ADHDFocus */ = {
 			isa = PBXGroup;
 			children = (
 				5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */,
 				43F7F74BA8808BD2B22804A6 /* Info.plist */,
+				9233BE26AD8EB08AC9509D5B /* Models */,
 				9ED30194ED89F7DDFD695CE2 /* Resources */,
 			);
 			path = ADHDFocus;
@@ -102,7 +122,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		"TEMP_CBD4D802-9066-4498-BE46-78C235892985" /* Views */ = {
+		"TEMP_24942F4A-F1D9-4C27-96DC-66FC628B8912" /* Views */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -195,6 +215,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */,
+				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
+				ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */,
+				C88779099F32E060759E1BCE /* FocusSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +226,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */,
+				530F7110B538BE7C060F731F /* FocusModeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +246,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -240,6 +265,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

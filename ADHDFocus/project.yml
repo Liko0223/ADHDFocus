@@ -60,6 +60,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.lilinke.ADHDFocusTests
         SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/ADHDFocus.app/Contents/MacOS/ADHDFocus
         BUNDLE_LOADER: $(TEST_HOST)
     dependencies:
