@@ -1,9 +1,20 @@
 import Foundation
+import AppKit
 import UserNotifications
 
 final class NotificationManager {
     static let shared = NotificationManager()
     private var permissionRequested = false
+    private func makeIconAttachment() -> UNNotificationAttachment? {
+        guard let icon = NSApp.applicationIconImage else { return nil }
+        let tmpURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("adhd_icon_\(UUID().uuidString).png")
+        guard let tiff = icon.tiffRepresentation,
+              let rep = NSBitmapImageRep(data: tiff),
+              let png = rep.representation(using: .png, properties: [:]) else { return nil }
+        try? png.write(to: tmpURL)
+        return try? UNNotificationAttachment(identifier: "icon", url: tmpURL)
+    }
 
     func requestPermission() {
         guard !permissionRequested else { return }
@@ -20,6 +31,7 @@ final class NotificationManager {
             content.body += "，番茄钟剩余 \(minutes) 分钟"
         }
         content.sound = .default
+        if let icon = makeIconAttachment() { content.attachments = [icon] }
 
         let request = UNNotificationRequest(
             identifier: "blocked-app-\(UUID().uuidString)",
@@ -45,6 +57,7 @@ final class NotificationManager {
             return
         }
         content.sound = .default
+        if let icon = makeIconAttachment() { content.attachments = [icon] }
 
         let request = UNNotificationRequest(
             identifier: "pomodoro-\(UUID().uuidString)",
