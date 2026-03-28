@@ -131,7 +131,7 @@ struct NotchContentView: View {
                     amplitude: manager.companionState.swayAmplitude
                 )
 
-                PixelCompanionView(state: manager.companionState)
+                PixelCompanionView(state: manager.companionState, time: timeline.date.timeIntervalSinceReferenceDate)
                     .frame(width: 22, height: 22)
                     .offset(y: bob)
                     .rotationEffect(.degrees(sway))
@@ -334,6 +334,7 @@ struct NotchShape: Shape {
 
 struct PixelCompanionView: View {
     let state: CompanionState
+    var time: Double = 0
 
     var body: some View {
         Canvas { context, size in
@@ -349,10 +350,10 @@ struct PixelCompanionView: View {
             let skinColor = Color(red: 0.98, green: 0.86, blue: 0.72)
             let eyeColor = Color(red: 0.18, green: 0.14, blue: 0.25)
 
-            let cx = s / 2  // center x
-            let startY = px  // top padding
+            let cx = s / 2
+            let startY = px
 
-            // Head (round: 5 wide, 4 tall, corners clipped)
+            // Head
             let headPixels: [(Int, Int)] = [
                 (1,0),(2,0),(3,0),
                 (0,1),(1,1),(2,1),(3,1),(4,1),
@@ -365,21 +366,27 @@ struct PixelCompanionView: View {
                 context.fill(Path(CGRect(x: hx, y: hy, width: px, height: px)), with: .color(skinColor))
             }
 
-            // Eyes
-            let eyeLX = cx - px * 1.1
-            let eyeRX = cx + px * 0.3
-            let eyeY = startY + px * 1.2
-            context.fill(Path(ellipseIn: CGRect(x: eyeLX, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
-            context.fill(Path(ellipseIn: CGRect(x: eyeRX, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
+            // Eyes — working gets focused ">" eyes
+            if state == .working {
+                let fc = eyeColor
+                context.fill(Path(CGRect(x: cx - px * 1.0, y: startY + px * 1.0, width: px * 0.5, height: px * 0.5)), with: .color(fc))
+                context.fill(Path(CGRect(x: cx - px * 0.6, y: startY + px * 1.5, width: px * 0.4, height: px * 0.4)), with: .color(fc))
+                context.fill(Path(CGRect(x: cx + px * 0.5, y: startY + px * 1.0, width: px * 0.5, height: px * 0.5)), with: .color(fc))
+                context.fill(Path(CGRect(x: cx + px * 0.9, y: startY + px * 1.5, width: px * 0.4, height: px * 0.4)), with: .color(fc))
+            } else {
+                let eyeY = startY + px * 1.2
+                context.fill(Path(ellipseIn: CGRect(x: cx - px * 1.1, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
+                context.fill(Path(ellipseIn: CGRect(x: cx + px * 0.3, y: eyeY, width: px * 0.7, height: px * 0.7)), with: .color(eyeColor))
 
-            // Rosy cheeks
-            if state == .idle || state == .resting {
-                let rosy = Color(red: 0.95, green: 0.60, blue: 0.60).opacity(0.45)
-                context.fill(Path(ellipseIn: CGRect(x: cx - px * 1.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
-                context.fill(Path(ellipseIn: CGRect(x: cx + px * 0.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
+                // Rosy cheeks for idle/resting
+                if state == .idle || state == .resting {
+                    let rosy = Color(red: 0.95, green: 0.60, blue: 0.60).opacity(0.45)
+                    context.fill(Path(ellipseIn: CGRect(x: cx - px * 1.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
+                    context.fill(Path(ellipseIn: CGRect(x: cx + px * 0.8, y: startY + px * 2.2, width: px, height: px * 0.5)), with: .color(rosy))
+                }
             }
 
-            // Body (4 wide, 3 tall)
+            // Body
             for row in 0..<3 {
                 for col in 0..<4 {
                     let bx = cx - px * 2 + CGFloat(col) * px
@@ -388,9 +395,10 @@ struct PixelCompanionView: View {
                 }
             }
 
-            // Arms
-            context.fill(Path(CGRect(x: cx - px * 3, y: startY + px * 4.5, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
-            context.fill(Path(CGRect(x: cx + px * 2, y: startY + px * 4.5, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
+            // Arms — working: typing animation, others: static
+            let armBounce: CGFloat = state == .working ? CGFloat(Int(time * 6) % 2 == 0 ? -1 : 1) * px * 0.5 : 0
+            context.fill(Path(CGRect(x: cx - px * 3, y: startY + px * 4.5 + armBounce, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
+            context.fill(Path(CGRect(x: cx + px * 2, y: startY + px * 4.5 - armBounce, width: px, height: px * 1.5)), with: .color(bodyColor.opacity(0.7)))
 
             // Legs
             context.fill(Path(CGRect(x: cx - px * 1.5, y: startY + px * 7, width: px, height: px * 1.2)), with: .color(bodyColor.opacity(0.6)))

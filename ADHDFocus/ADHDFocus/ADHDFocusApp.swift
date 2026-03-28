@@ -39,7 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func openMainWindow() {
-        if let window = mainWindow, window.isVisible {
+        if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
@@ -54,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
+        window.isReleasedWhenClosed = false
         window.title = "ADHD Focus"
         window.contentView = NSHostingView(rootView: contentView)
         window.center()
