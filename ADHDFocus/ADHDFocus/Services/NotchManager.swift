@@ -21,6 +21,7 @@ final class NotchManager {
     var notchWidth: CGFloat = 200
     var notchHeight: CGFloat = 38
     var screenWidth: CGFloat = 1440
+    var targetScreen: NSScreen?
 
     private let collapsedSideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
@@ -34,6 +35,7 @@ final class NotchManager {
         // Prefer the screen with a notch (built-in display)
         let screen = NSScreen.screens.first(where: { $0.hasNotch }) ?? NSScreen.main
         guard let screen else { return }
+        targetScreen = screen
 
         let screenFrame = screen.frame
         screenWidth = screenFrame.width

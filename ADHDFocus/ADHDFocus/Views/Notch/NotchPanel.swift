@@ -30,7 +30,7 @@ final class NotchHitTestView: NSView {
     override func hitTest(_ point: NSPoint) -> NSView? {
         guard let window, let manager else { return nil }
         let screenPoint = window.convertPoint(toScreen: convert(point, to: nil))
-        guard let screen = NSScreen.main else { return nil }
+        guard let screen = manager.targetScreen ?? NSScreen.main else { return nil }
         let activeRect = manager.activeRect(in: screen.frame)
         guard activeRect.contains(screenPoint) else { return nil }
         return super.hitTest(point)
