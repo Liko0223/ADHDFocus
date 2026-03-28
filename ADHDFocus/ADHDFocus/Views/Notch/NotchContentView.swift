@@ -120,7 +120,7 @@ struct NotchContentView: View {
 
                 PixelCompanionView(state: manager.companionState, time: timeline.date.timeIntervalSinceReferenceDate)
                     .frame(width: 30, height: 30)
-                    .offset(y: bob)
+                    .offset(y: bob + 2)
                     .rotationEffect(.degrees(sway))
             }
             .frame(width: sideExtension)
