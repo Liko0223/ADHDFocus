@@ -275,7 +275,9 @@ struct NotchContentView: View {
     }
 }
 
-// MARK: - Notch Shape with outward top corners
+// MARK: - Notch Shape
+// Top corners curve outward (concave) to blend with screen bezel
+// Bottom corners curve inward (convex) like normal rounded corners
 
 struct NotchShape: Shape {
     let topCornerRadius: CGFloat
@@ -288,44 +290,43 @@ struct NotchShape: Shape {
         let tcr = topCornerRadius
         let bcr = bottomCornerRadius
 
-        // Start at top-left, with outward curve
-        // The outward curve goes: straight down from top, then curves inward
-        path.move(to: CGPoint(x: 0, y: 0))
-
-        // Top-left outward corner: curve goes from (0,0) → (tcr, tcr)
-        // Control point at (0, tcr) creates outward bulge
+        // Top-left: start outside the rect, curve inward
+        // Point starts at (-tcr, 0) and curves to (0, tcr)
+        // This creates the outward concave curve that blends with the screen bezel
+        path.move(to: CGPoint(x: -tcr, y: 0))
         path.addQuadCurve(
-            to: CGPoint(x: tcr, y: tcr),
-            control: CGPoint(x: 0, y: tcr)
+            to: CGPoint(x: 0, y: tcr),
+            control: CGPoint(x: 0, y: 0)
         )
 
-        // Left edge down to bottom-left
-        path.addLine(to: CGPoint(x: tcr, y: rect.height - bcr))
+        // Left edge down
+        path.addLine(to: CGPoint(x: 0, y: rect.height - bcr))
 
-        // Bottom-left inward corner
+        // Bottom-left: normal inward rounded corner
         path.addQuadCurve(
-            to: CGPoint(x: tcr + bcr, y: rect.height),
-            control: CGPoint(x: tcr, y: rect.height)
+            to: CGPoint(x: bcr, y: rect.height),
+            control: CGPoint(x: 0, y: rect.height)
         )
 
         // Bottom edge
-        path.addLine(to: CGPoint(x: rect.width - tcr - bcr, y: rect.height))
+        path.addLine(to: CGPoint(x: rect.width - bcr, y: rect.height))
 
-        // Bottom-right inward corner
+        // Bottom-right: normal inward rounded corner
         path.addQuadCurve(
-            to: CGPoint(x: rect.width - tcr, y: rect.height - bcr),
-            control: CGPoint(x: rect.width - tcr, y: rect.height)
+            to: CGPoint(x: rect.width, y: rect.height - bcr),
+            control: CGPoint(x: rect.width, y: rect.height)
         )
 
         // Right edge up
-        path.addLine(to: CGPoint(x: rect.width - tcr, y: tcr))
+        path.addLine(to: CGPoint(x: rect.width, y: tcr))
 
-        // Top-right outward corner
+        // Top-right: outward concave curve
         path.addQuadCurve(
-            to: CGPoint(x: rect.width, y: 0),
-            control: CGPoint(x: rect.width, y: tcr)
+            to: CGPoint(x: rect.width + tcr, y: 0),
+            control: CGPoint(x: rect.width, y: 0)
         )
 
+        // Top edge (goes through the area above, connects back)
         path.closeSubpath()
         return path
     }
