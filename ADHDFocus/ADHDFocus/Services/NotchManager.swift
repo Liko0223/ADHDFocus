@@ -5,6 +5,8 @@ import SwiftUI
 final class NotchManager {
     private var panel: NotchPanel?
     private var hitTestView: NotchHitTestView?
+    private var syncTimer: Timer?
+    weak var engine: FocusEngine?
 
     var companionState: CompanionState = .idle
     var modeName: String?
@@ -43,6 +45,12 @@ final class NotchManager {
 
         self.panel = panel
         self.hitTestView = hitTest
+
+        // Sync timer display every second
+        syncTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self, let engine = self.engine else { return }
+            self.remainingSeconds = engine.pomodoroTimer?.remainingSeconds ?? 0
+        }
     }
 
     func updateState(isActive: Bool, modeName: String?, remainingSeconds: Int, isOnBreak: Bool) {

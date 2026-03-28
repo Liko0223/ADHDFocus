@@ -8,6 +8,7 @@ struct ADHDFocusApp: App {
     @State private var appMonitor: AppMonitor?
     @State private var currentSession: FocusSession?
     @State private var rulesServer: RulesServer?
+    @State private var notchManager = NotchManager()
 
     let container: ModelContainer
     private let dndController = DNDController()
@@ -44,6 +45,10 @@ struct ADHDFocusApp: App {
 
         NotificationManager.shared.requestPermission()
 
+        // Setup notch companion
+        notchManager.engine = engine
+        notchManager.setup()
+
         let monitor = AppMonitor(engine: engine, modelContext: container.mainContext)
         appMonitor = monitor
 
@@ -52,17 +57,24 @@ struct ADHDFocusApp: App {
         server.start()
         rulesServer = server
 
-        engine.onModeActivated = { mode in
+        engine.onModeActivated = { [self] mode in
             monitor.startMonitoring()
             if mode.enableDND { dndController.enableDND() }
 
             let session = FocusSession(modeID: mode.id, modeName: mode.name, statsTag: mode.statsTag)
             container.mainContext.insert(session)
             currentSession = session
+
+            notchManager.updateState(
+                isActive: true,
+                modeName: mode.name,
+                remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
+                isOnBreak: false
+            )
         }
 
         let ctx = container.mainContext
-        engine.onModeDeactivated = {
+        engine.onModeDeactivated = { [self] in
             monitor.stopMonitoring()
             dndController.disableDND()
 
@@ -73,10 +85,18 @@ struct ADHDFocusApp: App {
                 try? ctx.save()
             }
             currentSession = nil
+
+            notchManager.updateState(isActive: false, modeName: nil, remainingSeconds: 0, isOnBreak: false)
         }
 
-        engine.onPomodoroPhaseChange = { phase in
+        engine.onPomodoroPhaseChange = { [self] phase in
             NotificationManager.shared.sendPomodoroNotification(phase: phase)
+            notchManager.updateState(
+                isActive: true,
+                modeName: engine.activeMode?.name,
+                remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
+                isOnBreak: engine.pomodoroTimer?.isOnBreak ?? false
+            )
         }
     }
 
