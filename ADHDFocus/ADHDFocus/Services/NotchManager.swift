@@ -25,7 +25,7 @@ final class NotchManager {
 
     private let collapsedSideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
-    private let expandedHeight: CGFloat = 360
+    private let expandedHeight: CGFloat = 260
 
     var collapsedTotalWidth: CGFloat {
         notchWidth + collapsedSideExtension * 2

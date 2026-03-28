@@ -40,7 +40,7 @@ struct NotchContentView: View {
     // Fixed side extension — character always at the same position
     private let sideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
-    private let expandedPanelHeight: CGFloat = 360
+    private let expandedPanelHeight: CGFloat = 260
     private let bottomCornerRadius: CGFloat = 16
     private let topCornerRadius: CGFloat = 10  // outward curve radius
 
@@ -80,16 +80,29 @@ struct NotchContentView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                // Black background with notch-style shape
-                NotchShape(
-                    topCornerRadius: topCornerRadius,
-                    bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
-                    notchHeight: manager.notchHeight,
-                    isExpanded: manager.isExpanded
-                )
-                .fill(.black)
-                .frame(width: currentWidth, height: currentHeight)
-                .shadow(color: .black.opacity(manager.isExpanded ? 0.4 : 0), radius: 16)
+                // Black background
+                if manager.isExpanded {
+                    // Expanded: full rect top (scene fills to top edge), rounded bottom only
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 0,
+                        bottomLeadingRadius: bottomCornerRadius,
+                        bottomTrailingRadius: bottomCornerRadius,
+                        topTrailingRadius: 0
+                    )
+                    .fill(.black)
+                    .frame(width: currentWidth, height: currentHeight)
+                    .shadow(color: .black.opacity(0.4), radius: 16)
+                } else {
+                    // Collapsed: outward top corners for notch blend
+                    NotchShape(
+                        topCornerRadius: topCornerRadius,
+                        bottomCornerRadius: topCornerRadius,
+                        notchHeight: manager.notchHeight,
+                        isExpanded: false
+                    )
+                    .fill(.black)
+                    .frame(width: currentWidth, height: currentHeight)
+                }
 
                 VStack(spacing: 0) {
                     if manager.isExpanded {
