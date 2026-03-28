@@ -40,7 +40,7 @@ struct NotchContentView: View {
     // Fixed side extension — character always at the same position
     private let sideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
-    private let expandedPanelHeight: CGFloat = 380
+    private let expandedPanelHeight: CGFloat = 500
     private let bottomCornerRadius: CGFloat = 16
     private let topCornerRadius: CGFloat = 10  // outward curve radius
 
@@ -164,7 +164,12 @@ struct NotchContentView: View {
     // MARK: - Expanded panel
 
     private var expandedContent: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
+            // Companion scene at the top
+            CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth - 32)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+
             if manager.isActive, let name = manager.modeName {
                 HStack {
                     Circle().fill(.green).frame(width: 8, height: 8)

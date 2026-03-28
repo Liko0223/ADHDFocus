@@ -39,6 +39,7 @@
 		C5EF86FAE407B6E116255ACF /* NotchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA58F9152973A5E0CC1D41D /* NotchContentView.swift */; };
 		C6475346961BF47F0502D56C /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FE1D8E91F4BA4EE7A4B3CF /* MainWindowView.swift */; };
 		C88779099F32E060759E1BCE /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9170B6FB6E672FADA64DE /* FocusSession.swift */; };
+		CC13CDEDE4309E27EEF442C8 /* CompanionSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A777CA1613981942965EB77 /* CompanionSceneView.swift */; };
 		D2A9549516D518A1ADA8956C /* SpriteSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03860CDD9D664BA3071789D1 /* SpriteSheetView.swift */; };
 		D3DDC56250A5AF02AAC95E18 /* NotchPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027EECF7F4B4E7868E5E93B8 /* NotchPanel.swift */; };
 		E195A76AAA30B4859A26949B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A0980327B19CA6968397CC3 /* AppKit.framework */; };
@@ -72,6 +73,7 @@
 		37E8244A72B60B1D487102FD /* ModeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeEditorView.swift; sourceTree = "<group>"; };
 		39E78F3410889E09A72BAF06 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3A0980327B19CA6968397CC3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		3A777CA1613981942965EB77 /* CompanionSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSceneView.swift; sourceTree = "<group>"; };
 		43F7F74BA8808BD2B22804A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		44FE1D8E91F4BA4EE7A4B3CF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		53329645BA4D1D0255C861BA /* ADHDFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADHDFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				72395689F33E4C1492AE5478 /* BobAnimation.swift */,
+				3A777CA1613981942965EB77 /* CompanionSceneView.swift */,
 				2FA58F9152973A5E0CC1D41D /* NotchContentView.swift */,
 				027EECF7F4B4E7868E5E93B8 /* NotchPanel.swift */,
 				1C24AEBA827F04F1A5B9C711 /* NSScreen+Notch.swift */,
@@ -347,6 +350,7 @@
 				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
 				825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */,
 				3AC57EA40E5187A0772DEDA6 /* BobAnimation.swift in Sources */,
+				CC13CDEDE4309E27EEF442C8 /* CompanionSceneView.swift in Sources */,
 				8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */,
 				0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */,
 				34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */,
