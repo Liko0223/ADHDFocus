@@ -7,9 +7,9 @@ struct ADHDFocusApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Window("ADHD Focus", id: "main") {
-            MainWindowView(engine: appDelegate.engine)
-                .modelContainer(appDelegate.container)
+        // No default window — main window is opened on demand via AppDelegate
+        Settings {
+            EmptyView()
         }
     }
 }
@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var currentSession: FocusSession?
     private var rulesServer: RulesServer?
     private var notchManager = NotchManager()
+    private var mainWindow: NSWindow?
 
     override init() {
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
@@ -30,13 +31,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         container = try! ModelContainer(for: schema, configurations: [config])
         super.init()
         seedDefaultModesIfNeeded()
-
-        // Prevent main window from appearing on launch
-        NSApp.setActivationPolicy(.accessory)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupEngine()
+    }
+
+    func openMainWindow() {
+        if let window = mainWindow, window.isVisible {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let contentView = MainWindowView(engine: engine)
+            .modelContainer(container)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 520),
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "ADHD Focus"
+        window.contentView = NSHostingView(rootView: contentView)
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        mainWindow = window
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -49,6 +71,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Setup notch companion
         notchManager.engine = engine
         notchManager.modelContainer = container
+        notchManager.openMainWindow = { [weak self] in
+            self?.openMainWindow()
+        }
         notchManager.setup()
 
         let monitor = AppMonitor(engine: engine, modelContext: container.mainContext)

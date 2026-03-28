@@ -35,7 +35,6 @@ enum CompanionState: String {
 struct NotchContentView: View {
     @Bindable var manager: NotchManager
     @Query(sort: \FocusMode.sortOrder) private var modes: [FocusMode]
-    @Environment(\.openWindow) private var openWindow
 
     // Fixed side extension — character always at the same position
     private let sideExtension: CGFloat = 70
@@ -248,9 +247,7 @@ struct NotchContentView: View {
                     Spacer()
 
                     Button {
-                        NSApp.setActivationPolicy(.regular)
-                        openWindow(id: "main")
-                        NSApp.activate(ignoringOtherApps: true)
+                        manager.openMainWindow?()
                         manager.collapse()
                     } label: {
                         Image(systemName: "gearshape")

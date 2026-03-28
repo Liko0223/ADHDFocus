@@ -9,6 +9,7 @@ final class NotchManager {
     private var clickMonitor: Any?
     weak var engine: FocusEngine?
     var modelContainer: ModelContainer?
+    var openMainWindow: (() -> Void)?
 
     // State
     var companionState: CompanionState = .idle
