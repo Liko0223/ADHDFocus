@@ -134,6 +134,15 @@ final class BlockOverlayPanel: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         isMovable = false
 
+        // Use NSVisualEffectView as the root content view for proper frosted glass blur.
+        // SwiftUI .ultraThinMaterial does not blend with content behind a transparent NSPanel,
+        // but NSVisualEffectView does.
+        let visualEffect = NSVisualEffectView()
+        visualEffect.material = .hudWindow       // dark-tinted blur, readable against any bg
+        visualEffect.blendingMode = .behindWindow
+        visualEffect.state = .active
+        visualEffect.wantsLayer = true
+
         let content = BlockOverlayContent(
             appName: appName,
             modeName: modeName,
@@ -141,7 +150,19 @@ final class BlockOverlayPanel: NSPanel {
             onGoBack: onGoBack,
             onTempAllow: onTempAllow
         )
-        contentView = NSHostingView(rootView: content)
+        let hostingView = NSHostingView(rootView: content)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.layer?.backgroundColor = .clear
+
+        visualEffect.addSubview(hostingView)
+        NSLayoutConstraint.activate([
+            hostingView.leadingAnchor.constraint(equalTo: visualEffect.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: visualEffect.trailingAnchor),
+            hostingView.topAnchor.constraint(equalTo: visualEffect.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: visualEffect.bottomAnchor),
+        ])
+
+        contentView = visualEffect
     }
 
     override var canBecomeKey: Bool { true }
@@ -156,7 +177,7 @@ struct BlockOverlayContent: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.7)
+            Color.clear
 
             VStack(spacing: 16) {
                 Text("🚫")
