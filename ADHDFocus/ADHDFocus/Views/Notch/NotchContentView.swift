@@ -158,6 +158,7 @@ struct NotchContentView: View {
                                 .foregroundStyle(.white.opacity(isPaused ? 0.5 : 0.9))
                         }
                         .contentShape(Rectangle())
+                        .help(isPaused ? "点击继续" : "点击暂停")
                         .onTapGesture {
                             if isPaused {
                                 manager.engine?.pomodoroTimer?.resume()
