@@ -4,40 +4,39 @@ import AppKit
 
 @main
 struct ADHDFocusApp: App {
-    @State private var engine = FocusEngine()
-    @State private var appMonitor: AppMonitor?
-    @State private var currentSession: FocusSession?
-    @State private var rulesServer: RulesServer?
-    @State private var notchManager = NotchManager()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+    var body: some Scene {
+        Window("ADHD Focus", id: "main") {
+            MainWindowView(engine: appDelegate.engine)
+                .modelContainer(appDelegate.container)
+        }
+    }
+}
+
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    let engine = FocusEngine()
     let container: ModelContainer
     private let dndController = DNDController()
+    private var appMonitor: AppMonitor?
+    private var currentSession: FocusSession?
+    private var rulesServer: RulesServer?
+    private var notchManager = NotchManager()
 
-    init() {
+    override init() {
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         container = try! ModelContainer(for: schema, configurations: [config])
+        super.init()
         seedDefaultModesIfNeeded()
     }
 
-    var body: some Scene {
-        MenuBarExtra("ADHD Focus", systemImage: "brain.head.profile") {
-            MenuBarView(engine: engine)
-                .modelContainer(container)
-                .onAppear { setupEngine() }
-        }
-        .menuBarExtraStyle(.window)
-
-        Window("ADHD Focus", id: "main") {
-            MainWindowView(engine: engine)
-                .modelContainer(container)
-        }
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        setupEngine()
     }
 
     private func setupEngine() {
-        guard appMonitor == nil else { return }
-
-        // Request accessibility permission if not granted
         if !AXIsProcessTrusted() {
             let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
             AXIsProcessTrustedWithOptions(options)
@@ -47,17 +46,18 @@ struct ADHDFocusApp: App {
 
         // Setup notch companion
         notchManager.engine = engine
+        notchManager.modelContainer = container
         notchManager.setup()
 
         let monitor = AppMonitor(engine: engine, modelContext: container.mainContext)
         appMonitor = monitor
 
-        // Start local HTTP server for Chrome Extension
         let server = RulesServer(engine: engine)
         server.start()
         rulesServer = server
 
-        engine.onModeActivated = { [self] mode in
+        engine.onModeActivated = { [weak self] mode in
+            guard let self else { return }
             monitor.startMonitoring()
             if mode.enableDND { dndController.enableDND() }
 
@@ -73,8 +73,8 @@ struct ADHDFocusApp: App {
             )
         }
 
-        let ctx = container.mainContext
-        engine.onModeDeactivated = { [self] in
+        engine.onModeDeactivated = { [weak self] in
+            guard let self else { return }
             monitor.stopMonitoring()
             dndController.disableDND()
 
@@ -82,14 +82,15 @@ struct ADHDFocusApp: App {
                 session.endedAt = Date()
                 session.totalWorkSeconds = Int(Date().timeIntervalSince(session.startedAt))
                 session.completedPomodoros = engine.pomodoroTimer?.completedPomodoros ?? 0
-                try? ctx.save()
+                try? container.mainContext.save()
             }
             currentSession = nil
 
             notchManager.updateState(isActive: false, modeName: nil, remainingSeconds: 0, isOnBreak: false)
         }
 
-        engine.onPomodoroPhaseChange = { [self] phase in
+        engine.onPomodoroPhaseChange = { [weak self] phase in
+            guard let self else { return }
             NotificationManager.shared.sendPomodoroNotification(phase: phase)
             notchManager.updateState(
                 isActive: true,

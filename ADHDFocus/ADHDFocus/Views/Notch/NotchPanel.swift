@@ -20,16 +20,18 @@ final class NotchPanel: NSPanel {
         isMovable = false
     }
 
-    override var canBecomeKey: Bool { false }
+    override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }
 
 final class NotchHitTestView: NSView {
-    var activeRect: NSRect = .zero
+    weak var manager: NotchManager?
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        guard let window else { return nil }
+        guard let window, let manager else { return nil }
         let screenPoint = window.convertPoint(toScreen: convert(point, to: nil))
+        guard let screen = NSScreen.main else { return nil }
+        let activeRect = manager.activeRect(in: screen.frame)
         guard activeRect.contains(screenPoint) else { return nil }
         return super.hitTest(point)
     }
