@@ -9,12 +9,16 @@ final class BlockOverlayManager {
     private var blockedApp: NSRunningApplication?
     private var modeName: String = ""
     private var remainingSeconds: Int = 0
+    private var allowTempAccess: Bool = false
+    private var onTempAllow: ((String) -> Void)?
 
-    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int) {
+    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int, allowTempAccess: Bool = false, onTempAllow: ((String) -> Void)? = nil) {
         dismissAll()
         self.blockedApp = app
         self.modeName = modeName
         self.remainingSeconds = remainingSeconds
+        self.allowTempAccess = allowTempAccess
+        self.onTempAllow = onTempAllow
 
         updateOverlays()
 
@@ -80,13 +84,18 @@ final class BlockOverlayManager {
                 existing.setFrame(frame, display: false)
             } else {
                 // Create new overlay for this window
+                let bundleID = app.bundleIdentifier ?? ""
                 let panel = BlockOverlayPanel(
                     frame: frame,
                     appName: app.localizedName ?? "应用",
                     modeName: modeName,
                     remainingSeconds: remainingSeconds,
+                    allowTempAccess: allowTempAccess,
                     onGoBack: { [weak self] in
                         self?.goBackToWork()
+                    },
+                    onTempAllow: { [weak self] in
+                        self?.onTempAllow?(bundleID)
                     }
                 )
                 panel.orderFrontRegardless()
@@ -112,7 +121,7 @@ final class BlockOverlayManager {
 
 // Individual overlay panel for one window
 final class BlockOverlayPanel: NSPanel {
-    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, onGoBack: @escaping () -> Void) {
+    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, allowTempAccess: Bool, onGoBack: @escaping () -> Void, onTempAllow: @escaping () -> Void) {
         super.init(
             contentRect: frame,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -132,7 +141,9 @@ final class BlockOverlayPanel: NSPanel {
             appName: appName,
             modeName: modeName,
             remainingSeconds: remainingSeconds,
-            onGoBack: onGoBack
+            allowTempAccess: allowTempAccess,
+            onGoBack: onGoBack,
+            onTempAllow: onTempAllow
         )
         contentView = NSHostingView(rootView: content)
     }
@@ -144,11 +155,12 @@ struct BlockOverlayContent: View {
     let appName: String
     let modeName: String
     let remainingSeconds: Int
+    let allowTempAccess: Bool
     let onGoBack: () -> Void
+    let onTempAllow: () -> Void
 
     var body: some View {
         ZStack {
-            // Semi-transparent backdrop matching the window
             Color.black.opacity(0.7)
 
             VStack(spacing: 16) {
@@ -177,18 +189,35 @@ struct BlockOverlayContent: View {
                     .font(.subheadline)
                 }
 
-                Button {
-                    onGoBack()
-                } label: {
-                    Text("回到工作")
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                        .background(.purple)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                HStack(spacing: 12) {
+                    Button {
+                        onGoBack()
+                    } label: {
+                        Text("回到工作")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 10)
+                            .background(.purple)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .buttonStyle(.plain)
+
+                    if allowTempAccess {
+                        Button {
+                            onTempAllow()
+                        } label: {
+                            Text("允许 5 分钟")
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 10)
+                                .background(.white.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
             }
         }
     }

@@ -8,6 +8,7 @@ final class AppMonitor {
     private var launchObservation: NSObjectProtocol?
     private var activationObservation: NSObjectProtocol?
     private let overlayManager = BlockOverlayManager()
+    private var tempAllowedApps: [String: Date] = [:]  // bundleID -> expiry
 
     private let exemptApps = Set([
         "com.lilinke.ADHDFocus",
@@ -51,6 +52,11 @@ final class AppMonitor {
         checkRunningApps()
     }
 
+    private func tempAllowApp(_ bundleID: String) {
+        tempAllowedApps[bundleID] = Date().addingTimeInterval(5 * 60) // 5 minutes
+        overlayManager.dismissAll()
+    }
+
     func stopMonitoring() {
         if let obs = launchObservation {
             NSWorkspace.shared.notificationCenter.removeObserver(obs)
@@ -61,6 +67,7 @@ final class AppMonitor {
         launchObservation = nil
         activationObservation = nil
         overlayManager.dismissAll()
+        tempAllowedApps.removeAll()
     }
 
     private func checkRunningApps() {
@@ -76,6 +83,12 @@ final class AppMonitor {
         if app.activationPolicy != .regular { return }
         guard engine.shouldBlockApp(bundleID: bundleID) else { return }
 
+        // Check temp allow
+        if let expiry = tempAllowedApps[bundleID], Date() < expiry {
+            return
+        }
+        tempAllowedApps.removeValue(forKey: bundleID)
+
         // Record block event
         let event = BlockEvent(
             type: .app,
@@ -85,11 +98,26 @@ final class AppMonitor {
         modelContext.insert(event)
         try? modelContext.save()
 
-        // Show per-window overlays
-        overlayManager.showOverlays(
-            for: app,
-            modeName: engine.activeMode?.name ?? "",
-            remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
-        )
+        let strictness = engine.activeMode?.strictness ?? .overlay
+
+        switch strictness {
+        case .forceQuit:
+            app.terminate()
+            NotificationManager.shared.sendBlockedAppNotification(
+                appName: app.localizedName ?? bundleID,
+                modeName: engine.activeMode?.name ?? "",
+                remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
+            )
+        case .overlay, .delayAllow:
+            overlayManager.showOverlays(
+                for: app,
+                modeName: engine.activeMode?.name ?? "",
+                remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
+                allowTempAccess: strictness == .delayAllow,
+                onTempAllow: { [weak self] bundleID in
+                    self?.tempAllowApp(bundleID)
+                }
+            )
+        }
     }
 }

@@ -176,9 +176,9 @@ struct ModeEditorView: View {
                                     .font(.subheadline)
                                 Spacer()
                                 Picker("", selection: $mode.strictness) {
-                                    Text("提醒").tag(Strictness.remind)
+                                    Text("窗口遮罩").tag(Strictness.overlay)
                                     Text("强制退出").tag(Strictness.forceQuit)
-                                    Text("延迟允许").tag(Strictness.delayAllow)
+                                    Text("遮罩+可延迟").tag(Strictness.delayAllow)
                                 }
                                 .labelsHidden()
                                 .frame(width: 100)

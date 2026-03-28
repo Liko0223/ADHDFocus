@@ -8,9 +8,9 @@ enum AppPolicy: String, Codable {
 }
 
 enum Strictness: String, Codable {
-    case remind      // Show reminder, don't force quit
+    case overlay     // Window overlay, blocks interaction
     case forceQuit   // Terminate the app immediately
-    case delayAllow  // Allow after 5-minute buffer
+    case delayAllow  // Overlay + "allow 5 min" option
 }
 
 @Model
@@ -57,7 +57,7 @@ final class FocusMode {
         allowedURLs: [String] = [],
         blockedURLs: [String] = [],
         defaultURLPolicy: AppPolicy = .block,
-        strictness: Strictness = .forceQuit,
+        strictness: Strictness = .overlay,
         cooldownMinutes: Int = 0,
         workDuration: Int = 25 * 60,
         breakDuration: Int = 5 * 60,

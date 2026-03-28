@@ -12,7 +12,7 @@ import Foundation
     #expect(mode.allowedURLs.isEmpty)
     #expect(mode.blockedURLs.isEmpty)
     #expect(mode.defaultURLPolicy == .block)
-    #expect(mode.strictness == .forceQuit)
+    #expect(mode.strictness == .overlay)
     #expect(mode.cooldownMinutes == 0)
     #expect(mode.workDuration == 25 * 60)
     #expect(mode.breakDuration == 5 * 60)
