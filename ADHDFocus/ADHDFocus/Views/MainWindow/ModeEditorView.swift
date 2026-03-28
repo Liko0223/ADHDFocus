@@ -178,7 +178,6 @@ struct ModeEditorView: View {
                                 Picker("", selection: $mode.strictness) {
                                     Text("窗口遮罩").tag(Strictness.overlay)
                                     Text("强制退出").tag(Strictness.forceQuit)
-                                    Text("遮罩+可延迟").tag(Strictness.delayAllow)
                                 }
                                 .labelsHidden()
                                 .frame(width: 100)

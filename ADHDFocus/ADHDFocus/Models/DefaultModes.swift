@@ -38,7 +38,7 @@ struct DefaultModes {
                 "twitter.com", "x.com", "facebook.com", "instagram.com", "youtube.com"
             ],
             defaultURLPolicy: .remind,
-            strictness: .delayAllow,
+            strictness: .overlay,
             enableDND: true,
             hideDock: false,
             isPreset: true,
@@ -113,7 +113,7 @@ struct DefaultModes {
                 "weibo.com", "xiaohongshu.com", "bilibili.com", "douyin.com", "youtube.com"
             ],
             defaultURLPolicy: .block,
-            strictness: .delayAllow,
+            strictness: .overlay,
             enableDND: true,
             hideDock: true,
             isPreset: true,

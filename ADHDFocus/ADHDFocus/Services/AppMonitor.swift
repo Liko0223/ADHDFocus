@@ -108,12 +108,11 @@ final class AppMonitor {
                 modeName: engine.activeMode?.name ?? "",
                 remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
             )
-        case .overlay, .delayAllow:
+        case .overlay:
             overlayManager.showOverlays(
                 for: app,
                 modeName: engine.activeMode?.name ?? "",
                 remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
-                allowTempAccess: strictness == .delayAllow,
                 onTempAllow: { [weak self] bundleID in
                     self?.tempAllowApp(bundleID)
                 }

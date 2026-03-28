@@ -8,9 +8,8 @@ enum AppPolicy: String, Codable {
 }
 
 enum Strictness: String, Codable {
-    case overlay     // Window overlay, blocks interaction
+    case overlay     // Window overlay with "allow 5 min" option
     case forceQuit   // Terminate the app immediately
-    case delayAllow  // Overlay + "allow 5 min" option
 }
 
 @Model

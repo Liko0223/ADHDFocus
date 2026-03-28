@@ -9,15 +9,13 @@ final class BlockOverlayManager {
     private var blockedApp: NSRunningApplication?
     private var modeName: String = ""
     private var remainingSeconds: Int = 0
-    private var allowTempAccess: Bool = false
     private var onTempAllow: ((String) -> Void)?
 
-    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int, allowTempAccess: Bool = false, onTempAllow: ((String) -> Void)? = nil) {
+    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int, onTempAllow: ((String) -> Void)? = nil) {
         dismissAll()
         self.blockedApp = app
         self.modeName = modeName
         self.remainingSeconds = remainingSeconds
-        self.allowTempAccess = allowTempAccess
         self.onTempAllow = onTempAllow
 
         updateOverlays()
@@ -90,7 +88,6 @@ final class BlockOverlayManager {
                     appName: app.localizedName ?? "应用",
                     modeName: modeName,
                     remainingSeconds: remainingSeconds,
-                    allowTempAccess: allowTempAccess,
                     onGoBack: { [weak self] in
                         self?.goBackToWork()
                     },
@@ -121,7 +118,7 @@ final class BlockOverlayManager {
 
 // Individual overlay panel for one window
 final class BlockOverlayPanel: NSPanel {
-    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, allowTempAccess: Bool, onGoBack: @escaping () -> Void, onTempAllow: @escaping () -> Void) {
+    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, onGoBack: @escaping () -> Void, onTempAllow: @escaping () -> Void) {
         super.init(
             contentRect: frame,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -141,7 +138,6 @@ final class BlockOverlayPanel: NSPanel {
             appName: appName,
             modeName: modeName,
             remainingSeconds: remainingSeconds,
-            allowTempAccess: allowTempAccess,
             onGoBack: onGoBack,
             onTempAllow: onTempAllow
         )
@@ -155,7 +151,6 @@ struct BlockOverlayContent: View {
     let appName: String
     let modeName: String
     let remainingSeconds: Int
-    let allowTempAccess: Bool
     let onGoBack: () -> Void
     let onTempAllow: () -> Void
 
@@ -203,20 +198,18 @@ struct BlockOverlayContent: View {
                     }
                     .buttonStyle(.plain)
 
-                    if allowTempAccess {
-                        Button {
-                            onTempAllow()
-                        } label: {
-                            Text("允许 5 分钟")
-                                .font(.body.weight(.medium))
-                                .foregroundStyle(.white.opacity(0.8))
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 10)
-                                .background(.white.opacity(0.15))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                        .buttonStyle(.plain)
+                    Button {
+                        onTempAllow()
+                    } label: {
+                        Text("允许 5 分钟")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.8))
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 10)
+                            .background(.white.opacity(0.15))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
