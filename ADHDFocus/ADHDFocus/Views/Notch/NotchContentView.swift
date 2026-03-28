@@ -195,7 +195,7 @@ struct NotchContentView: View {
                     if manager.isActive, manager.remainingSeconds > 0 {
                         Text(formatTime(manager.remainingSeconds))
                             .font(.caption.weight(.bold).monospacedDigit())
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(.white.opacity(0.9))
                     }
                 }
 
