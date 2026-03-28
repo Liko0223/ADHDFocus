@@ -49,6 +49,8 @@ targets:
     dependencies:
       - sdk: SwiftData.framework
       - sdk: SwiftUI.framework
+      - sdk: AppKit.framework
+      - sdk: UserNotifications.framework
 
   ADHDFocusTests:
     type: bundle.unit-test

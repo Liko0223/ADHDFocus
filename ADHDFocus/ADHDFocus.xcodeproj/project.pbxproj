@@ -7,20 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */; };
 		0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5D802C95CB466592EB5247 /* DefaultModes.swift */; };
 		34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */; };
 		5278672FC29F753B837945F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 122ACD82DE885656995FED88 /* Assets.xcassets */; };
 		530F7110B538BE7C060F731F /* FocusModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E03D9382FE46707E4D9468 /* FocusModeTests.swift */; };
+		5768B88076A5C45788B3F74D /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 269F7E0B577C574B84FC7082 /* UserNotifications.framework */; };
 		62ABDB1620B0FC834FB840A4 /* PomodoroTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FC50B8499ED4C668EB03A6 /* PomodoroTimerTests.swift */; };
 		66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737297A491D3C5EFF831C48F /* BlockEvent.swift */; };
 		6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */; };
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
 		7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */; };
+		8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4E2708F04FCFD597D87E5 /* DNDController.swift */; };
 		A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */; };
 		ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3366F2338DAA700B20DE37 /* FocusMode.swift */; };
 		B03AADD164764EBE3972E306 /* FocusEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */; };
+		B9A61CD8F0C295F14884E55F /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2F76345BC89363F21B7798 /* NotificationManager.swift */; };
 		C51AD3158530EF1F1646E234 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */; };
 		C88779099F32E060759E1BCE /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9170B6FB6E672FADA64DE /* FocusSession.swift */; };
+		E195A76AAA30B4859A26949B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A0980327B19CA6968397CC3 /* AppKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,8 +43,10 @@
 		10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADHDFocusTests.swift; sourceTree = "<group>"; };
 		122ACD82DE885656995FED88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1C3366F2338DAA700B20DE37 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
+		269F7E0B577C574B84FC7082 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		2A5D802C95CB466592EB5247 /* DefaultModes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModes.swift; sourceTree = "<group>"; };
 		32E03D9382FE46707E4D9468 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
+		3A0980327B19CA6968397CC3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		43F7F74BA8808BD2B22804A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53329645BA4D1D0255C861BA /* ADHDFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADHDFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		59CC9278C31AF28A754A5352 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -49,7 +56,10 @@
 		7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
 		845249BDB9F7F2FD4941618F /* ADHDFocusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ADHDFocusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngine.swift; sourceTree = "<group>"; };
+		8DA4E2708F04FCFD597D87E5 /* DNDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDController.swift; sourceTree = "<group>"; };
 		E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngineTests.swift; sourceTree = "<group>"; };
+		EA2F76345BC89363F21B7798 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMonitor.swift; sourceTree = "<group>"; };
 		F7FC50B8499ED4C668EB03A6 /* PomodoroTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroTimerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +70,8 @@
 			files = (
 				C51AD3158530EF1F1646E234 /* SwiftData.framework in Frameworks */,
 				720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */,
+				E195A76AAA30B4859A26949B /* AppKit.framework in Frameworks */,
+				5768B88076A5C45788B3F74D /* UserNotifications.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,8 +92,10 @@
 		6A1860D3A24DB1D0EC872A34 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3A0980327B19CA6968397CC3 /* AppKit.framework */,
 				7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */,
 				59CC9278C31AF28A754A5352 /* SwiftUI.framework */,
+				269F7E0B577C574B84FC7082 /* UserNotifications.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -139,13 +153,16 @@
 		F185C11D1994394903F12BB2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */,
+				8DA4E2708F04FCFD597D87E5 /* DNDController.swift */,
 				8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */,
+				EA2F76345BC89363F21B7798 /* NotificationManager.swift */,
 				0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		"TEMP_D6FED09D-3DEB-47D0-A4DF-9A54C250D636" /* Views */ = {
+		"TEMP_79A3231B-86E3-4EFA-9715-932F1326DBC8" /* Views */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -238,11 +255,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */,
+				060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */,
 				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
+				8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */,
 				0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */,
 				34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */,
 				ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */,
 				C88779099F32E060759E1BCE /* FocusSession.swift in Sources */,
+				B9A61CD8F0C295F14884E55F /* NotificationManager.swift in Sources */,
 				6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
