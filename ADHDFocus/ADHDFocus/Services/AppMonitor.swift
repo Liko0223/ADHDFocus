@@ -98,7 +98,7 @@ final class AppMonitor {
         modelContext.insert(event)
         try? modelContext.save()
 
-        let strictness = engine.activeMode?.strictness ?? .overlay
+        let strictness = (engine.activeMode?.strictness ?? .overlay).effective
 
         switch strictness {
         case .forceQuit:
@@ -108,7 +108,7 @@ final class AppMonitor {
                 modeName: engine.activeMode?.name ?? "",
                 remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
             )
-        case .overlay:
+        default:
             overlayManager.showOverlays(
                 for: app,
                 modeName: engine.activeMode?.name ?? "",

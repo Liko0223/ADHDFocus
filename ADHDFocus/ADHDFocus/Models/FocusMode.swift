@@ -10,6 +10,15 @@ enum AppPolicy: String, Codable {
 enum Strictness: String, Codable {
     case overlay     // Window overlay with "allow 5 min" option
     case forceQuit   // Terminate the app immediately
+    case remind      // Legacy — treated as overlay
+    case delayAllow  // Legacy — treated as overlay
+
+    var effective: Strictness {
+        switch self {
+        case .remind, .delayAllow: return .overlay
+        default: return self
+        }
+    }
 }
 
 @Model
