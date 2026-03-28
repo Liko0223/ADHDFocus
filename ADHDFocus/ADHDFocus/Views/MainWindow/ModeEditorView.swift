@@ -1,11 +1,12 @@
 import SwiftUI
+import AppKit
 
 struct ModeEditorView: View {
     @Bindable var mode: FocusMode
-    @State private var newAllowedApp = ""
-    @State private var newBlockedApp = ""
     @State private var newAllowedURL = ""
     @State private var newBlockedURL = ""
+    @State private var showAllowedAppPicker = false
+    @State private var showBlockedAppPicker = false
 
     var body: some View {
         ScrollView {
@@ -26,23 +27,29 @@ struct ModeEditorView: View {
                 // App rules
                 GroupBox("应用规则") {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("允许的应用 (Bundle ID)")
-                            .font(.caption.weight(.medium))
-                        appListEditor(
-                            items: $mode.allowedApps,
-                            newItem: $newAllowedApp,
-                            placeholder: "com.figma.Desktop"
-                        )
+                        HStack {
+                            Text("允许的应用")
+                                .font(.caption.weight(.medium))
+                            Spacer()
+                            Button("选择应用") {
+                                showAllowedAppPicker = true
+                            }
+                            .controlSize(.small)
+                        }
+                        appChipList(items: $mode.allowedApps)
 
                         Divider()
 
-                        Text("禁止的应用 (Bundle ID)")
-                            .font(.caption.weight(.medium))
-                        appListEditor(
-                            items: $mode.blockedApps,
-                            newItem: $newBlockedApp,
-                            placeholder: "com.tencent.xinWeChat"
-                        )
+                        HStack {
+                            Text("禁止的应用")
+                                .font(.caption.weight(.medium))
+                            Spacer()
+                            Button("选择应用") {
+                                showBlockedAppPicker = true
+                            }
+                            .controlSize(.small)
+                        }
+                        appChipList(items: $mode.blockedApps)
 
                         Divider()
 
@@ -60,7 +67,7 @@ struct ModeEditorView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("允许的网站")
                             .font(.caption.weight(.medium))
-                        appListEditor(
+                        urlListEditor(
                             items: $mode.allowedURLs,
                             newItem: $newAllowedURL,
                             placeholder: "dribbble.com"
@@ -70,7 +77,7 @@ struct ModeEditorView: View {
 
                         Text("禁止的网站")
                             .font(.caption.weight(.medium))
-                        appListEditor(
+                        urlListEditor(
                             items: $mode.blockedURLs,
                             newItem: $newBlockedURL,
                             placeholder: "weibo.com"
@@ -156,10 +163,33 @@ struct ModeEditorView: View {
             }
             .padding(20)
         }
+        .sheet(isPresented: $showAllowedAppPicker) {
+            AppPickerView(title: "选择允许的应用", selectedBundleIDs: $mode.allowedApps)
+        }
+        .sheet(isPresented: $showBlockedAppPicker) {
+            AppPickerView(title: "选择禁止的应用", selectedBundleIDs: $mode.blockedApps)
+        }
     }
 
     @ViewBuilder
-    private func appListEditor(items: Binding<[String]>, newItem: Binding<String>, placeholder: String) -> some View {
+    private func appChipList(items: Binding<[String]>) -> some View {
+        if items.wrappedValue.isEmpty {
+            Text("未选择任何应用")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        } else {
+            FlowLayout(spacing: 6) {
+                ForEach(items.wrappedValue, id: \.self) { bundleID in
+                    AppChipView(bundleID: bundleID) {
+                        items.wrappedValue.removeAll { $0 == bundleID }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func urlListEditor(items: Binding<[String]>, newItem: Binding<String>, placeholder: String) -> some View {
         ForEach(items.wrappedValue, id: \.self) { item in
             HStack {
                 Text(item)
@@ -193,5 +223,91 @@ struct ModeEditorView: View {
             }
             .disabled(newItem.wrappedValue.trimmingCharacters(in: .whitespaces).isEmpty)
         }
+    }
+}
+
+// MARK: - App Chip
+
+struct AppChipView: View {
+    let bundleID: String
+    let onRemove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let appPath = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path {
+                Image(nsImage: NSWorkspace.shared.icon(forFile: appPath))
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                Text(appName(for: appPath))
+                    .font(.caption)
+            } else {
+                Text(bundleID)
+                    .font(.caption.monospaced())
+            }
+            Button {
+                onRemove()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(.quaternary.opacity(0.5))
+        .clipShape(Capsule())
+    }
+
+    private func appName(for path: String) -> String {
+        let url = URL(fileURLWithPath: path)
+        let plistURL = url.appendingPathComponent("Contents/Info.plist")
+        if let data = try? Data(contentsOf: plistURL),
+           let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] {
+            return (plist["CFBundleDisplayName"] as? String)
+                ?? (plist["CFBundleName"] as? String)
+                ?? url.deletingPathExtension().lastPathComponent
+        }
+        return url.deletingPathExtension().lastPathComponent
+    }
+}
+
+// MARK: - Flow Layout
+
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = layout(proposal: proposal, subviews: subviews)
+        return result.size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = layout(proposal: proposal, subviews: subviews)
+        for (index, position) in result.positions.enumerated() {
+            subviews[index].place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
+        }
+    }
+
+    private func layout(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+        let maxWidth = proposal.width ?? .infinity
+        var positions: [CGPoint] = []
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth && x > 0 {
+                x = 0
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+            positions.append(CGPoint(x: x, y: y))
+            rowHeight = max(rowHeight, size.height)
+            x += size.width + spacing
+        }
+
+        return (CGSize(width: maxWidth, height: y + rowHeight), positions)
     }
 }

@@ -10,6 +10,7 @@
 		0070570DDACDB4D1A45D047A /* NativeMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F33C2AEC569E649128EC6C /* NativeMessagingTests.swift */; };
 		060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */; };
 		0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5D802C95CB466592EB5247 /* DefaultModes.swift */; };
+		1FC04B89C8A5D78D8018EB08 /* InstalledAppsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */; };
 		26772B6191FC780CD8904F4A /* ModeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE34CBEFA7680F7365D84BF9 /* ModeListView.swift */; };
 		33667A1B001AAF9736AA4550 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E78F3410889E09A72BAF06 /* SettingsView.swift */; };
 		34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */; };
@@ -22,10 +23,12 @@
 		6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */; };
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
 		7573C817AB8B08493C1E3827 /* ADHDFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A149F68DDA9398158D9C0A /* ADHDFocusTests.swift */; };
+		825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */; };
 		8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4E2708F04FCFD597D87E5 /* DNDController.swift */; };
 		9E6EDDF9B999836981134F40 /* ModeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8244A72B60B1D487102FD /* ModeEditorView.swift */; };
 		A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */; };
 		ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3366F2338DAA700B20DE37 /* FocusMode.swift */; };
+		AF24FF6BA8467BC3C7A00033 /* AppPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D44F59C648B8E2A77D51E2 /* AppPickerView.swift */; };
 		B03AADD164764EBE3972E306 /* FocusEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */; };
 		B9A61CD8F0C295F14884E55F /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2F76345BC89363F21B7798 /* NotificationManager.swift */; };
 		C51AD3158530EF1F1646E234 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */; };
@@ -53,6 +56,7 @@
 		1C3366F2338DAA700B20DE37 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
 		269F7E0B577C574B84FC7082 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		2A5D802C95CB466592EB5247 /* DefaultModes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModes.swift; sourceTree = "<group>"; };
+		32D44F59C648B8E2A77D51E2 /* AppPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerView.swift; sourceTree = "<group>"; };
 		32E03D9382FE46707E4D9468 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
 		37E8244A72B60B1D487102FD /* ModeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeEditorView.swift; sourceTree = "<group>"; };
 		39E78F3410889E09A72BAF06 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -60,6 +64,7 @@
 		43F7F74BA8808BD2B22804A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		44FE1D8E91F4BA4EE7A4B3CF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		53329645BA4D1D0255C861BA /* ADHDFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADHDFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledAppsProvider.swift; sourceTree = "<group>"; };
 		59CC9278C31AF28A754A5352 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADHDFocusApp.swift; sourceTree = "<group>"; };
 		61529745F0A626111ADFDF4F /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
@@ -68,6 +73,7 @@
 		7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
 		81F33C2AEC569E649128EC6C /* NativeMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeMessagingTests.swift; sourceTree = "<group>"; };
 		845249BDB9F7F2FD4941618F /* ADHDFocusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ADHDFocusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockOverlayWindow.swift; sourceTree = "<group>"; };
 		8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngine.swift; sourceTree = "<group>"; };
 		8DA4E2708F04FCFD597D87E5 /* DNDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDController.swift; sourceTree = "<group>"; };
 		AE34CBEFA7680F7365D84BF9 /* ModeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeListView.swift; sourceTree = "<group>"; };
@@ -99,6 +105,7 @@
 			children = (
 				8E7977C2228E3B81C71B669F /* MainWindow */,
 				6641C6A7FDF8EF63A87B5520 /* MenuBar */,
+				FADF1A105319BD3A7263AF5E /* Shared */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -203,11 +210,21 @@
 				F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */,
 				8DA4E2708F04FCFD597D87E5 /* DNDController.swift */,
 				8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */,
+				536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */,
 				E1C63B338EF8DE4BC3E60ACC /* NativeMessagingHost.swift */,
 				EA2F76345BC89363F21B7798 /* NotificationManager.swift */,
 				0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		FADF1A105319BD3A7263AF5E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				32D44F59C648B8E2A77D51E2 /* AppPickerView.swift */,
+				8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,12 +314,15 @@
 			files = (
 				A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */,
 				060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */,
+				AF24FF6BA8467BC3C7A00033 /* AppPickerView.swift in Sources */,
 				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
+				825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */,
 				8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */,
 				0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */,
 				34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */,
 				ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */,
 				C88779099F32E060759E1BCE /* FocusSession.swift in Sources */,
+				1FC04B89C8A5D78D8018EB08 /* InstalledAppsProvider.swift in Sources */,
 				C6475346961BF47F0502D56C /* MainWindowView.swift in Sources */,
 				4D75631D3CA5DFA531C4EEB9 /* MenuBarView.swift in Sources */,
 				9E6EDDF9B999836981134F40 /* ModeEditorView.swift in Sources */,

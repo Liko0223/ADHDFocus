@@ -5,7 +5,21 @@ import SwiftData
 final class AppMonitor {
     private let engine: FocusEngine
     private let modelContext: ModelContext
-    private var observation: NSObjectProtocol?
+    private var launchObservation: NSObjectProtocol?
+    private var activationObservation: NSObjectProtocol?
+    private var overlayWindow: BlockOverlayWindow?
+
+    private let exemptApps = Set([
+        "com.lilinke.ADHDFocus",
+        "com.apple.finder",
+        "com.apple.loginwindow",
+        "com.apple.SystemPreferences",
+        "com.apple.systempreferences",
+        "com.apple.dock",
+        "com.apple.WindowManager",
+        "com.apple.controlcenter",
+        "com.apple.SecurityAgent"
+    ])
 
     init(engine: FocusEngine, modelContext: ModelContext) {
         self.engine = engine
@@ -14,83 +28,55 @@ final class AppMonitor {
 
     func startMonitoring() {
         // Monitor new app launches
-        observation = NSWorkspace.shared.notificationCenter.addObserver(
+        launchObservation = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didLaunchApplicationNotification,
             object: nil,
             queue: .main
         ) { [weak self] notification in
-            self?.handleAppLaunch(notification)
+            guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            self?.handleBlockedApp(app)
         }
 
-        // Also check currently running apps
+        // Monitor app activation (user switches to a blocked app)
+        activationObservation = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            self?.handleBlockedApp(app)
+        }
+
+        // Check currently running apps
         checkRunningApps()
+    }
+
+    func stopMonitoring() {
+        if let obs = launchObservation {
+            NSWorkspace.shared.notificationCenter.removeObserver(obs)
+        }
+        if let obs = activationObservation {
+            NSWorkspace.shared.notificationCenter.removeObserver(obs)
+        }
+        launchObservation = nil
+        activationObservation = nil
+        dismissOverlay()
     }
 
     private func checkRunningApps() {
         for app in NSWorkspace.shared.runningApplications {
-            guard let bundleID = app.bundleIdentifier else { continue }
-
-            let exemptApps = [
-                "com.lilinke.ADHDFocus",
-                "com.apple.finder",
-                "com.apple.loginwindow",
-                "com.apple.SystemPreferences",
-                "com.apple.systempreferences",
-                "com.apple.dock",
-                "com.apple.WindowManager",
-                "com.apple.controlcenter"
-            ]
-            if exemptApps.contains(bundleID) { continue }
-            if app.activationPolicy != .regular { continue }
-
-            guard engine.shouldBlockApp(bundleID: bundleID) else { continue }
-
-            let appName = app.localizedName ?? bundleID
-
-            let event = BlockEvent(
-                type: .app,
-                target: bundleID,
-                modeName: engine.activeMode?.name ?? ""
-            )
-            modelContext.insert(event)
-            try? modelContext.save()
-
-            if engine.activeMode?.strictness == .forceQuit {
-                app.terminate()
-            }
-
-            NotificationManager.shared.sendBlockedAppNotification(
-                appName: appName,
-                modeName: engine.activeMode?.name ?? "",
-                remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
-            )
+            guard app.activationPolicy == .regular else { continue }
+            handleBlockedApp(app)
         }
     }
 
-    func stopMonitoring() {
-        if let observation {
-            NSWorkspace.shared.notificationCenter.removeObserver(observation)
-        }
-        observation = nil
-    }
-
-    private func handleAppLaunch(_ notification: Notification) {
-        guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
-              let bundleID = app.bundleIdentifier else { return }
-
-        let exemptApps = [
-            "com.lilinke.ADHDFocus",
-            "com.apple.finder",
-            "com.apple.loginwindow",
-            "com.apple.SystemPreferences",
-            "com.apple.systempreferences"
-        ]
+    private func handleBlockedApp(_ app: NSRunningApplication) {
+        guard let bundleID = app.bundleIdentifier else { return }
         if exemptApps.contains(bundleID) { return }
-
+        if app.activationPolicy != .regular { return }
         guard engine.shouldBlockApp(bundleID: bundleID) else { return }
 
-        let appName = app.localizedName ?? bundleID
-
+        // Record block event
         let event = BlockEvent(
             type: .app,
             target: bundleID,
@@ -99,14 +85,24 @@ final class AppMonitor {
         modelContext.insert(event)
         try? modelContext.save()
 
-        if engine.activeMode?.strictness == .forceQuit {
-            app.terminate()
-        }
+        // Show overlay instead of killing the app
+        showOverlay(for: app)
+    }
 
-        NotificationManager.shared.sendBlockedAppNotification(
-            appName: appName,
+    private func showOverlay(for app: NSRunningApplication) {
+        dismissOverlay()
+
+        let overlay = BlockOverlayWindow(
+            blockedApp: app,
             modeName: engine.activeMode?.name ?? "",
             remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0
         )
+        overlay.makeKeyAndOrderFront(nil)
+        overlayWindow = overlay
+    }
+
+    private func dismissOverlay() {
+        overlayWindow?.dismiss()
+        overlayWindow = nil
     }
 }

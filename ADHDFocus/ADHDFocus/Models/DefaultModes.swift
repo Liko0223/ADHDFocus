@@ -15,7 +15,13 @@ struct DefaultModes {
                 "com.bohemiancoding.sketch3",
                 "com.adobe.Photoshop",
                 "com.adobe.illustrator",
-                "com.google.Chrome"
+                "com.google.Chrome",
+                "com.anthropic.claudefordesktop",
+                "com.apple.Terminal",
+                "com.googlecode.iterm2",
+                "dev.warp.Warp-Stable",
+                "com.microsoft.VSCode",
+                "com.todesktop.230313mzl4w4u92"
             ],
             blockedApps: [
                 "com.tencent.xinWeChat",
