@@ -58,22 +58,28 @@
       });
     }
 
-    // "回到工作" — close this tab
+    // "回到工作" — navigate to new tab page (safe)
     document.getElementById("goBackBtn").addEventListener("click", function() {
-      chrome.runtime.sendMessage({ type: "go_back" });
+      window.location.href = "https://www.google.com";
     });
 
-    // "允许 5 分钟" — temp allow then navigate to blocked URL
+    // "允许 5 分钟" — tell background to temp allow, then navigate
     document.getElementById("allowBtn").addEventListener("click", function() {
-      chrome.runtime.sendMessage({
-        type: "temp_allow",
-        url: blockedURL,
-        minutes: 5
-      }, function(response) {
-        if (response && response.ok) {
-          window.location.href = blockedURL;
-        }
-      });
+      try {
+        chrome.runtime.sendMessage({
+          type: "temp_allow",
+          url: blockedURL,
+          minutes: 5
+        }, function() {
+          // Navigate regardless of response
+          setTimeout(function() {
+            window.location.href = blockedURL;
+          }, 200);
+        });
+      } catch (e) {
+        // Fallback: just navigate (will be blocked again, but at least button works)
+        window.location.href = blockedURL;
+      }
     });
   </script>
 </body>
