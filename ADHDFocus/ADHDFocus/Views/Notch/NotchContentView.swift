@@ -80,38 +80,23 @@ struct NotchContentView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                // Black background
-                if manager.isExpanded {
-                    // Expanded: full rect top (scene fills to top edge), rounded bottom only
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 0,
-                        bottomLeadingRadius: bottomCornerRadius,
-                        bottomTrailingRadius: bottomCornerRadius,
-                        topTrailingRadius: 0
-                    )
-                    .fill(.black)
-                    .frame(width: currentWidth, height: currentHeight)
-                    .shadow(color: .black.opacity(0.4), radius: 16)
-                } else {
-                    // Collapsed: outward top corners for notch blend
-                    NotchShape(
-                        topCornerRadius: topCornerRadius,
-                        bottomCornerRadius: topCornerRadius,
-                        notchHeight: manager.notchHeight,
-                        isExpanded: false
-                    )
-                    .fill(.black)
-                    .frame(width: currentWidth, height: currentHeight)
-                }
+                // Black background — always with outward top corners
+                NotchShape(
+                    topCornerRadius: topCornerRadius,
+                    bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
+                    notchHeight: manager.notchHeight,
+                    isExpanded: manager.isExpanded
+                )
+                .fill(.black)
+                .frame(width: currentWidth, height: currentHeight)
+                .shadow(color: .black.opacity(manager.isExpanded ? 0.4 : 0), radius: 16)
 
                 VStack(spacing: 0) {
                     if manager.isExpanded {
-                        // Expanded: scene starts from very top (behind notch), no top bar character
                         expandedContent
                             .frame(width: currentWidth)
                             .transition(.opacity.combined(with: .move(edge: .top)))
                     } else {
-                        // Collapsed: character + timer bar
                         collapsedBar
                             .frame(width: currentWidth, height: manager.notchHeight)
                             .contentShape(Rectangle())
@@ -120,13 +105,15 @@ struct NotchContentView: View {
                             }
                     }
                 }
-                .frame(width: currentWidth)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if manager.isExpanded {
-                        // tap on the scene area to collapse
-                    }
-                }
+                .frame(width: currentWidth, height: currentHeight)
+                .clipShape(
+                    NotchShape(
+                        topCornerRadius: topCornerRadius,
+                        bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
+                        notchHeight: manager.notchHeight,
+                        isExpanded: manager.isExpanded
+                    )
+                )
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
             .offset(x: manager.isExpanded ? 0 : collapsedOffsetX)
@@ -283,7 +270,8 @@ struct NotchContentView: View {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.top, 12)
+            .padding(.bottom, 16)
         }
     }
 
