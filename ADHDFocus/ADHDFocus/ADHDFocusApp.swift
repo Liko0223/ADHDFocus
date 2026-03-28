@@ -30,17 +30,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         container = try! ModelContainer(for: schema, configurations: [config])
         super.init()
         seedDefaultModesIfNeeded()
+
+        // Prevent main window from appearing on launch
+        NSApp.setActivationPolicy(.accessory)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupEngine()
-
-        // Close main window on launch — notch is the primary entry point
-        DispatchQueue.main.async {
-            for window in NSApp.windows where !(window is NotchPanel) {
-                window.close()
-            }
-        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

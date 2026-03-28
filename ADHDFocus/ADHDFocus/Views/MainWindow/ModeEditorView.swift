@@ -306,6 +306,32 @@ struct ModeEditorView: View {
     }
 }
 
+// MARK: - App Info Cache
+
+private final class AppInfoCache {
+    static let shared = AppInfoCache()
+    private var cache: [String: (name: String, icon: NSImage)] = [:]
+
+    func info(for bundleID: String) -> (name: String, icon: NSImage)? {
+        if let cached = cache[bundleID] { return cached }
+        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else { return nil }
+        let path = appURL.path
+        let icon = NSWorkspace.shared.icon(forFile: path)
+        icon.size = NSSize(width: 16, height: 16)
+
+        let plistURL = appURL.appendingPathComponent("Contents/Info.plist")
+        var name = appURL.deletingPathExtension().lastPathComponent
+        if let data = try? Data(contentsOf: plistURL),
+           let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] {
+            name = (plist["CFBundleDisplayName"] as? String)
+                ?? (plist["CFBundleName"] as? String)
+                ?? name
+        }
+        cache[bundleID] = (name, icon)
+        return (name, icon)
+    }
+}
+
 // MARK: - App Chip
 
 struct AppChipView: View {
@@ -314,11 +340,11 @@ struct AppChipView: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            if let appPath = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: appPath))
+            if let info = AppInfoCache.shared.info(for: bundleID) {
+                Image(nsImage: info.icon)
                     .resizable()
                     .frame(width: 16, height: 16)
-                Text(appName(for: appPath))
+                Text(info.name)
                     .font(.caption)
             } else {
                 Text(bundleID)
@@ -337,18 +363,6 @@ struct AppChipView: View {
         .padding(.vertical, 4)
         .background(.quaternary.opacity(0.5))
         .clipShape(Capsule())
-    }
-
-    private func appName(for path: String) -> String {
-        let url = URL(fileURLWithPath: path)
-        let plistURL = url.appendingPathComponent("Contents/Info.plist")
-        if let data = try? Data(contentsOf: plistURL),
-           let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] {
-            return (plist["CFBundleDisplayName"] as? String)
-                ?? (plist["CFBundleName"] as? String)
-                ?? url.deletingPathExtension().lastPathComponent
-        }
-        return url.deletingPathExtension().lastPathComponent
     }
 }
 
