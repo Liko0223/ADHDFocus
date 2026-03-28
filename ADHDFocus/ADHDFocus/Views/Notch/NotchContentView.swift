@@ -40,7 +40,7 @@ struct NotchContentView: View {
     // Fixed side extension — character always at the same position
     private let sideExtension: CGFloat = 70
     private let expandedWidth: CGFloat = 340
-    private let expandedPanelHeight: CGFloat = 500
+    private let expandedPanelHeight: CGFloat = 360
     private let bottomCornerRadius: CGFloat = 16
     private let topCornerRadius: CGFloat = 10  // outward curve radius
 
@@ -164,49 +164,49 @@ struct NotchContentView: View {
     // MARK: - Expanded panel
 
     private var expandedContent: some View {
-        VStack(spacing: 12) {
-            // Companion scene at the top
-            CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth - 32)
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
+        VStack(spacing: 0) {
+            // Scene fills top half, edge to edge
+            CompanionSceneView(state: manager.companionState, sceneWidth: currentWidth)
+                .frame(height: 140)
 
-            if manager.isActive, let name = manager.modeName {
-                HStack {
-                    Circle().fill(.green).frame(width: 8, height: 8)
-                    Text(name)
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.white)
+            // Controls below
+            VStack(spacing: 8) {
+                // Status + mode grid
+                HStack(spacing: 6) {
+                    if manager.isActive, let name = manager.modeName {
+                        Circle().fill(.green).frame(width: 6, height: 6)
+                        Text(name)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.white)
+                    } else {
+                        Text("选择模式")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
                     Spacer()
-                    if manager.remainingSeconds > 0 {
+                    if manager.isActive, manager.remainingSeconds > 0 {
                         Text(formatTime(manager.remainingSeconds))
-                            .font(.subheadline.weight(.bold).monospacedDigit())
+                            .font(.caption.weight(.bold).monospacedDigit())
                             .foregroundStyle(.purple)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-            }
+                .padding(.horizontal, 14)
+                .padding(.top, 10)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(manager.isActive ? "切换模式" : "选择模式")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
-                    .padding(.horizontal, 16)
-
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
                     ForEach(modes) { mode in
                         Button {
                             manager.activateMode(mode)
                         } label: {
-                            HStack(spacing: 8) {
-                                Text(mode.icon).font(.body)
+                            HStack(spacing: 6) {
+                                Text(mode.icon).font(.callout)
                                 Text(mode.name)
                                     .font(.caption)
                                     .foregroundStyle(.white)
                                     .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
+                            .padding(.vertical, 8)
                             .background(
                                 manager.engine?.activeMode?.id == mode.id
                                     ? Color.purple.opacity(0.3)
@@ -226,50 +226,46 @@ struct NotchContentView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 16)
-            }
+                .padding(.horizontal, 14)
 
-            Spacer()
-
-            HStack(spacing: 12) {
-                if manager.isActive {
-                    Button {
-                        manager.deactivateMode()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "stop.fill").font(.caption2)
-                            Text("结束专注").font(.caption)
+                // Bottom bar
+                HStack(spacing: 10) {
+                    if manager.isActive {
+                        Button {
+                            manager.deactivateMode()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "stop.fill").font(.system(size: 8))
+                                Text("结束").font(.caption2)
+                            }
+                            .foregroundStyle(.red)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.red.opacity(0.15))
+                            .clipShape(Capsule())
                         }
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.red.opacity(0.15))
-                        .clipShape(Capsule())
+                        .buttonStyle(.plain)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        openWindow(id: "main")
+                        NSApp.activate(ignoringOtherApps: true)
+                        manager.collapse()
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .padding(6)
+                            .background(Color.white.opacity(0.08))
+                            .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
                 }
-
-                Spacer()
-
-                Button {
-                    openWindow(id: "main")
-                    NSApp.activate(ignoringOtherApps: true)
-                    manager.collapse()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "gearshape").font(.caption2)
-                        Text("设置").font(.caption)
-                    }
-                    .foregroundStyle(.white.opacity(0.6))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.white.opacity(0.08))
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
+                .padding(.horizontal, 14)
+                .padding(.bottom, 10)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
         }
     }
 

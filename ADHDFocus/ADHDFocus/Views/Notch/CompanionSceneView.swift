@@ -62,7 +62,6 @@ struct CompanionSceneView: View {
             }
         }
         .frame(height: sceneHeight)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
         .onAppear { startWalking() }
         .onDisappear { walkTimer?.invalidate() }
         .onChange(of: state) { startWalking() }
