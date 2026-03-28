@@ -94,12 +94,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         engine.onModeActivated = { [weak self] mode in
             guard let self else { return }
+            print("[ADHD] Mode activated: \(mode.name)")
             monitor.startMonitoring()
             if mode.enableDND { dndController.enableDND() }
 
             let session = FocusSession(modeID: mode.id, modeName: mode.name, statsTag: mode.statsTag)
             container.mainContext.insert(session)
             currentSession = session
+            print("[ADHD] Session created for mode: \(mode.name)")
 
             notchManager.updateState(
                 isActive: true,
@@ -111,14 +113,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         engine.onModeDeactivated = { [weak self] in
             guard let self else { return }
+            print("[ADHD] Mode deactivated")
             monitor.stopMonitoring()
             dndController.disableDND()
 
             if let session = currentSession {
                 session.endedAt = Date()
                 session.totalWorkSeconds = Int(Date().timeIntervalSince(session.startedAt))
-                session.completedPomodoros = engine.pomodoroTimer?.completedPomodoros ?? 0
+                let pomodoros = engine.pomodoroTimer?.completedPomodoros ?? 0
+                session.completedPomodoros = pomodoros
+                print("[ADHD] Session ended — workSeconds: \(session.totalWorkSeconds), pomodoros: \(pomodoros)")
                 try? container.mainContext.save()
+            } else {
+                print("[ADHD] WARNING: no currentSession to save")
             }
             currentSession = nil
 
@@ -127,6 +134,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         engine.onPomodoroPhaseChange = { [weak self] phase in
             guard let self else { return }
+            print("[ADHD] Pomodoro phase: \(phase), completedPomodoros: \(engine.pomodoroTimer?.completedPomodoros ?? -1)")
             NotificationManager.shared.sendPomodoroNotification(phase: phase)
             notchManager.updateState(
                 isActive: true,
