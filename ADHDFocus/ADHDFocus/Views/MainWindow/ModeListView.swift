@@ -52,7 +52,6 @@ struct ModeListView: View {
             // Editor
             if let mode = selectedMode {
                 ModeEditorView(mode: mode)
-                    .id(mode.id)
             } else {
                 ContentUnavailableView(
                     "选择一个模式",

@@ -20,9 +20,23 @@ final class InstalledAppsProvider {
 
     private var cachedApps: [InstalledApp]?
 
+    func preload() {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            let apps = self?.loadApps() ?? []
+            DispatchQueue.main.async {
+                self?.cachedApps = apps
+            }
+        }
+    }
+
     func getInstalledApps() -> [InstalledApp] {
         if let cached = cachedApps { return cached }
+        let apps = loadApps()
+        cachedApps = apps
+        return apps
+    }
 
+    private func loadApps() -> [InstalledApp] {
         var apps: [InstalledApp] = []
         var seenBundleIDs = Set<String>()
 
@@ -37,7 +51,6 @@ final class InstalledAppsProvider {
         }
 
         apps.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        cachedApps = apps
         return apps
     }
 
