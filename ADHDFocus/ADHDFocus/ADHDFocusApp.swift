@@ -13,8 +13,7 @@ struct ADHDFocusApp: App {
         .menuBarExtraStyle(.window)
 
         Window("ADHD Focus", id: "main") {
-            Text("Main Window — Coming Soon")
-                .frame(minWidth: 600, minHeight: 400)
+            MainWindowView(engine: engine)
                 .modelContainer(for: [FocusMode.self, FocusSession.self, BlockEvent.self])
         }
     }
