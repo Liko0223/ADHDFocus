@@ -48,6 +48,7 @@ struct StatsView: View {
     }
 
     var body: some View {
+        ScrollView {
         VStack(spacing: 24) {
             Text("今日概览")
                 .font(.title2.weight(.semibold))
@@ -98,6 +99,7 @@ struct StatsView: View {
             .buttonStyle(.plain)
         }
         .padding(24)
+        }
         .onAppear { refreshTodayData() }
         .onChange(of: sessions.count) { _, _ in refreshTodayData() }
         .onChange(of: blockEvents.count) { _, _ in refreshTodayData() }
