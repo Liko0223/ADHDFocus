@@ -3,16 +3,19 @@ import SwiftData
 
 @main
 struct ADHDFocusApp: App {
+    @State private var engine = FocusEngine()
+
     var body: some Scene {
         MenuBarExtra("ADHD Focus", systemImage: "brain.head.profile") {
-            Text("ADHD Focus — Coming Soon")
-                .padding()
+            MenuBarView(engine: engine)
+                .modelContainer(for: [FocusMode.self, FocusSession.self, BlockEvent.self])
         }
         .menuBarExtraStyle(.window)
 
         Window("ADHD Focus", id: "main") {
             Text("Main Window — Coming Soon")
                 .frame(minWidth: 600, minHeight: 400)
+                .modelContainer(for: [FocusMode.self, FocusSession.self, BlockEvent.self])
         }
     }
 }
