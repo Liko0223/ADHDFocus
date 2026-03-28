@@ -86,8 +86,10 @@ final class NotchManager {
         self.panel = panel
 
         syncTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self, let engine = self.engine else { return }
-            self.remainingSeconds = engine.pomodoroTimer?.remainingSeconds ?? 0
+            Task { @MainActor in
+                guard let self, let engine = self.engine else { return }
+                self.remainingSeconds = engine.pomodoroTimer?.remainingSeconds ?? 0
+            }
         }
 
         // Monitor clicks outside to collapse
