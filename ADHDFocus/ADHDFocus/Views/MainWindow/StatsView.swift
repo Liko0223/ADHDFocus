@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct StatsView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var sessions: [FocusSession]
     @Query private var blockEvents: [BlockEvent]
 
@@ -60,8 +61,27 @@ struct StatsView: View {
             }
 
             Spacer()
+
+            Button {
+                clearAllData()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "trash")
+                        .font(.caption)
+                    Text("清除历史数据")
+                        .font(.caption)
+                }
+                .foregroundStyle(.red.opacity(0.7))
+            }
+            .buttonStyle(.plain)
         }
         .padding(24)
+    }
+
+    private func clearAllData() {
+        for s in sessions { modelContext.delete(s) }
+        for e in blockEvents { modelContext.delete(e) }
+        try? modelContext.save()
     }
 }
 

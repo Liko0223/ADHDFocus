@@ -9,6 +9,7 @@ final class AppMonitor {
     private var activationObservation: NSObjectProtocol?
     private let overlayManager = BlockOverlayManager()
     private var tempAllowedApps: [String: Date] = [:]  // bundleID -> expiry
+    private var lastBlockRecord: [String: Date] = [:]  // bundleID -> last recorded time
 
     private let exemptApps = Set([
         "com.lilinke.ADHDFocus",
@@ -89,14 +90,20 @@ final class AppMonitor {
         }
         tempAllowedApps.removeValue(forKey: bundleID)
 
-        // Record block event
-        let event = BlockEvent(
-            type: .app,
-            target: bundleID,
-            modeName: engine.activeMode?.name ?? ""
-        )
-        modelContext.insert(event)
-        try? modelContext.save()
+        // Record block event (dedupe: once per app per 60 seconds)
+        let now = Date()
+        if let lastTime = lastBlockRecord[bundleID], now.timeIntervalSince(lastTime) < 60 {
+            // Skip recording, still show overlay
+        } else {
+            lastBlockRecord[bundleID] = now
+            let event = BlockEvent(
+                type: .app,
+                target: bundleID,
+                modeName: engine.activeMode?.name ?? ""
+            )
+            modelContext.insert(event)
+            try? modelContext.save()
+        }
 
         let strictness = (engine.activeMode?.strictness ?? .overlay).effective
 
