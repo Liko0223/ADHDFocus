@@ -4,7 +4,6 @@ import SwiftUI
 @Observable
 final class NotchManager {
     private var panel: NotchPanel?
-    private var hitTestView: NotchHitTestView?
     private var syncTimer: Timer?
     weak var engine: FocusEngine?
 
@@ -13,17 +12,28 @@ final class NotchManager {
     var remainingSeconds: Int = 0
     var isActive: Bool = false
 
-    func setup() {
-        guard let screen = NSScreen.main, screen.hasNotch else { return }
+    // Geometry for the view
+    var notchWidth: CGFloat = 200
+    var notchHeight: CGFloat = 38
 
-        let notchFrame = screen.notchFrame
-        // Create a wider frame to include content on both sides of the notch
-        let panelWidth = notchFrame.width + 120  // Extra space for text
+    func setup() {
+        guard let screen = NSScreen.main else { return }
+
+        let screenFrame = screen.frame
+
+        if screen.hasNotch {
+            let ns = screen.notchSize
+            notchWidth = ns.width
+            notchHeight = ns.height
+        }
+
+        // Panel spans full screen width, height = notch area + extra for character to peek above
+        let panelHeight: CGFloat = notchHeight + 20
         let panelFrame = NSRect(
-            x: notchFrame.origin.x - 60,
-            y: notchFrame.origin.y,
-            width: panelWidth,
-            height: notchFrame.height
+            x: screenFrame.origin.x,
+            y: screenFrame.maxY - panelHeight,
+            width: screenFrame.width,
+            height: panelHeight
         )
 
         let panel = NotchPanel(contentRect: panelFrame)
@@ -34,17 +44,9 @@ final class NotchManager {
         hostingView.frame = NSRect(origin: .zero, size: panelFrame.size)
         hostingView.autoresizingMask = [.width, .height]
 
-        let hitTest = NotchHitTestView()
-        hitTest.activeRect = notchFrame
-        hitTest.frame = NSRect(origin: .zero, size: panelFrame.size)
-        hitTest.autoresizingMask = [.width, .height]
-        hitTest.addSubview(hostingView)
-
-        panel.contentView = hitTest
+        panel.contentView = hostingView
         panel.orderFrontRegardless()
-
         self.panel = panel
-        self.hitTestView = hitTest
 
         // Sync timer display every second
         syncTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -69,7 +71,6 @@ final class NotchManager {
 
     func showBlocked() {
         companionState = .blocked
-        // Reset after 2 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             if self?.companionState == .blocked {
                 self?.companionState = self?.isActive == true ? .working : .idle
@@ -78,7 +79,6 @@ final class NotchManager {
     }
 }
 
-// Bridge view that observes NotchManager
 struct NotchObservingView: View {
     @Bindable var manager: NotchManager
 
@@ -87,7 +87,9 @@ struct NotchObservingView: View {
             companionState: manager.companionState,
             modeName: manager.modeName,
             remainingSeconds: manager.remainingSeconds,
-            isActive: manager.isActive
+            isActive: manager.isActive,
+            notchWidth: manager.notchWidth,
+            notchHeight: manager.notchHeight
         )
     }
 }
