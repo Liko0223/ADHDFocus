@@ -2,6 +2,7 @@ const RULES_URL = "http://localhost:52836/rules";
 const POLL_INTERVAL = 2000;
 
 let currentRules = null;
+let tempAllowed = {}; // host -> expiry timestamp
 
 async function fetchRules() {
   try {
@@ -10,7 +11,6 @@ async function fetchRules() {
     currentRules = rules;
     chrome.storage.local.set({ rules: currentRules });
   } catch (e) {
-    // App not running
     currentRules = null;
     chrome.storage.local.set({ rules: null });
   }
@@ -24,6 +24,15 @@ function isURLBlocked(url, rules) {
     host = new URL(url).hostname.toLowerCase();
   } catch {
     return false;
+  }
+
+  // Check temp allow
+  if (tempAllowed[host] && Date.now() < tempAllowed[host]) {
+    return false;
+  }
+  // Clean expired
+  if (tempAllowed[host] && Date.now() >= tempAllowed[host]) {
+    delete tempAllowed[host];
   }
 
   for (const pattern of rules.allowedURLs || []) {
@@ -45,7 +54,7 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   }
 });
 
-// Also check when tab finishes loading (catches SPA / typed URLs)
+// Also check when tab finishes loading
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "complete" || !tab.url) return;
   if (tab.url.startsWith("chrome") || tab.url.startsWith("chrome-extension")) return;
@@ -69,7 +78,23 @@ function redirectToBlocked(tabId, url) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "get_rules") {
     sendResponse(currentRules);
+  } else if (message.type === "temp_allow") {
+    // Allow this URL's host for N minutes
+    try {
+      const host = new URL(message.url).hostname.toLowerCase();
+      const minutes = message.minutes || 5;
+      tempAllowed[host] = Date.now() + minutes * 60 * 1000;
+      sendResponse({ ok: true });
+    } catch {
+      sendResponse({ ok: false });
+    }
+  } else if (message.type === "go_back") {
+    // Close the blocked tab or navigate to a safe page
+    if (sender.tab) {
+      chrome.tabs.remove(sender.tab.id);
+    }
   }
+  return true; // keep message channel open for async sendResponse
 });
 
 // Start polling
