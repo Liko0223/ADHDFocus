@@ -64,6 +64,10 @@ struct SettingsView: View {
                             .font(.caption)
                         Text("4. 选择 ADHDFocus 应用包内的 ChromeExtension 文件夹")
                             .font(.caption)
+                        Text("扩展通过本地 HTTP 服务器（端口 52836）与 ADHD Focus 通信，请确保 ADHD Focus 在后台运行。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 4)
                     }
                     .padding(8)
                 }
