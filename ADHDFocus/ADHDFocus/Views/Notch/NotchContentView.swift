@@ -164,6 +164,7 @@ struct NotchContentView: View {
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
+            .offset(y: -2)
             .frame(width: sideExtension)
         }
     }
