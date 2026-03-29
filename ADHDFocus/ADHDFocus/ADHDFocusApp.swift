@@ -48,6 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var rulesServer: RulesServer?
     private var notchManager = NotchManager()
     private var autoTriggerService: AutoTriggerService?
+    private var celebrationManager = CelebrationManager()
     private var mainWindow: NSWindow?
     private var onboardingWindow: NSWindow?
 
@@ -260,9 +261,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 isOnBreak: engine.pomodoroTimer?.isOnBreak ?? false
             )
 
-            // Show celebration when entering break (work cycle completed)
+            // Screen glow celebration when completing a work cycle
             if phase == .break_ || phase == .longBreak {
-                notchManager.showCelebration()
+                celebrationManager.show()
             }
         }
     }
