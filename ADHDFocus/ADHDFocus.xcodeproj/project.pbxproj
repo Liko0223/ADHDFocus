@@ -14,6 +14,7 @@
 		2A9BFAA527DA2B3D8ACDA8F8 /* RulesServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82455E88E2B43A2F45E02F1B /* RulesServer.swift */; };
 		33667A1B001AAF9736AA4550 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E78F3410889E09A72BAF06 /* SettingsView.swift */; };
 		34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */; };
+		38717DD8C057617718424F25 /* AutoTriggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */; };
 		3AC57EA40E5187A0772DEDA6 /* BobAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72395689F33E4C1492AE5478 /* BobAnimation.swift */; };
 		5278672FC29F753B837945F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 122ACD82DE885656995FED88 /* Assets.xcassets */; };
 		530F7110B538BE7C060F731F /* FocusModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E03D9382FE46707E4D9468 /* FocusModeTests.swift */; };
@@ -85,6 +86,7 @@
 		8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockOverlayWindow.swift; sourceTree = "<group>"; };
 		8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngine.swift; sourceTree = "<group>"; };
 		8DA4E2708F04FCFD597D87E5 /* DNDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDController.swift; sourceTree = "<group>"; };
+		9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTriggerService.swift; sourceTree = "<group>"; };
 		AE34CBEFA7680F7365D84BF9 /* ModeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeListView.swift; sourceTree = "<group>"; };
 		B3B1D9C04CEDE9C7F457153C /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngineTests.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */,
+				9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */,
 				8DA4E2708F04FCFD597D87E5 /* DNDController.swift */,
 				8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */,
 				536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */,
@@ -327,6 +330,7 @@
 				A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */,
 				060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */,
 				AF24FF6BA8467BC3C7A00033 /* AppPickerView.swift in Sources */,
+				38717DD8C057617718424F25 /* AutoTriggerService.swift in Sources */,
 				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
 				825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */,
 				3AC57EA40E5187A0772DEDA6 /* BobAnimation.swift in Sources */,
