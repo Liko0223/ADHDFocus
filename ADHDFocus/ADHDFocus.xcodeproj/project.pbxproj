@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,7 +24,6 @@
 		6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F01286567D3EDAB58981D5E /* PomodoroTimer.swift */; };
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
 		825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */; };
-		8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4E2708F04FCFD597D87E5 /* DNDController.swift */; };
 		9A168365D90505C1CCFA2122 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F4C0A32E4C31E528FAE5A /* OnboardingView.swift */; };
 		9E6EDDF9B999836981134F40 /* ModeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8244A72B60B1D487102FD /* ModeEditorView.swift */; };
 		9EE96203419C8DFB85E959B1 /* NotchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E9975B72851FC7937AFA45 /* NotchManager.swift */; };
@@ -86,7 +85,6 @@
 		845249BDB9F7F2FD4941618F /* ADHDFocusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ADHDFocusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockOverlayWindow.swift; sourceTree = "<group>"; };
 		8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngine.swift; sourceTree = "<group>"; };
-		8DA4E2708F04FCFD597D87E5 /* DNDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDController.swift; sourceTree = "<group>"; };
 		9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTriggerService.swift; sourceTree = "<group>"; };
 		A69F4C0A32E4C31E528FAE5A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AE34CBEFA7680F7365D84BF9 /* ModeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeListView.swift; sourceTree = "<group>"; };
@@ -233,7 +231,6 @@
 			children = (
 				F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */,
 				9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */,
-				8DA4E2708F04FCFD597D87E5 /* DNDController.swift */,
 				8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */,
 				536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */,
 				64E9975B72851FC7937AFA45 /* NotchManager.swift */,
@@ -300,7 +297,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1430;
 			};
 			buildConfigurationList = 597A6EF6265FE2705A4791B4 /* Build configuration list for PBXProject "ADHDFocus" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -312,6 +309,7 @@
 			);
 			mainGroup = B8D4A9781550004C2F211ADA;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -345,7 +343,6 @@
 				825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */,
 				3AC57EA40E5187A0772DEDA6 /* BobAnimation.swift in Sources */,
 				CC13CDEDE4309E27EEF442C8 /* CompanionSceneView.swift in Sources */,
-				8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */,
 				0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */,
 				34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */,
 				ABB9C86E2041DF4B7F86B746 /* FocusMode.swift in Sources */,
@@ -394,7 +391,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -414,7 +410,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -463,11 +458,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -481,7 +474,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
@@ -495,7 +487,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ADHDFocus/ADHDFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ADHDFocus/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -517,7 +508,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ADHDFocus/ADHDFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ADHDFocus/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -566,11 +556,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -591,7 +579,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;

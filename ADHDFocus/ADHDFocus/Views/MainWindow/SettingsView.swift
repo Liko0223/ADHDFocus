@@ -33,23 +33,6 @@ struct SettingsView: View {
                     .padding(8)
                 }
 
-                GroupBox("勿扰模式设置") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("需要在 macOS 快捷指令 App 中创建两个快捷指令：")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("1. \"Enable DND\" — 设置专注模式为勿扰，开启")
-                            .font(.caption.monospaced())
-                        Text("2. \"Disable DND\" — 设置专注模式为勿扰，关闭")
-                            .font(.caption.monospaced())
-
-                        Button("打开快捷指令") {
-                            NSWorkspace.shared.open(URL(string: "shortcuts://")!)
-                        }
-                        .padding(.top, 4)
-                    }
-                    .padding(8)
-                }
 
                 GroupBox("Chrome 扩展") {
                     VStack(alignment: .leading, spacing: 8) {

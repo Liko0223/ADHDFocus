@@ -4,6 +4,7 @@ import AppKit
 
 extension Notification.Name {
     static let showOnboarding = Notification.Name("showOnboarding")
+    static let expandNotchPanel = Notification.Name("expandNotchPanel")
 }
 
 @main
@@ -22,7 +23,6 @@ struct ADHDFocusApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let engine = FocusEngine()
     let container: ModelContainer
-    private let dndController = DNDController()
     private var appMonitor: AppMonitor?
     private var currentSession: FocusSession?
     private var rulesServer: RulesServer?
@@ -53,6 +53,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NotificationCenter.default.addObserver(forName: .showOnboarding, object: nil, queue: .main) { [weak self] _ in
             self?.showOnboarding()
+        }
+        NotificationCenter.default.addObserver(forName: .expandNotchPanel, object: nil, queue: .main) { [weak self] _ in
+            self?.notchManager.expand()
         }
     }
 
@@ -153,7 +156,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return }
             trigger?.pause()
             monitor.startMonitoring()
-            if mode.enableDND { dndController.enableDND() }
 
             let session = FocusSession(modeID: mode.id, modeName: mode.name, statsTag: mode.statsTag)
             container.mainContext.insert(session)
@@ -171,7 +173,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return }
             trigger?.resume()
             monitor.stopMonitoring()
-            dndController.disableDND()
 
             if let session = currentSession {
                 session.endedAt = Date()

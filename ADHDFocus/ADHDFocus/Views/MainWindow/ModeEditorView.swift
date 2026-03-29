@@ -165,8 +165,6 @@ struct ModeEditorView: View {
 
                     editorSection("环境与策略") {
                         VStack(alignment: .leading, spacing: 10) {
-                            Toggle("勿扰模式", isOn: $mode.enableDND)
-                                .font(.subheadline)
                             Toggle("隐藏 Dock", isOn: $mode.hideDock)
                                 .font(.subheadline)
 
