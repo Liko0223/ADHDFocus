@@ -14,10 +14,6 @@ struct ADHDFocusApp: App {
     var body: some Scene {
         Settings {
             EmptyView()
-                .onAppear {
-                    // Ensure setup runs via SwiftUI lifecycle
-                    appDelegate.ensureSetup()
-                }
         }
     }
 }
@@ -48,18 +44,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         super.init()
         seedDefaultModesIfNeeded()
+
+        // Schedule setup on next run loop (after SwiftUI finishes init)
+        DispatchQueue.main.async { [weak self] in
+            self?.doSetup()
+        }
     }
 
-    private var hasSetup = false
-
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        ensureSetup()
-    }
-
-    func ensureSetup() {
-        guard !hasSetup else { return }
-        hasSetup = true
-
+    private func doSetup() {
         setupEngine()
         InstalledAppsProvider.shared.preload()
 
@@ -70,10 +62,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.notchManager.expand()
         }
 
-        // Show onboarding after setup
+        // Show onboarding
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.showOnboardingIfNeeded()
         }
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Backup: doSetup is idempotent via notchManager.panel check
     }
 
     func openMainWindow() {
