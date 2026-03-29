@@ -219,16 +219,23 @@ struct OnboardingView: View {
 
             Spacer().frame(height: 20)
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Chrome 安装说明：\n1. 打开 Chrome → 更多工具 → 扩展程序\n2. 开启右上角「开发者模式」\n3. 点击「加载已解压的扩展程序」\n4. 选择下方文件夹中的 ChromeExtension 目录")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Chrome 安装说明：")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.primary)
+                    Text("1. 打开 Chrome → 更多工具 → 扩展程序\n2. 开启右上角「开发者模式」\n3. 点击「加载已解压的扩展程序」\n4. 选择右侧按钮打开的文件夹")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer()
 
                 Button("在 Finder 中打开") {
                     revealExtensionInFinder()
                 }
-                .buttonStyle(SecondaryButtonStyle())
+                .controlSize(.regular)
             }
             .padding(14)
             .background(
