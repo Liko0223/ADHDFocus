@@ -311,10 +311,11 @@ struct OnboardingView: View {
             Button(isGranted ? "已授权" : actionLabel) {
                 action()
             }
-            .controlSize(.small)
+            .controlSize(.regular)
             .disabled(isGranted)
         }
-        .padding(16)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 18)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(NSColor.controlBackgroundColor))
