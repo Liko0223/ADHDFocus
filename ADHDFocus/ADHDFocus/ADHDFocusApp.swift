@@ -50,6 +50,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var autoTriggerService: AutoTriggerService?
     private var mainWindow: NSWindow?
     private var onboardingWindow: NSWindow?
+    private var celebrationManager = CelebrationManager()
 
     override init() {
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
@@ -259,6 +260,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
                 isOnBreak: engine.pomodoroTimer?.isOnBreak ?? false
             )
+
+            // Show celebration when entering break (work cycle completed)
+            if phase == .break_ || phase == .longBreak {
+                celebrationManager.showCelebration()
+            }
         }
     }
 
