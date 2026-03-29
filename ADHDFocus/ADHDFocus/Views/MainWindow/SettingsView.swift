@@ -73,12 +73,22 @@ struct SettingsView: View {
                 }
 
                 GroupBox("关于") {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("ADHD Focus v1.0.0")
                             .font(.caption)
                         Text("为设计师打造的专注助手")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+
+                        Divider()
+
+                        Button("重新体验引导流程") {
+                            UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                            if let appDelegate = NSApp.delegate as? AppDelegate {
+                                appDelegate.showOnboardingIfNeeded()
+                            }
+                        }
+                        .controlSize(.small)
                     }
                     .padding(8)
                 }
