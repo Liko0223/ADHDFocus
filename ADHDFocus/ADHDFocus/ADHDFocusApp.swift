@@ -230,6 +230,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 context.insert(mode)
             }
             try? context.save()
+        } else {
+            // Restore any missing preset modes
+            let allModes = (try? context.fetch(FetchDescriptor<FocusMode>())) ?? []
+            let existingNames = Set(allModes.map { $0.name })
+            for preset in DefaultModes.createAll() {
+                if !existingNames.contains(preset.name) {
+                    context.insert(preset)
+                }
+            }
+            try? context.save()
         }
     }
 }
