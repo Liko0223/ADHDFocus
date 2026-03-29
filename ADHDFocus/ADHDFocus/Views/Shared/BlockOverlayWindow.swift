@@ -177,7 +177,7 @@ struct BlockOverlayContent: View {
 
     var body: some View {
         ZStack {
-            Color.clear
+            Color.black.opacity(0.55)
 
             VStack(spacing: 16) {
                 Text("🚫")
@@ -199,7 +199,7 @@ struct BlockOverlayContent: View {
                             .foregroundStyle(.white.opacity(0.5))
                         Text(String(format: "%02d:%02d", minutes, seconds))
                             .monospacedDigit()
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(.white)
                             .fontWeight(.bold)
                     }
                     .font(.subheadline)

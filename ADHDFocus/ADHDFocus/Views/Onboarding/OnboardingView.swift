@@ -71,7 +71,7 @@ struct OnboardingView: View {
 
             Spacer().frame(height: 6)
 
-            Text("为设计师打造的专注助手")
+            Text("专为 ADHD 打造的专注助手")
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
 
