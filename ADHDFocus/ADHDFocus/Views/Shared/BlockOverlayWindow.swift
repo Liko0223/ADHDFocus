@@ -10,13 +10,15 @@ final class BlockOverlayManager {
     private var modeName: String = ""
     private var remainingSeconds: Int = 0
     private var onTempAllow: ((String) -> Void)?
+    private var onWhitelist: ((String) -> Void)?
 
-    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int, onTempAllow: ((String) -> Void)? = nil) {
+    func showOverlays(for app: NSRunningApplication, modeName: String, remainingSeconds: Int, onTempAllow: ((String) -> Void)? = nil, onWhitelist: ((String) -> Void)? = nil) {
         dismissAll()
         self.blockedApp = app
         self.modeName = modeName
         self.remainingSeconds = remainingSeconds
         self.onTempAllow = onTempAllow
+        self.onWhitelist = onWhitelist
 
         updateOverlays()
 
@@ -93,6 +95,10 @@ final class BlockOverlayManager {
                     },
                     onTempAllow: { [weak self] in
                         self?.onTempAllow?(bundleID)
+                    },
+                    onWhitelist: { [weak self] in
+                        self?.onWhitelist?(bundleID)
+                        self?.dismissAll()
                     }
                 )
                 panel.orderFrontRegardless()
@@ -118,7 +124,7 @@ final class BlockOverlayManager {
 
 // Individual overlay panel for one window
 final class BlockOverlayPanel: NSPanel {
-    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, onGoBack: @escaping () -> Void, onTempAllow: @escaping () -> Void) {
+    init(frame: NSRect, appName: String, modeName: String, remainingSeconds: Int, onGoBack: @escaping () -> Void, onTempAllow: @escaping () -> Void, onWhitelist: @escaping () -> Void) {
         super.init(
             contentRect: frame,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -148,7 +154,8 @@ final class BlockOverlayPanel: NSPanel {
             modeName: modeName,
             remainingSeconds: remainingSeconds,
             onGoBack: onGoBack,
-            onTempAllow: onTempAllow
+            onTempAllow: onTempAllow,
+            onWhitelist: onWhitelist
         )
         let hostingView = NSHostingView(rootView: content)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
@@ -174,6 +181,7 @@ struct BlockOverlayContent: View {
     let remainingSeconds: Int
     let onGoBack: () -> Void
     let onTempAllow: () -> Void
+    let onWhitelist: () -> Void
 
     var body: some View {
         ZStack {
@@ -232,6 +240,15 @@ struct BlockOverlayContent: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                Button {
+                    onWhitelist()
+                } label: {
+                    Text("加入白名单")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+                .buttonStyle(.plain)
             }
         }
     }

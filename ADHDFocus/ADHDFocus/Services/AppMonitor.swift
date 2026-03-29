@@ -122,8 +122,20 @@ final class AppMonitor {
                 remainingSeconds: engine.pomodoroTimer?.remainingSeconds ?? 0,
                 onTempAllow: { [weak self] bundleID in
                     self?.tempAllowApp(bundleID)
+                },
+                onWhitelist: { [weak self] bundleID in
+                    self?.whitelistApp(bundleID)
                 }
             )
         }
+    }
+
+    private func whitelistApp(_ bundleID: String) {
+        guard let mode = engine.activeMode else { return }
+        if !mode.allowedApps.contains(bundleID) {
+            mode.allowedApps.append(bundleID)
+        }
+        mode.blockedApps.removeAll { $0 == bundleID }
+        try? modelContext.save()
     }
 }
