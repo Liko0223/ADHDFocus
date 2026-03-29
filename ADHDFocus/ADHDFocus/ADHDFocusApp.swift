@@ -2,6 +2,10 @@ import SwiftUI
 import SwiftData
 import AppKit
 
+extension Notification.Name {
+    static let showOnboarding = Notification.Name("showOnboarding")
+}
+
 @main
 struct ADHDFocusApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -46,6 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupEngine()
         InstalledAppsProvider.shared.preload()
         showOnboardingIfNeeded()
+
+        NotificationCenter.default.addObserver(forName: .showOnboarding, object: nil, queue: .main) { [weak self] _ in
+            self?.showOnboarding()
+        }
     }
 
     func openMainWindow() {

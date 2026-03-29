@@ -83,9 +83,7 @@ struct SettingsView: View {
                         Divider()
 
                         Button("重新体验引导流程") {
-                            if let appDelegate = NSApp.delegate as? AppDelegate {
-                                appDelegate.showOnboarding()
-                            }
+                            NotificationCenter.default.post(name: .showOnboarding, object: nil)
                         }
                         .controlSize(.small)
                     }
