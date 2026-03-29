@@ -16,17 +16,8 @@ final class AutoTriggerService {
     private var ignoredApps: Set<String> = []
     private var isWatching = false
 
-    private let exemptApps: Set<String> = [
-        "com.lilinke.ADHDFocus",
-        "com.apple.finder",
-        "com.apple.loginwindow",
-        "com.apple.SystemPreferences",
-        "com.apple.systempreferences",
-        "com.apple.dock",
-        "com.apple.WindowManager",
-        "com.apple.controlcenter",
-        "com.apple.SecurityAgent"
-    ]
+    private let exemptApps = AppConstants.exemptApps
+    private var cachedModes: [FocusMode]?
 
     init(engine: FocusEngine, modelContext: ModelContext, notchManager: NotchManager) {
         self.engine = engine
@@ -79,6 +70,7 @@ final class AutoTriggerService {
         ignoredApps.removeAll()
         currentApp = nil
         appStartTime = nil
+        cachedModes = nil
         checkTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.checkTrigger()
@@ -122,8 +114,11 @@ final class AutoTriggerService {
     }
 
     private func matchMode(for bundleID: String) -> FocusMode? {
-        let descriptor = FetchDescriptor<FocusMode>(sortBy: [SortDescriptor(\FocusMode.sortOrder)])
-        guard let modes = try? modelContext.fetch(descriptor) else { return nil }
+        if cachedModes == nil {
+            let descriptor = FetchDescriptor<FocusMode>(sortBy: [SortDescriptor(\FocusMode.sortOrder)])
+            cachedModes = try? modelContext.fetch(descriptor)
+        }
+        guard let modes = cachedModes else { return nil }
 
         // Priority 1: explicit triggerApps
         for mode in modes {

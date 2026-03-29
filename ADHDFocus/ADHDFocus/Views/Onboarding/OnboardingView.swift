@@ -507,7 +507,7 @@ struct OnboardingView: View {
     }
 
     private func finishOnboarding() {
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        UserDefaults.standard.set(true, forKey: AppConstants.hasCompletedOnboarding)
         onComplete()
         // Expand notch panel so user sees it
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

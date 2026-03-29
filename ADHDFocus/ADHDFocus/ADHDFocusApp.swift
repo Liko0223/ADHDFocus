@@ -7,6 +7,21 @@ extension Notification.Name {
     static let expandNotchPanel = Notification.Name("expandNotchPanel")
 }
 
+enum AppConstants {
+    static let hasCompletedOnboarding = "hasCompletedOnboarding"
+    static let exemptApps: Set<String> = [
+        "com.lilinke.ADHDFocus",
+        "com.apple.finder",
+        "com.apple.loginwindow",
+        "com.apple.SystemPreferences",
+        "com.apple.systempreferences",
+        "com.apple.dock",
+        "com.apple.WindowManager",
+        "com.apple.controlcenter",
+        "com.apple.SecurityAgent"
+    ]
+}
+
 @main
 struct ADHDFocusApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -37,7 +52,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindow: NSWindow?
 
     override init() {
-        print("[ADHD] AppDelegate init called")
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
@@ -111,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func showOnboardingIfNeeded() {
-        guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else { return }
+        guard !UserDefaults.standard.bool(forKey: AppConstants.hasCompletedOnboarding) else { return }
         showOnboarding()
     }
 

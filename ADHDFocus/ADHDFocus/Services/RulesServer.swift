@@ -12,9 +12,10 @@ final class RulesServer {
     }
 
     func start() {
+        guard let nwPort = NWEndpoint.Port(rawValue: port) else { return }
         do {
             let params = NWParameters.tcp
-            listener = try NWListener(using: params, on: NWEndpoint.Port(rawValue: port)!)
+            listener = try NWListener(using: params, on: nwPort)
             listener?.newConnectionHandler = { [weak self] connection in
                 self?.handleConnection(connection)
             }

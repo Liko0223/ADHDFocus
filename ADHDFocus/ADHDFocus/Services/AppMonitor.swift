@@ -11,17 +11,7 @@ final class AppMonitor {
     private var tempAllowedApps: [String: Date] = [:]  // bundleID -> expiry
     private var lastBlockRecord: [String: Date] = [:]  // bundleID -> last recorded time
 
-    private let exemptApps = Set([
-        "com.lilinke.ADHDFocus",
-        "com.apple.finder",
-        "com.apple.loginwindow",
-        "com.apple.SystemPreferences",
-        "com.apple.systempreferences",
-        "com.apple.dock",
-        "com.apple.WindowManager",
-        "com.apple.controlcenter",
-        "com.apple.SecurityAgent"
-    ])
+    private let exemptApps = AppConstants.exemptApps
 
     init(engine: FocusEngine, modelContext: ModelContext) {
         self.engine = engine
