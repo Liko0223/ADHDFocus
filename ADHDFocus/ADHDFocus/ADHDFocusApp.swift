@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var currentSession: FocusSession?
     private var rulesServer: RulesServer?
     private var notchManager = NotchManager()
+    private var autoTriggerService: AutoTriggerService?
     private var mainWindow: NSWindow?
 
     override init() {
@@ -85,6 +86,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         notchManager.setup()
 
+        // Setup auto-trigger
+        let trigger = AutoTriggerService(engine: engine, modelContext: container.mainContext, notchManager: notchManager)
+        trigger.startWatching()
+        autoTriggerService = trigger
+
+        notchManager.onIgnoreSuggestion = { [weak trigger] in
+            trigger?.ignoreCurrentApp()
+        }
+
         let monitor = AppMonitor(engine: engine, modelContext: container.mainContext)
         appMonitor = monitor
 
@@ -92,8 +102,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         server.start()
         rulesServer = server
 
-        engine.onModeActivated = { [weak self] mode in
+        engine.onModeActivated = { [weak self, weak trigger] mode in
             guard let self else { return }
+            trigger?.pause()
             monitor.startMonitoring()
             if mode.enableDND { dndController.enableDND() }
 
@@ -109,8 +120,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
         }
 
-        engine.onModeDeactivated = { [weak self] in
+        engine.onModeDeactivated = { [weak self, weak trigger] in
             guard let self else { return }
+            trigger?.resume()
             monitor.stopMonitoring()
             dndController.disableDND()
 
