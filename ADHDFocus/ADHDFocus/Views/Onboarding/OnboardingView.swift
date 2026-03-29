@@ -467,17 +467,23 @@ struct OnboardingView: View {
     }
 
     private func revealExtensionInFinder() {
-        if let bundleURL = Bundle.main.bundleURL.deletingLastPathComponent() as URL? {
-            let extensionURL = bundleURL.appendingPathComponent("ChromeExtension")
-            if FileManager.default.fileExists(atPath: extensionURL.path) {
-                NSWorkspace.shared.activateFileViewerSelecting([extensionURL])
+        // Try common locations for ChromeExtension folder
+        let candidates = [
+            // Inside app bundle (production)
+            Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/ChromeExtension"),
+            // Next to app bundle (development - Xcode DerivedData)
+            Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent("ChromeExtension"),
+            // Project source directory (development)
+            URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Projects/Mac/ADHD/ADHDFocus/ChromeExtension"),
+        ]
+        for url in candidates {
+            if FileManager.default.fileExists(atPath: url.path) {
+                NSWorkspace.shared.activateFileViewerSelecting([url])
                 return
             }
         }
-        // Fallback: reveal the app's Resources folder
-        if let resourceURL = Bundle.main.resourceURL {
-            NSWorkspace.shared.activateFileViewerSelecting([resourceURL])
-        }
+        // Last fallback: open the app bundle
+        NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
     }
 
     private func completedOnboarding() {
