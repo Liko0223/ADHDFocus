@@ -19,6 +19,7 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Step content
             Group {
                 switch currentStep {
                 case 0: welcomeStep
@@ -29,8 +30,18 @@ struct OnboardingView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            // Step indicator dots
+            HStack(spacing: 8) {
+                ForEach(0..<4, id: \.self) { i in
+                    Circle()
+                        .fill(i == currentStep ? Color.accentColor : Color.primary.opacity(0.15))
+                        .frame(width: 6, height: 6)
+                }
+            }
+            .padding(.bottom, 20)
         }
-        .frame(width: 480, height: 560)
+        .frame(width: 480, height: 580)
         .background(Color(NSColor.windowBackgroundColor))
         .onDisappear {
             accessibilityTimer?.invalidate()
@@ -44,19 +55,29 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            catWithBubble(message: "嗨~ 我是你的专注伙伴！")
+            // App icon
+            if let icon = NSApp.applicationIconImage {
+                Image(nsImage: icon)
+                    .resizable()
+                    .frame(width: 80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+            }
 
-            Spacer().frame(height: 36)
+            Spacer().frame(height: 20)
 
             Text("ADHD Focus")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
-                .foregroundStyle(.primary)
+                .font(.system(size: 32, weight: .bold, design: .rounded))
 
-            Spacer().frame(height: 8)
+            Spacer().frame(height: 6)
 
             Text("为设计师打造的专注助手")
-                .font(.system(size: 15, weight: .medium))
+                .font(.system(size: 14))
                 .foregroundStyle(.secondary)
+
+            Spacer().frame(height: 28)
+
+            catWithBubble(message: "嗨~ 我是你的专注伙伴！接下来帮你做几个简单的设置~")
 
             Spacer()
 
@@ -65,33 +86,32 @@ struct OnboardingView: View {
                     currentStep = 1
                 }
             }
-
-            Spacer().frame(height: 32)
         }
         .padding(.horizontal, 40)
+        .padding(.bottom, 24)
     }
 
     // MARK: - Step 2: Accessibility
 
     private var accessibilityStep: some View {
         VStack(spacing: 0) {
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 24)
 
-            catWithBubble(message: "帮我开一下权限吧~")
+            catWithBubble(message: "帮我开一下权限吧~ 这样我才能帮你挡住分心的应用")
 
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 24)
 
-            // Explain what this permission enables
-            VStack(alignment: .leading, spacing: 8) {
+            // What this enables
+            VStack(alignment: .leading, spacing: 10) {
                 Label("拦截分心应用 — 工作时自动遮挡微信、微博等", systemImage: "app.badge.checkmark")
                 Label("窗口级遮罩 — 不杀进程，温和地帮你回到工作", systemImage: "rectangle.on.rectangle")
-                Label("智能提醒 — 检测到你在用设计工具时建议开启专注", systemImage: "sparkles")
+                Label("智能提醒 — 用设计工具时建议开启专注", systemImage: "sparkles")
             }
             .font(.system(size: 12))
             .foregroundStyle(.secondary)
-            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 24)
 
             permissionCard(
                 title: "辅助功能权限",
@@ -99,36 +119,33 @@ struct OnboardingView: View {
                 isGranted: accessibilityGranted
             )
 
-            Spacer().frame(height: 16)
+            Spacer().frame(height: 12)
+
+            Button(accessibilityGranted ? "已授权" : "去授权") {
+                openAccessibilitySettings()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(accessibilityGranted)
 
             if !accessibilityGranted {
-                Button("去授权") {
-                    openAccessibilitySettings()
-                }
-                .buttonStyle(SecondaryButtonStyle())
+                Text("跳过后应用拦截功能不可用")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.orange.opacity(0.8))
+                    .padding(.top, 6)
             }
 
             Spacer()
 
-            VStack(spacing: 8) {
-                if !accessibilityGranted {
-                    Text("跳过后应用拦截功能不可用")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                primaryButton(title: "下一步") {
-                    accessibilityTimer?.invalidate()
-                    accessibilityTimer = nil
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        currentStep = 2
-                    }
+            primaryButton(title: "下一步") {
+                accessibilityTimer?.invalidate()
+                accessibilityTimer = nil
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    currentStep = 2
                 }
             }
-
-            Spacer().frame(height: 32)
         }
         .padding(.horizontal, 40)
+        .padding(.bottom, 24)
         .onAppear {
             checkAccessibility()
             startAccessibilityPolling()
@@ -143,21 +160,21 @@ struct OnboardingView: View {
 
     private var notificationStep: some View {
         VStack(spacing: 0) {
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 24)
 
-            catWithBubble(message: "允许我发通知~")
+            catWithBubble(message: "允许我发通知~ 番茄钟结束时提醒你休息")
 
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 24)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Label("番茄钟提醒 — 工作结束提醒你休息，休息结束回来工作", systemImage: "timer")
+            VStack(alignment: .leading, spacing: 10) {
+                Label("番茄钟提醒 — 工作结束提醒休息，休息结束回来工作", systemImage: "timer")
                 Label("拦截通知 — 有应用被拦截时告诉你", systemImage: "hand.raised")
             }
             .font(.system(size: 12))
             .foregroundStyle(.secondary)
-            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 24)
 
             permissionCard(
                 title: "通知权限",
@@ -165,9 +182,9 @@ struct OnboardingView: View {
                 isGranted: notificationStatus == .authorized
             )
 
-            Spacer().frame(height: 16)
+            Spacer().frame(height: 12)
 
-            Button(notificationStatus == .authorized ? "查看通知设置" : "去授权") {
+            Button(notificationStatus == .authorized ? "已授权" : "去授权") {
                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
             }
             .buttonStyle(SecondaryButtonStyle())
@@ -179,10 +196,9 @@ struct OnboardingView: View {
                     currentStep = 3
                 }
             }
-
-            Spacer().frame(height: 32)
         }
         .padding(.horizontal, 40)
+        .padding(.bottom, 24)
         .onAppear {
             requestNotificationPermission()
         }
@@ -194,7 +210,7 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer().frame(height: 24)
 
-            catWithBubble(message: "选一个你常用的模式，马上开始第一次专注！")
+            catWithBubble(message: "选一个模式，开始第一次专注！")
 
             Spacer().frame(height: 20)
 
@@ -208,9 +224,9 @@ struct OnboardingView: View {
                 }
             }
 
-            Spacer().frame(height: 16)
+            Spacer().frame(height: 14)
 
-            // Browser extension collapsible section
+            // Browser extension
             extensionSection
 
             Spacer()
@@ -221,10 +237,9 @@ struct OnboardingView: View {
             ) {
                 completedOnboarding()
             }
-
-            Spacer().frame(height: 32)
         }
         .padding(.horizontal, 40)
+        .padding(.bottom, 24)
     }
 
     // MARK: - Shared Components
