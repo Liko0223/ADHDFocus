@@ -314,24 +314,13 @@ struct NotchContentView: View {
     // MARK: - Suggestion bar
 
     private var suggestionBar: some View {
-        VStack(spacing: 6) {
-            // Top row: cat face + suggestion text
-            HStack(spacing: 6) {
-                PixelCompanionView(state: manager.companionState, time: Date().timeIntervalSinceReferenceDate)
-                    .frame(width: 18, height: 18)
-
-                if let appName = manager.suggestedAppName {
-                    let messages = [
-                        "在用 \(appName)~ 要专注吗？",
-                        "\(appName) 打开啦~ 专注？",
-                    ]
-                    Text(messages[abs(appName.hashValue) % messages.count])
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.85))
-                        .lineLimit(1)
-                }
-
-                Spacer()
+        VStack(alignment: .leading, spacing: 6) {
+            // Text
+            if let appName = manager.suggestedAppName {
+                Text("在用 \(appName)~ 要专注吗？")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .lineLimit(1)
             }
 
             // Bottom row: mode activate button + dismiss button
