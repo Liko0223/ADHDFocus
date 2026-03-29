@@ -7,6 +7,7 @@ struct ModeEditorView: View {
     @State private var newBlockedURL = ""
     @State private var showAllowedAppPicker = false
     @State private var showBlockedAppPicker = false
+    @State private var showTriggerAppPicker = false
 
     var body: some View {
         ScrollView {
@@ -185,6 +186,53 @@ struct ModeEditorView: View {
                         }
                     }
                 }
+
+                // Automation
+                HStack(alignment: .top, spacing: 16) {
+                    editorSection("自动化") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Text("触发应用")
+                                    .font(.subheadline)
+                                Spacer()
+                                Button("选择") {
+                                    showTriggerAppPicker = true
+                                }
+                                .controlSize(.small)
+                            }
+
+                            if mode.triggerApps.isEmpty {
+                                Text("未设置（使用允许应用列表推断）")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            } else {
+                                FlowLayout(spacing: 6) {
+                                    ForEach(mode.triggerApps, id: \.self) { bundleID in
+                                        AppChipView(bundleID: bundleID) {
+                                            mode.triggerApps.removeAll { $0 == bundleID }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Divider()
+
+                            HStack {
+                                Text("触发延迟")
+                                    .font(.subheadline)
+                                Spacer()
+                                Picker("", selection: $mode.triggerDelay) {
+                                    Text("10 秒").tag(10)
+                                    Text("30 秒").tag(30)
+                                    Text("1 分钟").tag(60)
+                                    Text("5 分钟").tag(300)
+                                }
+                                .labelsHidden()
+                                .frame(width: 100)
+                            }
+                        }
+                    }
+                }
             }
             .padding(24)
         }
@@ -194,6 +242,9 @@ struct ModeEditorView: View {
         }
         .sheet(isPresented: $showBlockedAppPicker) {
             AppPickerView(title: "选择禁止的应用", selectedBundleIDs: $mode.blockedApps)
+        }
+        .sheet(isPresented: $showTriggerAppPicker) {
+            AppPickerView(title: "选择触发应用", selectedBundleIDs: $mode.triggerApps)
         }
     }
 
