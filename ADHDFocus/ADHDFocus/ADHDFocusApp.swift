@@ -49,6 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func openMainWindow() {
+        NSApp.setActivationPolicy(.regular)
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -79,10 +80,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showOnboardingIfNeeded() {
         guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else { return }
+        showOnboarding()
+    }
+
+    func showOnboarding() {
+        // Close existing onboarding window if any
+        onboardingWindow?.close()
+        onboardingWindow = nil
+
+        // LSUIElement apps need regular policy to show windows
+        NSApp.setActivationPolicy(.regular)
 
         let view = OnboardingView(engine: engine) { [weak self] in
             self?.onboardingWindow?.close()
             self?.onboardingWindow = nil
+            NSApp.setActivationPolicy(.accessory)
         }
         .modelContainer(container)
 

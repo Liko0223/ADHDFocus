@@ -83,9 +83,8 @@ struct SettingsView: View {
                         Divider()
 
                         Button("重新体验引导流程") {
-                            UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
                             if let appDelegate = NSApp.delegate as? AppDelegate {
-                                appDelegate.showOnboardingIfNeeded()
+                                appDelegate.showOnboarding()
                             }
                         }
                         .controlSize(.small)
