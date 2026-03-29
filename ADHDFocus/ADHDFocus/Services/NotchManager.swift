@@ -193,9 +193,9 @@ final class NotchManager {
         } else if isSuggesting {
             return NSRect(
                 x: centerX - collapsedTotalWidth / 2,
-                y: screenFrame.maxY - notchHeight - 40,
+                y: screenFrame.maxY - notchHeight - 56,
                 width: collapsedTotalWidth,
-                height: notchHeight + 40
+                height: notchHeight + 56
             )
         } else {
             return NSRect(

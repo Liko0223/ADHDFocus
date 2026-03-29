@@ -56,7 +56,7 @@ struct NotchContentView: View {
         if manager.isExpanded {
             return manager.notchHeight + expandedPanelHeight
         } else if manager.isSuggesting {
-            return manager.notchHeight + 40
+            return manager.notchHeight + 56
         } else {
             return manager.notchHeight
         }
@@ -173,15 +173,6 @@ struct NotchContentView: View {
                             .fill(.green)
                             .frame(width: 6, height: 6)
                     }
-                } else if manager.isSuggesting, let appName = manager.suggestedAppName {
-                    let messages = [
-                        "在用\(appName)~ 要专注吗？",
-                        "\(appName)打开啦~ 专注？",
-                    ]
-                    Text(messages[abs(appName.hashValue) % messages.count])
-                        .font(.system(size: 8, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .lineLimit(1)
                 } else {
                     Text(idleGreeting)
                         .font(.system(size: 9, weight: .medium))
@@ -323,46 +314,67 @@ struct NotchContentView: View {
     // MARK: - Suggestion bar
 
     private var suggestionBar: some View {
-        HStack(spacing: 8) {
-            // Mode button (one-click activate)
-            if let mode = manager.suggestedMode {
-                Button {
-                    manager.acceptSuggestion()
-                } label: {
-                    HStack(spacing: 5) {
-                        Text(mode.icon)
-                            .font(.system(size: 11))
-                        Text(mode.name)
-                            .font(.system(size: 11, weight: .medium))
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 7))
+        VStack(spacing: 6) {
+            // Top row: cat face + suggestion text
+            HStack(spacing: 6) {
+                PixelCompanionView(state: manager.companionState, time: Date().timeIntervalSinceReferenceDate)
+                    .frame(width: 18, height: 18)
+
+                if let appName = manager.suggestedAppName {
+                    let messages = [
+                        "在用 \(appName)~ 要专注吗？",
+                        "\(appName) 打开啦~ 专注？",
+                    ]
+                    Text(messages[abs(appName.hashValue) % messages.count])
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .lineLimit(1)
+                }
+
+                Spacer()
+            }
+
+            // Bottom row: mode activate button + dismiss button
+            HStack(spacing: 8) {
+                if let mode = manager.suggestedMode {
+                    Button {
+                        manager.acceptSuggestion()
+                    } label: {
+                        HStack(spacing: 5) {
+                            Text(mode.icon)
+                                .font(.system(size: 10))
+                            Text(mode.name)
+                                .font(.system(size: 10, weight: .medium))
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 7))
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.purple.opacity(0.6))
+                        .clipShape(Capsule())
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.purple.opacity(0.6))
-                    .clipShape(Capsule())
+                    .buttonStyle(.plain)
+                }
+
+                Spacer()
+
+                Button {
+                    manager.onIgnoreSuggestion?()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .padding(5)
+                        .background(Color.white.opacity(0.1))
+                        .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
             }
-
-            Spacer()
-
-            // Dismiss button
-            Button {
-                manager.onIgnoreSuggestion?()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .padding(5)
-                    .background(Color.white.opacity(0.1))
-                    .clipShape(Circle())
-            }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 16)
-        .frame(height: 36)
+        .padding(.vertical, 8)
+        .frame(height: 56)
     }
 
     private var idleGreeting: String {
