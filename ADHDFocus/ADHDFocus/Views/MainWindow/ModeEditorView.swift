@@ -229,6 +229,7 @@ struct ModeEditorView: View {
             }
             .padding(24)
         }
+        .clipped()
         .background(.background)
         .sheet(isPresented: $showAllowedAppPicker) {
             AppPickerView(title: "选择允许的应用", selectedBundleIDs: $mode.allowedApps)
