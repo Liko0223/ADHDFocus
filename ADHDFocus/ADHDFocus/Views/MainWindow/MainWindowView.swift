@@ -35,5 +35,6 @@ struct MainWindowView: View {
             }
         }
         .frame(minWidth: 800, minHeight: 520)
+        .toolbarBackground(.visible, for: .windowToolbar)
     }
 }

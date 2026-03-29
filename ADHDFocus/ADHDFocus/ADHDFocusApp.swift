@@ -13,9 +13,8 @@ struct ADHDFocusApp: App {
 
     var body: some Scene {
         Settings {
-            MainWindowView(engine: appDelegate.engine)
-                .modelContainer(appDelegate.container)
-                .frame(minWidth: 700, minHeight: 500)
+            Text("请通过刘海面板打开设置")
+                .frame(width: 300, height: 100)
         }
     }
 }
