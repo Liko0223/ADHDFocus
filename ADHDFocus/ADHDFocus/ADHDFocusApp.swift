@@ -13,7 +13,9 @@ struct ADHDFocusApp: App {
 
     var body: some Scene {
         Settings {
-            EmptyView()
+            MainWindowView(engine: appDelegate.engine)
+                .modelContainer(appDelegate.container)
+                .frame(minWidth: 700, minHeight: 500)
         }
     }
 }
