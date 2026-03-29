@@ -77,9 +77,21 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer().frame(height: 32)
 
-            catWithBubble(message: "帮我开一下权限吧~ 这样我才能帮你挡住分心的应用哦")
+            catWithBubble(message: "帮我开一下权限吧~")
 
-            Spacer().frame(height: 28)
+            Spacer().frame(height: 20)
+
+            // Explain what this permission enables
+            VStack(alignment: .leading, spacing: 8) {
+                Label("拦截分心应用 — 工作时自动遮挡微信、微博等", systemImage: "app.badge.checkmark")
+                Label("窗口级遮罩 — 不杀进程，温和地帮你回到工作", systemImage: "rectangle.on.rectangle")
+                Label("智能提醒 — 检测到你在用设计工具时建议开启专注", systemImage: "sparkles")
+            }
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 8)
+
+            Spacer().frame(height: 20)
 
             permissionCard(
                 title: "辅助功能权限",
@@ -133,9 +145,19 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer().frame(height: 32)
 
-            catWithBubble(message: "允许我发通知，番茄钟结束时提醒你休息~")
+            catWithBubble(message: "允许我发通知~")
 
-            Spacer().frame(height: 28)
+            Spacer().frame(height: 20)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Label("番茄钟提醒 — 工作结束提醒你休息，休息结束回来工作", systemImage: "timer")
+                Label("拦截通知 — 有应用被拦截时告诉你", systemImage: "hand.raised")
+            }
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 8)
+
+            Spacer().frame(height: 20)
 
             permissionCard(
                 title: "通知权限",
