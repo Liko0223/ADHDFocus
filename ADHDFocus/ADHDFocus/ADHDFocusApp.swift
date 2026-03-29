@@ -139,7 +139,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             titlebarBlur.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             titlebarBlur.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
             titlebarBlur.topAnchor.constraint(equalTo: containerView.topAnchor),
-            titlebarBlur.heightAnchor.constraint(equalToConstant: 52),
+            titlebarBlur.heightAnchor.constraint(equalToConstant: 28),
         ])
 
         window.contentView = containerView
