@@ -10,6 +10,7 @@ final class NotchManager {
     weak var engine: FocusEngine?
     var modelContainer: ModelContainer?
     var openMainWindow: (() -> Void)?
+    var onIgnoreSuggestion: (() -> Void)?
 
     // State
     var companionState: CompanionState = .idle
@@ -17,6 +18,10 @@ final class NotchManager {
     var remainingSeconds: Int = 0
     var isActive: Bool = false
     var isExpanded: Bool = false
+    var isSuggesting: Bool = false
+    var suggestedMode: FocusMode?
+    var suggestedAppName: String?
+    private var suggestionTimer: Timer?
 
     // Geometry
     var notchWidth: CGFloat = 200
@@ -107,6 +112,7 @@ final class NotchManager {
     }
 
     func expand() {
+        dismissSuggestion()
         isExpanded = true
     }
 
@@ -122,6 +128,32 @@ final class NotchManager {
     func deactivateMode() {
         engine?.deactivate()
         collapse()
+    }
+
+    func showSuggestion(mode: FocusMode, appName: String) {
+        suggestedMode = mode
+        suggestedAppName = appName
+        isSuggesting = true
+
+        // Auto-dismiss after 5 seconds
+        suggestionTimer?.invalidate()
+        suggestionTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] _ in
+            self?.dismissSuggestion()
+        }
+    }
+
+    func dismissSuggestion() {
+        suggestionTimer?.invalidate()
+        suggestionTimer = nil
+        isSuggesting = false
+        suggestedMode = nil
+        suggestedAppName = nil
+    }
+
+    func acceptSuggestion() {
+        guard let mode = suggestedMode else { return }
+        dismissSuggestion()
+        engine?.activate(mode: mode)
     }
 
     func updateState(isActive: Bool, modeName: String?, remainingSeconds: Int, isOnBreak: Bool) {
@@ -157,6 +189,13 @@ final class NotchManager {
                 y: screenFrame.maxY - notchHeight - expandedHeight,
                 width: w,
                 height: notchHeight + expandedHeight
+            )
+        } else if isSuggesting {
+            return NSRect(
+                x: centerX - collapsedTotalWidth / 2,
+                y: screenFrame.maxY - notchHeight - 40,
+                width: collapsedTotalWidth,
+                height: notchHeight + 40
             )
         } else {
             return NSRect(
