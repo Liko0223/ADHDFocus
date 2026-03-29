@@ -49,7 +49,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupEngine()
         InstalledAppsProvider.shared.preload()
-        showOnboardingIfNeeded()
+
+        // Delay onboarding to ensure app is fully ready
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.showOnboardingIfNeeded()
+        }
 
         NotificationCenter.default.addObserver(forName: .showOnboarding, object: nil, queue: .main) { [weak self] _ in
             self?.showOnboarding()
