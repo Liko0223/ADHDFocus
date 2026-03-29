@@ -165,6 +165,15 @@ struct OnboardingView: View {
                 isGranted: notificationStatus == .authorized
             )
 
+            Spacer().frame(height: 16)
+
+            if notificationStatus != .authorized {
+                Button("去授权") {
+                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+            }
+
             Spacer()
 
             primaryButton(title: "下一步") {
