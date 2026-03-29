@@ -6,11 +6,13 @@ import ApplicationServices
 
 struct OnboardingView: View {
     @State private var currentStep = 0
+    @State private var slideDirection: Edge = .trailing
     @State private var selectedModeIndex: Int? = nil
     @State private var accessibilityGranted = false
     @State private var accessibilityTimer: Timer?
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var extensionSectionExpanded = false
+    @State private var hoveredModeIndex: Int? = nil
 
     @Query(sort: \FocusMode.sortOrder) private var modes: [FocusMode]
 
@@ -23,21 +25,25 @@ struct OnboardingView: View {
             Group {
                 switch currentStep {
                 case 0: welcomeStep
-                case 1: accessibilityStep
-                case 2: notificationStep
-                case 3: extensionStep
-                case 4: modeSelectionStep
+                case 1: permissionsStep
+                case 2: extensionStep
+                case 3: modeSelectionStep
                 default: EmptyView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .transition(.asymmetric(
+                insertion: .move(edge: slideDirection),
+                removal: .move(edge: slideDirection == .trailing ? .leading : .trailing)
+            ))
 
-            // Step indicator dots
+            // Capsule-style progress indicator
             HStack(spacing: 8) {
-                ForEach(0..<5, id: \.self) { i in
-                    Circle()
+                ForEach(0..<4, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: 3)
                         .fill(i == currentStep ? Color.accentColor : Color.primary.opacity(0.15))
-                        .frame(width: 6, height: 6)
+                        .frame(width: i == currentStep ? 20 : 6, height: 6)
+                        .animation(.spring(response: 0.3), value: currentStep)
                 }
             }
             .padding(.bottom, 20)
@@ -50,7 +56,7 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Step 1: Welcome
+    // MARK: - Step 0: Welcome
 
     private var welcomeStep: some View {
         VStack(spacing: 0) {
@@ -85,6 +91,7 @@ struct OnboardingView: View {
             Spacer()
 
             primaryButton(title: "开始设置 →") {
+                slideDirection = .trailing
                 withAnimation(.easeInOut(duration: 0.25)) {
                     currentStep = 1
                 }
@@ -94,35 +101,48 @@ struct OnboardingView: View {
         .padding(.bottom, 24)
     }
 
-    // MARK: - Step 2: Accessibility
+    // MARK: - Step 1: Permissions (Accessibility + Notifications merged)
 
-    private var accessibilityStep: some View {
+    private var permissionsStep: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 24)
 
-            catWithBubble(message: "帮我开一下权限吧~ 这样我才能帮你挡住分心的应用")
+            catWithBubble(message: "帮我开两个小权限~ 这样我才能全力帮你专注")
 
-            Spacer().frame(height: 24)
+            Spacer().frame(height: 20)
 
-            // What this enables
+            // Feature explanations for both permissions
             VStack(alignment: .leading, spacing: 10) {
                 Label("拦截分心应用 — 工作时自动遮挡微信、微博等", systemImage: "app.badge.checkmark")
-                Label("窗口级遮罩 — 不杀进程，温和地帮你回到工作", systemImage: "rectangle.on.rectangle")
                 Label("智能提醒 — 用设计工具时建议开启专注", systemImage: "sparkles")
+                Label("番茄钟提醒 — 工作结束提醒休息，休息结束回来工作", systemImage: "timer")
+                Label("拦截通知 — 有应用被拦截时告诉你", systemImage: "hand.raised")
             }
             .font(.system(size: 12))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 24)
+            Spacer().frame(height: 16)
 
-            permissionCard(
-                title: "辅助功能权限",
-                description: "用于监控并拦截分心应用",
-                isGranted: accessibilityGranted,
-                actionLabel: "去授权"
-            ) {
-                openAccessibilitySettings()
+            // Both permission cards stacked
+            VStack(spacing: 10) {
+                permissionCard(
+                    title: "辅助功能权限",
+                    description: "用于监控并拦截分心应用",
+                    isGranted: accessibilityGranted,
+                    actionLabel: "去授权"
+                ) {
+                    openAccessibilitySettings()
+                }
+
+                permissionCard(
+                    title: "通知权限",
+                    description: "番茄钟结束时发送休息提醒",
+                    isGranted: notificationStatus == .authorized,
+                    actionLabel: "去授权"
+                ) {
+                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                }
             }
 
             if !accessibilityGranted {
@@ -132,11 +152,12 @@ struct OnboardingView: View {
                     .padding(.top, 8)
             }
 
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 24)
 
             primaryButton(title: "下一步") {
                 accessibilityTimer?.invalidate()
                 accessibilityTimer = nil
+                slideDirection = .trailing
                 withAnimation(.easeInOut(duration: 0.25)) {
                     currentStep = 2
                 }
@@ -147,6 +168,7 @@ struct OnboardingView: View {
         .onAppear {
             checkAccessibility()
             startAccessibilityPolling()
+            requestNotificationPermission()
         }
         .onDisappear {
             accessibilityTimer?.invalidate()
@@ -154,51 +176,7 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Step 3: Notifications
-
-    private var notificationStep: some View {
-        VStack(spacing: 0) {
-            Spacer().frame(height: 24)
-
-            catWithBubble(message: "允许我发通知~ 番茄钟结束时提醒你休息")
-
-            Spacer().frame(height: 24)
-
-            VStack(alignment: .leading, spacing: 10) {
-                Label("番茄钟提醒 — 工作结束提醒休息，休息结束回来工作", systemImage: "timer")
-                Label("拦截通知 — 有应用被拦截时告诉你", systemImage: "hand.raised")
-            }
-            .font(.system(size: 12))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Spacer().frame(height: 24)
-
-            permissionCard(
-                title: "通知权限",
-                description: "番茄钟结束时发送休息提醒",
-                isGranted: notificationStatus == .authorized,
-                actionLabel: "去授权"
-            ) {
-                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
-            }
-
-            Spacer().frame(height: 32)
-
-            primaryButton(title: "下一步") {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    currentStep = 3
-                }
-            }
-        }
-        .padding(.horizontal, 40)
-        .padding(.bottom, 24)
-        .onAppear {
-            requestNotificationPermission()
-        }
-    }
-
-    // MARK: - Step 4: Browser Extension
+    // MARK: - Step 2: Browser Extension
 
     private var extensionStep: some View {
         VStack(spacing: 0) {
@@ -251,14 +229,16 @@ struct OnboardingView: View {
 
             VStack(spacing: 10) {
                 primaryButton(title: "下一步") {
+                    slideDirection = .trailing
                     withAnimation(.easeInOut(duration: 0.25)) {
-                        currentStep = 4
+                        currentStep = 3
                     }
                 }
 
                 Button("跳过") {
+                    slideDirection = .trailing
                     withAnimation(.easeInOut(duration: 0.25)) {
-                        currentStep = 4
+                        currentStep = 3
                     }
                 }
                 .font(.system(size: 12))
@@ -270,7 +250,7 @@ struct OnboardingView: View {
         .padding(.bottom, 24)
     }
 
-    // MARK: - Step 5: Mode Selection
+    // MARK: - Step 3: Mode Selection
 
     private var modeSelectionStep: some View {
         VStack(spacing: 0) {
@@ -284,7 +264,7 @@ struct OnboardingView: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(modes.indices, id: \.self) { index in
                     let mode = modes[index]
-                    modeCard(mode: mode, isSelected: selectedModeIndex == index) {
+                    modeCard(mode: mode, isSelected: selectedModeIndex == index, index: index) {
                         selectedModeIndex = index
                     }
                 }
@@ -362,7 +342,9 @@ struct OnboardingView: View {
                 Image(systemName: isGranted ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                     .font(.system(size: 20))
                     .foregroundStyle(isGranted ? .green : .orange)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isGranted)
             }
+            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isGranted)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -393,8 +375,9 @@ struct OnboardingView: View {
         )
     }
 
-    private func modeCard(mode: FocusMode, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+    private func modeCard(mode: FocusMode, isSelected: Bool, index: Int, action: @escaping () -> Void) -> some View {
+        let isHovered = hoveredModeIndex == index
+        return Button(action: action) {
             VStack(spacing: 8) {
                 Text(mode.icon)
                     .font(.system(size: 28))
@@ -424,53 +407,16 @@ struct OnboardingView: View {
             )
         }
         .buttonStyle(.plain)
-    }
-
-    private var extensionSection: some View {
-        VStack(spacing: 0) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    extensionSectionExpanded.toggle()
-                }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: extensionSectionExpanded ? "chevron.down" : "chevron.right")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                    Text("安装浏览器扩展（可选）")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if extensionSectionExpanded {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Chrome 安装说明：\n1. 打开 Chrome → 更多工具 → 扩展程序\n2. 开启右上角「开发者模式」\n3. 点击「加载已解压的扩展程序」\n4. 选择下方文件夹中的 ChromeExtension 目录")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Button("在 Finder 中打开") {
-                        revealExtensionInFinder()
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                }
-                .padding(.top, 10)
-                .padding(.leading, 4)
-            }
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color(NSColor.controlBackgroundColor))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.primary.opacity(0.07), lineWidth: 1)
-                )
+        .scaleEffect(isHovered ? 1.03 : 1.0)
+        .shadow(
+            color: isHovered ? Color.black.opacity(0.12) : Color.clear,
+            radius: isHovered ? 8 : 0,
+            y: isHovered ? 3 : 0
         )
+        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+        .onHover { hovering in
+            hoveredModeIndex = hovering ? index : nil
+        }
     }
 
     @ViewBuilder
