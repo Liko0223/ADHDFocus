@@ -36,48 +36,48 @@ final class CelebrationManager {
 
 struct ScreenGlowView: View {
     @State private var opacity: Double = 0
-    @State private var startTime: Date?
-
     private let glowWidth: CGFloat = 60
+    private let color: Color
+
+    private static let palette: [Color] = [
+        Color(red: 0.3, green: 0.85, blue: 0.5),  // green
+        Color(red: 0.4, green: 0.6, blue: 1.0),   // blue
+        Color(red: 1.0, green: 0.65, blue: 0.2),   // orange
+        Color(red: 0.6, green: 0.4, blue: 1.0),    // purple
+        Color(red: 0.3, green: 0.8, blue: 0.9),    // cyan
+        Color(red: 1.0, green: 0.5, blue: 0.6),    // pink
+    ]
+
+    init() {
+        color = Self.palette.randomElement()!
+    }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30)) { timeline in
-            let t = timeline.date.timeIntervalSinceReferenceDate
-            let hue1 = t.truncatingRemainder(dividingBy: 2.0) / 2.0
-            let hue2 = (hue1 + 0.33).truncatingRemainder(dividingBy: 1.0)
-            let c1 = Color(hue: hue1, saturation: 0.8, brightness: 1.0)
-            let c2 = Color(hue: hue2, saturation: 0.8, brightness: 1.0)
+        GeometryReader { geo in
+            ZStack {
+                LinearGradient(colors: [color.opacity(0.7), .clear], startPoint: .top, endPoint: .bottom)
+                    .frame(height: glowWidth)
+                    .frame(maxWidth: .infinity)
+                    .position(x: geo.size.width / 2, y: glowWidth / 2)
 
-            GeometryReader { geo in
-                ZStack {
-                    // Top
-                    LinearGradient(colors: [c1.opacity(0.7), c2.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: glowWidth)
-                        .frame(maxWidth: .infinity)
-                        .position(x: geo.size.width / 2, y: glowWidth / 2)
+                LinearGradient(colors: [color.opacity(0.7), .clear], startPoint: .bottom, endPoint: .top)
+                    .frame(height: glowWidth)
+                    .frame(maxWidth: .infinity)
+                    .position(x: geo.size.width / 2, y: geo.size.height - glowWidth / 2)
 
-                    // Bottom
-                    LinearGradient(colors: [c2.opacity(0.7), c1.opacity(0.3), .clear], startPoint: .bottom, endPoint: .top)
-                        .frame(height: glowWidth)
-                        .frame(maxWidth: .infinity)
-                        .position(x: geo.size.width / 2, y: geo.size.height - glowWidth / 2)
+                LinearGradient(colors: [color.opacity(0.6), .clear], startPoint: .leading, endPoint: .trailing)
+                    .frame(width: glowWidth)
+                    .frame(maxHeight: .infinity)
+                    .position(x: glowWidth / 2, y: geo.size.height / 2)
 
-                    // Left
-                    LinearGradient(colors: [c1.opacity(0.6), c2.opacity(0.2), .clear], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: glowWidth)
-                        .frame(maxHeight: .infinity)
-                        .position(x: glowWidth / 2, y: geo.size.height / 2)
-
-                    // Right
-                    LinearGradient(colors: [c2.opacity(0.6), c1.opacity(0.2), .clear], startPoint: .trailing, endPoint: .leading)
-                        .frame(width: glowWidth)
-                        .frame(maxHeight: .infinity)
-                        .position(x: geo.size.width - glowWidth / 2, y: geo.size.height / 2)
-                }
-                .opacity(opacity)
+                LinearGradient(colors: [color.opacity(0.6), .clear], startPoint: .trailing, endPoint: .leading)
+                    .frame(width: glowWidth)
+                    .frame(maxHeight: .infinity)
+                    .position(x: geo.size.width - glowWidth / 2, y: geo.size.height / 2)
             }
-            .ignoresSafeArea()
+            .opacity(opacity)
         }
+        .ignoresSafeArea()
         .onAppear {
             withAnimation(.easeIn(duration: 0.3)) {
                 opacity = 1
