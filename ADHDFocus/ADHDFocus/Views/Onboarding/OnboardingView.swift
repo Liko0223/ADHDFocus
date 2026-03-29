@@ -25,7 +25,8 @@ struct OnboardingView: View {
                 case 0: welcomeStep
                 case 1: accessibilityStep
                 case 2: notificationStep
-                case 3: modeSelectionStep
+                case 3: extensionStep
+                case 4: modeSelectionStep
                 default: EmptyView()
                 }
             }
@@ -33,7 +34,7 @@ struct OnboardingView: View {
 
             // Step indicator dots
             HStack(spacing: 8) {
-                ForEach(0..<4, id: \.self) { i in
+                ForEach(0..<5, id: \.self) { i in
                     Circle()
                         .fill(i == currentStep ? Color.accentColor : Color.primary.opacity(0.15))
                         .frame(width: 6, height: 6)
@@ -197,7 +198,72 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Step 4: Mode Selection
+    // MARK: - Step 4: Browser Extension
+
+    private var extensionStep: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 24)
+
+            catWithBubble(message: "安装浏览器扩展可以帮你拦截分心的网站哦~")
+
+            Spacer().frame(height: 24)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Label("URL 拦截 — 专注时自动屏蔽分心网站", systemImage: "safari")
+                Label("自定义黑名单 — 按模式设置不同的屏蔽规则", systemImage: "list.bullet.clipboard")
+                Label("无缝集成 — 和应用拦截一起联动工作", systemImage: "link")
+            }
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Spacer().frame(height: 20)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Chrome 安装说明：\n1. 打开 Chrome → 更多工具 → 扩展程序\n2. 开启右上角「开发者模式」\n3. 点击「加载已解压的扩展程序」\n4. 选择下方文件夹中的 ChromeExtension 目录")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button("在 Finder 中打开") {
+                    revealExtensionInFinder()
+                }
+                .buttonStyle(SecondaryButtonStyle())
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(NSColor.controlBackgroundColor))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+                    )
+            )
+
+            Spacer()
+
+            VStack(spacing: 10) {
+                primaryButton(title: "下一步") {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        currentStep = 4
+                    }
+                }
+
+                Button("跳过") {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        currentStep = 4
+                    }
+                }
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.bottom, 24)
+    }
+
+    // MARK: - Step 5: Mode Selection
 
     private var modeSelectionStep: some View {
         VStack(spacing: 0) {
@@ -216,11 +282,6 @@ struct OnboardingView: View {
                     }
                 }
             }
-
-            Spacer().frame(height: 14)
-
-            // Browser extension
-            extensionSection
 
             Spacer()
 
