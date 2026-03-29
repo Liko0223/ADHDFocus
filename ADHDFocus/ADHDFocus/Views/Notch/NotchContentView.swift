@@ -53,7 +53,13 @@ struct NotchContentView: View {
     }
 
     private var currentHeight: CGFloat {
-        manager.isExpanded ? manager.notchHeight + expandedPanelHeight : manager.notchHeight
+        if manager.isExpanded {
+            return manager.notchHeight + expandedPanelHeight
+        } else if manager.isSuggesting {
+            return manager.notchHeight + 40
+        } else {
+            return manager.notchHeight
+        }
     }
 
     private var panelAnimation: Animation {
@@ -68,7 +74,7 @@ struct NotchContentView: View {
                 // Black background — always with outward top corners
                 NotchShape(
                     topCornerRadius: topCornerRadius,
-                    bottomCornerRadius: manager.isExpanded ? bottomCornerRadius : topCornerRadius,
+                    bottomCornerRadius: (manager.isExpanded || manager.isSuggesting) ? bottomCornerRadius : topCornerRadius,
                     notchHeight: manager.notchHeight,
                     isExpanded: manager.isExpanded
                 )
@@ -86,8 +92,16 @@ struct NotchContentView: View {
                             .frame(width: currentWidth, height: manager.notchHeight)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                manager.toggleExpanded()
+                                if !manager.isSuggesting {
+                                    manager.toggleExpanded()
+                                }
                             }
+
+                        if manager.isSuggesting {
+                            suggestionBar
+                                .frame(width: currentWidth)
+                                .transition(.move(edge: .top).combined(with: .opacity))
+                        }
                     }
                 }
                 .frame(width: currentWidth, height: currentHeight)
@@ -99,6 +113,7 @@ struct NotchContentView: View {
         }
         .animation(panelAnimation, value: manager.isExpanded)
         .animation(panelAnimation, value: manager.isActive)
+        .animation(panelAnimation, value: manager.isSuggesting)
     }
 
     // MARK: - Collapsed bar
@@ -158,6 +173,15 @@ struct NotchContentView: View {
                             .fill(.green)
                             .frame(width: 6, height: 6)
                     }
+                } else if manager.isSuggesting, let appName = manager.suggestedAppName {
+                    let messages = [
+                        "在用\(appName)~ 要专注吗？",
+                        "\(appName)打开啦~ 专注？",
+                    ]
+                    Text(messages[abs(appName.hashValue) % messages.count])
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineLimit(1)
                 } else {
                     Text(idleGreeting)
                         .font(.system(size: 9, weight: .medium))
@@ -294,6 +318,51 @@ struct NotchContentView: View {
             .padding(.top, 12)
             .padding(.bottom, 16)
         }
+    }
+
+    // MARK: - Suggestion bar
+
+    private var suggestionBar: some View {
+        HStack(spacing: 8) {
+            // Mode button (one-click activate)
+            if let mode = manager.suggestedMode {
+                Button {
+                    manager.acceptSuggestion()
+                } label: {
+                    HStack(spacing: 5) {
+                        Text(mode.icon)
+                            .font(.system(size: 11))
+                        Text(mode.name)
+                            .font(.system(size: 11, weight: .medium))
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 7))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.purple.opacity(0.6))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer()
+
+            // Dismiss button
+            Button {
+                manager.onIgnoreSuggestion?()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .padding(5)
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 36)
     }
 
     private var idleGreeting: String {
