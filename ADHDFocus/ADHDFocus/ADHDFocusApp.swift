@@ -97,6 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         window.isReleasedWhenClosed = false
         window.title = "ADHD Focus"
+        window.titlebarAppearsTransparent = false
+        window.titleVisibility = .visible
         window.contentView = NSHostingView(rootView: contentView)
         window.center()
         window.makeKeyAndOrderFront(nil)
