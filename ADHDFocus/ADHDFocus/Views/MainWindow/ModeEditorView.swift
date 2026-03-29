@@ -163,13 +163,8 @@ struct ModeEditorView: View {
                         }
                     }
 
-                    editorSection("环境与策略") {
+                    editorSection("策略") {
                         VStack(alignment: .leading, spacing: 10) {
-                            Toggle("隐藏 Dock", isOn: $mode.hideDock)
-                                .font(.subheadline)
-
-                            Divider()
-
                             HStack {
                                 Text("拦截方式")
                                     .font(.subheadline)
