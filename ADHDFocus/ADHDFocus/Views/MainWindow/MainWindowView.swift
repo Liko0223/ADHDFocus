@@ -35,6 +35,11 @@ struct MainWindowView: View {
             }
         }
         .frame(minWidth: 800, minHeight: 520)
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                Color.clear.frame(width: 0, height: 0)
+            }
+        }
         .toolbarBackground(.visible, for: .windowToolbar)
     }
 }
