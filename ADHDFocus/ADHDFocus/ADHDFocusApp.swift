@@ -25,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var notchManager = NotchManager()
     private var autoTriggerService: AutoTriggerService?
     private var mainWindow: NSWindow?
+    private var onboardingWindow: NSWindow?
 
     override init() {
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
@@ -44,6 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupEngine()
         InstalledAppsProvider.shared.preload()
+        showOnboardingIfNeeded()
     }
 
     func openMainWindow() {
@@ -73,6 +75,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
+    }
+
+    func showOnboardingIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else { return }
+
+        let view = OnboardingView(engine: engine) { [weak self] in
+            self?.onboardingWindow?.close()
+            self?.onboardingWindow = nil
+        }
+        .modelContainer(container)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 560),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.isReleasedWhenClosed = false
+        window.title = "ADHD Focus"
+        window.styleMask.remove(.miniaturizable)
+        window.contentView = NSHostingView(rootView: view)
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        onboardingWindow = window
     }
 
     private func setupEngine() {

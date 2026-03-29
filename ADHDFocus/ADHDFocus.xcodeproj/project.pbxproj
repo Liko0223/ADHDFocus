@@ -25,6 +25,7 @@
 		720EFDF9464A7DFA82736B18 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CC9278C31AF28A754A5352 /* SwiftUI.framework */; };
 		825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */; };
 		8AD2FD61CEE780DB5EA1C5D6 /* DNDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4E2708F04FCFD597D87E5 /* DNDController.swift */; };
+		9A168365D90505C1CCFA2122 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F4C0A32E4C31E528FAE5A /* OnboardingView.swift */; };
 		9E6EDDF9B999836981134F40 /* ModeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8244A72B60B1D487102FD /* ModeEditorView.swift */; };
 		9EE96203419C8DFB85E959B1 /* NotchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E9975B72851FC7937AFA45 /* NotchManager.swift */; };
 		A0EA6DDA25536179A4F11409 /* ADHDFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC826BFDAF2C454FC67963D /* ADHDFocusApp.swift */; };
@@ -87,6 +88,7 @@
 		8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngine.swift; sourceTree = "<group>"; };
 		8DA4E2708F04FCFD597D87E5 /* DNDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDController.swift; sourceTree = "<group>"; };
 		9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTriggerService.swift; sourceTree = "<group>"; };
+		A69F4C0A32E4C31E528FAE5A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AE34CBEFA7680F7365D84BF9 /* ModeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeListView.swift; sourceTree = "<group>"; };
 		B3B1D9C04CEDE9C7F457153C /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		E8BE0A57D99DE487DA19C6C4 /* FocusEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEngineTests.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			children = (
 				8E7977C2228E3B81C71B669F /* MainWindow */,
 				305A3ADBB211F0FC5E2CFEE9 /* Notch */,
+				7075C10CE28E454E533EF690 /* Onboarding */,
 				FADF1A105319BD3A7263AF5E /* Shared */,
 			);
 			path = Views;
@@ -152,6 +155,14 @@
 				269F7E0B577C574B84FC7082 /* UserNotifications.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7075C10CE28E454E533EF690 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A69F4C0A32E4C31E528FAE5A /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		8E7977C2228E3B81C71B669F /* MainWindow */ = {
@@ -349,6 +360,7 @@
 				9EE96203419C8DFB85E959B1 /* NotchManager.swift in Sources */,
 				D3DDC56250A5AF02AAC95E18 /* NotchPanel.swift in Sources */,
 				B9A61CD8F0C295F14884E55F /* NotificationManager.swift in Sources */,
+				9A168365D90505C1CCFA2122 /* OnboardingView.swift in Sources */,
 				6C28ED3ADFBD39CA5C83946A /* PomodoroTimer.swift in Sources */,
 				2A9BFAA527DA2B3D8ACDA8F8 /* RulesServer.swift in Sources */,
 				33667A1B001AAF9736AA4550 /* SettingsView.swift in Sources */,
