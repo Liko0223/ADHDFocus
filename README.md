@@ -15,12 +15,10 @@
 </p>
 
 <p align="center">
-  <a href="#-english">English</a> · <a href="#-中文">中文</a>
+  <strong>English</strong> · <a href="README_CN.md">中文</a>
 </p>
 
 ---
-
-## 🇺🇸 English
 
 ### Features
 
@@ -57,6 +55,9 @@
 **🤖 Auto-Trigger**
 - Detects prolonged use of specific apps and suggests entering focus mode
 - Configurable trigger delay (10s/30s/1min/5min)
+
+**🎉 Celebration Effect**
+- Screen edge glow when completing a Pomodoro work cycle
 
 **🎯 4 Preset Modes**
 - Deep Design — Figma/Sketch/PS + design websites
@@ -96,85 +97,6 @@ open ADHDFocus.xcodeproj
 - macOS 14.0+
 - MacBook with notch (MacBook Pro/Air M-series)
 - Accessibility permission (for app blocking)
-
----
-
-## 🇨🇳 中文
-
-### 功能特性
-
-**🐱 像素猫猫伴侣**
-- 可爱的像素橘猫陪你一起工作
-- 不同专注模式有独特的像素场景（画室、图书馆、咖啡厅、书桌）
-- 猫猫会根据你的状态做出反应（工作、休息、被拦截）
-
-**📱 刘海屏交互**
-- 所有操作都在 MacBook 刘海区域完成
-- 点击刘海展开控制面板，选择模式、查看状态
-- 收起时显示猫猫 + 番茄钟倒计时
-
-**🚫 智能应用拦截**
-- 窗口级遮罩拦截分心应用（不杀进程）
-- 一键加入白名单
-- 允许 5 分钟临时放行
-
-**🌐 Chrome URL 拦截**
-- 配套 Chrome 扩展拦截分心网站
-- 自定义 URL 黑/白名单
-- 拦截页面推荐替代网站
-
-**⏱ 番茄钟**
-- 可自定义工作/休息/长休息时长
-- 暂停/继续（点击刘海倒计时）
-- 休息时自动解除应用拦截
-
-**📊 专注统计**
-- 今日专注时长、番茄钟完成数
-- 拦截记录详情（应用图标+时间）
-- 连续专注天数
-
-**🤖 自动化触发**
-- 检测到持续使用某应用时自动建议进入专注模式
-- 可配置触发延迟（10秒/30秒/1分钟/5分钟）
-
-**🎯 4 个预设模式**
-- 深度设计 — Figma/Sketch/PS + 设计网站
-- 调研灵感 — 浏览器 + 参考网站
-- 沟通协作 — 微信/飞书/Slack
-- 写作整理 — Notion/备忘录
-
-### 安装
-
-**下载安装（推荐）**
-
-1. 从 [GitHub Releases](https://github.com/Liko0223/ADHDFocus/releases) 下载 `ADHDFocus.dmg`
-2. 打开 DMG，将 `ADHDFocus` 拖入 `Applications` 文件夹
-3. 首次启动：**右键 → 打开**（仅首次需要，绕过 Gatekeeper）
-4. 在系统设置 → 隐私与安全性中授权辅助功能权限
-
-**从源码编译**
-
-```bash
-git clone https://github.com/Liko0223/ADHDFocus.git
-cd ADHDFocus/ADHDFocus
-brew install xcodegen  # 如未安装
-xcodegen generate
-open ADHDFocus.xcodeproj
-# Cmd+R 运行
-```
-
-### Chrome 扩展安装
-
-1. 打开 Chrome → `chrome://extensions`
-2. 开启「开发者模式」
-3. 点击「加载已解压的扩展」
-4. 选择 `ADHDFocus/ChromeExtension` 文件夹
-
-### 系统要求
-
-- macOS 14.0+
-- 有刘海的 MacBook（MacBook Pro/Air M 系列）
-- 辅助功能权限（用于应用拦截）
 
 ---
 
