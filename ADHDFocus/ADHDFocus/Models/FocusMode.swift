@@ -52,6 +52,10 @@ final class FocusMode {
     var enableDND: Bool
     var hideDock: Bool
 
+    // Auto-trigger
+    var triggerApps: [String]  // Bundle IDs that trigger this mode (empty = use allowedApps)
+    var triggerDelay: Int      // Seconds before triggering suggestion (default 60)
+
     var isPreset: Bool
     var sortOrder: Int
 
@@ -73,6 +77,8 @@ final class FocusMode {
         longBreakInterval: Int = 4,
         enableDND: Bool = true,
         hideDock: Bool = false,
+        triggerApps: [String] = [],
+        triggerDelay: Int = 60,
         isPreset: Bool = false,
         sortOrder: Int = 0
     ) {
@@ -94,6 +100,8 @@ final class FocusMode {
         self.longBreakInterval = longBreakInterval
         self.enableDND = enableDND
         self.hideDock = hideDock
+        self.triggerApps = triggerApps
+        self.triggerDelay = triggerDelay
         self.isPreset = isPreset
         self.sortOrder = sortOrder
     }
