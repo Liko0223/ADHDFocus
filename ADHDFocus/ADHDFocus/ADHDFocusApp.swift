@@ -111,9 +111,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         window.isReleasedWhenClosed = false
         window.title = "ADHD Focus"
-        window.titlebarAppearsTransparent = false
+        window.titlebarAppearsTransparent = true
         window.titleVisibility = .visible
-        window.contentView = NSHostingView(rootView: contentView)
+        window.styleMask.insert(.fullSizeContentView)
+
+        // Content
+        let hostingView = NSHostingView(rootView: contentView)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Titlebar blur overlay
+        let titlebarBlur = NSVisualEffectView()
+        titlebarBlur.material = .titlebar
+        titlebarBlur.blendingMode = .withinWindow
+        titlebarBlur.state = .followsWindowActiveState
+        titlebarBlur.translatesAutoresizingMaskIntoConstraints = false
+
+        let containerView = NSView()
+        containerView.addSubview(hostingView)
+        containerView.addSubview(titlebarBlur)
+
+        NSLayoutConstraint.activate([
+            hostingView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            hostingView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            hostingView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+
+            titlebarBlur.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            titlebarBlur.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            titlebarBlur.topAnchor.constraint(equalTo: containerView.topAnchor),
+            titlebarBlur.heightAnchor.constraint(equalToConstant: 52),
+        ])
+
+        window.contentView = containerView
         window.center()
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
