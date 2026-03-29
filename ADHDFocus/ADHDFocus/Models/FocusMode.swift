@@ -53,8 +53,8 @@ final class FocusMode {
     var hideDock: Bool
 
     // Auto-trigger
-    var triggerApps: [String]  // Bundle IDs that trigger this mode (empty = use allowedApps)
-    var triggerDelay: Int      // Seconds before triggering suggestion (default 60)
+    var triggerApps: [String] = []  // Bundle IDs that trigger this mode (empty = use allowedApps)
+    var triggerDelay: Int = 60      // Seconds before triggering suggestion (default 60)
 
     var isPreset: Bool
     var sortOrder: Int
