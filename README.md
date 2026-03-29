@@ -66,24 +66,23 @@
 
 ### Installation
 
-1. Clone the repository
+**Download (Recommended)**
+
+1. Download `ADHDFocus.dmg` from [GitHub Releases](https://github.com/Liko0223/ADHDFocus/releases)
+2. Open the DMG and drag `ADHDFocus` to the `Applications` folder
+3. First launch: **Right-click → Open** (required once to bypass Gatekeeper)
+4. Grant Accessibility permission in System Settings → Privacy & Security
+
+**Build from Source**
+
 ```bash
 git clone https://github.com/Liko0223/ADHDFocus.git
-```
-
-2. Install xcodegen (if not installed)
-```bash
-brew install xcodegen
-```
-
-3. Generate Xcode project and open
-```bash
 cd ADHDFocus/ADHDFocus
+brew install xcodegen  # if not installed
 xcodegen generate
 open ADHDFocus.xcodeproj
+# Press Cmd+R to run
 ```
-
-4. Press `Cmd+R` to run
 
 ### Chrome Extension Setup
 
@@ -146,24 +145,23 @@ open ADHDFocus.xcodeproj
 
 ### 安装
 
-1. 克隆仓库
+**下载安装（推荐）**
+
+1. 从 [GitHub Releases](https://github.com/Liko0223/ADHDFocus/releases) 下载 `ADHDFocus.dmg`
+2. 打开 DMG，将 `ADHDFocus` 拖入 `Applications` 文件夹
+3. 首次启动：**右键 → 打开**（仅首次需要，绕过 Gatekeeper）
+4. 在系统设置 → 隐私与安全性中授权辅助功能权限
+
+**从源码编译**
+
 ```bash
 git clone https://github.com/Liko0223/ADHDFocus.git
-```
-
-2. 安装 xcodegen（如未安装）
-```bash
-brew install xcodegen
-```
-
-3. 生成 Xcode 项目并打开
-```bash
 cd ADHDFocus/ADHDFocus
+brew install xcodegen  # 如未安装
 xcodegen generate
 open ADHDFocus.xcodeproj
+# Cmd+R 运行
 ```
-
-4. `Cmd+R` 运行
 
 ### Chrome 扩展安装
 
