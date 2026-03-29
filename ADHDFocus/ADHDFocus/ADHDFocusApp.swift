@@ -12,9 +12,12 @@ struct ADHDFocusApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        // No default window — main window is opened on demand via AppDelegate
         Settings {
             EmptyView()
+                .onAppear {
+                    // Ensure setup runs via SwiftUI lifecycle
+                    appDelegate.ensureSetup()
+                }
         }
     }
 }
@@ -32,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindow: NSWindow?
 
     override init() {
+        print("[ADHD] AppDelegate init called")
         let schema = Schema([FocusMode.self, FocusSession.self, BlockEvent.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
@@ -46,20 +50,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         seedDefaultModesIfNeeded()
     }
 
+    private var hasSetup = false
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        ensureSetup()
+    }
+
+    func ensureSetup() {
+        guard !hasSetup else { return }
+        hasSetup = true
+
         setupEngine()
         InstalledAppsProvider.shared.preload()
-
-        // Delay onboarding to ensure app is fully ready
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.showOnboardingIfNeeded()
-        }
 
         NotificationCenter.default.addObserver(forName: .showOnboarding, object: nil, queue: .main) { [weak self] _ in
             self?.showOnboarding()
         }
         NotificationCenter.default.addObserver(forName: .expandNotchPanel, object: nil, queue: .main) { [weak self] _ in
             self?.notchManager.expand()
+        }
+
+        // Show onboarding after setup
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.showOnboardingIfNeeded()
         }
     }
 
