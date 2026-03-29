@@ -75,9 +75,11 @@ struct OnboardingView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
 
-            Spacer().frame(height: 28)
+            Spacer().frame(height: 12)
 
-            catWithBubble(message: "嗨~ 我是你的专注伙伴！接下来帮你做几个简单的设置~")
+            Text("接下来帮你做几个简单的设置~")
+                .font(.system(size: 13))
+                .foregroundStyle(.tertiary)
 
             Spacer()
 
@@ -116,22 +118,17 @@ struct OnboardingView: View {
             permissionCard(
                 title: "辅助功能权限",
                 description: "用于监控并拦截分心应用",
-                isGranted: accessibilityGranted
-            )
-
-            Spacer().frame(height: 12)
-
-            Button(accessibilityGranted ? "已授权" : "去授权") {
+                isGranted: accessibilityGranted,
+                actionLabel: "去授权"
+            ) {
                 openAccessibilitySettings()
             }
-            .buttonStyle(SecondaryButtonStyle())
-            .disabled(accessibilityGranted)
 
             if !accessibilityGranted {
                 Text("跳过后应用拦截功能不可用")
                     .font(.system(size: 11))
                     .foregroundStyle(.orange.opacity(0.8))
-                    .padding(.top, 6)
+                    .padding(.top, 8)
             }
 
             Spacer()
@@ -179,15 +176,11 @@ struct OnboardingView: View {
             permissionCard(
                 title: "通知权限",
                 description: "番茄钟结束时发送休息提醒",
-                isGranted: notificationStatus == .authorized
-            )
-
-            Spacer().frame(height: 12)
-
-            Button(notificationStatus == .authorized ? "已授权" : "去授权") {
+                isGranted: notificationStatus == .authorized,
+                actionLabel: "去授权"
+            ) {
                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
             }
-            .buttonStyle(SecondaryButtonStyle())
 
             Spacer()
 
@@ -231,11 +224,21 @@ struct OnboardingView: View {
 
             Spacer()
 
-            primaryButton(
-                title: "开始专注！",
-                isEnabled: selectedModeIndex != nil
-            ) {
-                completedOnboarding()
+            VStack(spacing: 10) {
+                primaryButton(
+                    title: "开始专注！",
+                    isEnabled: selectedModeIndex != nil
+                ) {
+                    completedOnboarding()
+                }
+
+                Button("跳过，稍后再选") {
+                    UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+                    onComplete()
+                }
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 40)
@@ -282,7 +285,7 @@ struct OnboardingView: View {
         }
     }
 
-    private func permissionCard(title: String, description: String, isGranted: Bool) -> some View {
+    private func permissionCard(title: String, description: String, isGranted: Bool, actionLabel: String, action: @escaping () -> Void) -> some View {
         HStack(spacing: 14) {
             ZStack {
                 Circle()
@@ -304,6 +307,12 @@ struct OnboardingView: View {
             }
 
             Spacer()
+
+            Button(isGranted ? "已授权" : actionLabel) {
+                action()
+            }
+            .controlSize(.small)
+            .disabled(isGranted)
         }
         .padding(16)
         .background(
