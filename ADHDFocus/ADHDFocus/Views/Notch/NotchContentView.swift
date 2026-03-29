@@ -81,6 +81,22 @@ struct NotchContentView: View {
                 .fill(.black)
                 .frame(width: currentWidth, height: currentHeight)
                 .shadow(color: .black.opacity(manager.isExpanded ? 0.4 : 0), radius: 16)
+                .overlay(
+                    // Celebration glow
+                    manager.isCelebrating ?
+                    RoundedRectangle(cornerRadius: bottomCornerRadius)
+                        .stroke(
+                            AngularGradient(
+                                colors: [.purple, .blue, .cyan, .green, .yellow, .orange, .pink, .purple],
+                                center: .center
+                            ),
+                            lineWidth: 3
+                        )
+                        .blur(radius: 6)
+                        .frame(width: currentWidth, height: currentHeight)
+                        .opacity(manager.isCelebrating ? 1 : 0)
+                    : nil
+                )
 
                 VStack(spacing: 0) {
                     if manager.isExpanded {
@@ -114,6 +130,7 @@ struct NotchContentView: View {
         .animation(panelAnimation, value: manager.isExpanded)
         .animation(panelAnimation, value: manager.isActive)
         .animation(panelAnimation, value: manager.isSuggesting)
+        .animation(.easeInOut(duration: 0.5), value: manager.isCelebrating)
     }
 
     // MARK: - Collapsed bar
@@ -173,6 +190,10 @@ struct NotchContentView: View {
                             .fill(.green)
                             .frame(width: 6, height: 6)
                     }
+                } else if manager.isCelebrating {
+                    Text("🎉 Good job!")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
                 } else {
                     Text(idleGreeting)
                         .font(.system(size: 9, weight: .medium))

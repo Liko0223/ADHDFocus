@@ -22,6 +22,7 @@ final class NotchManager {
     var suggestedMode: FocusMode?
     var suggestedAppName: String?
     private var suggestionTimer: Timer?
+    var isCelebrating: Bool = false
 
     // Geometry
     var notchWidth: CGFloat = 200
@@ -154,6 +155,13 @@ final class NotchManager {
         guard let mode = suggestedMode else { return }
         dismissSuggestion()
         engine?.activate(mode: mode)
+    }
+
+    func showCelebration() {
+        isCelebrating = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
+            self?.isCelebrating = false
+        }
     }
 
     func updateState(isActive: Bool, modeName: String?, remainingSeconds: Int, isOnBreak: Bool) {

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05CBED7B23701F6587992964 /* CelebrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C640D0AC41A7A1E63F7ADB /* CelebrationManager.swift */; };
 		060ECED5BE0FFE7B1431780D /* AppMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */; };
 		0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5D802C95CB466592EB5247 /* DefaultModes.swift */; };
 		1FC04B89C8A5D78D8018EB08 /* InstalledAppsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */; };
@@ -37,7 +36,6 @@
 		C51AD3158530EF1F1646E234 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A87F0D2F3A09D8E892D9F72 /* SwiftData.framework */; };
 		C5EF86FAE407B6E116255ACF /* NotchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA58F9152973A5E0CC1D41D /* NotchContentView.swift */; };
 		C6475346961BF47F0502D56C /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FE1D8E91F4BA4EE7A4B3CF /* MainWindowView.swift */; };
-		C697F8FBC42E8BC7521CCD8B /* CelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B69CEE9C58F50E1E2E2C85D /* CelebrationView.swift */; };
 		C88779099F32E060759E1BCE /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9170B6FB6E672FADA64DE /* FocusSession.swift */; };
 		CC13CDEDE4309E27EEF442C8 /* CompanionSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A777CA1613981942965EB77 /* CompanionSceneView.swift */; };
 		D2A9549516D518A1ADA8956C /* SpriteSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03860CDD9D664BA3071789D1 /* SpriteSheetView.swift */; };
@@ -72,8 +70,6 @@
 		39E78F3410889E09A72BAF06 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3A0980327B19CA6968397CC3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		3A777CA1613981942965EB77 /* CompanionSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSceneView.swift; sourceTree = "<group>"; };
-		3B69CEE9C58F50E1E2E2C85D /* CelebrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelebrationView.swift; sourceTree = "<group>"; };
-		41C640D0AC41A7A1E63F7ADB /* CelebrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelebrationManager.swift; sourceTree = "<group>"; };
 		43F7F74BA8808BD2B22804A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		44FE1D8E91F4BA4EE7A4B3CF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		53329645BA4D1D0255C861BA /* ADHDFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADHDFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -235,7 +231,6 @@
 			children = (
 				F4BA1C8ECCD98709B557FBD9 /* AppMonitor.swift */,
 				9099EC210B2249D8FD08B6DD /* AutoTriggerService.swift */,
-				41C640D0AC41A7A1E63F7ADB /* CelebrationManager.swift */,
 				8B846CEBC5A191CCCFBE05D6 /* FocusEngine.swift */,
 				536EF33AD9A8C9246D3A93DD /* InstalledAppsProvider.swift */,
 				64E9975B72851FC7937AFA45 /* NotchManager.swift */,
@@ -251,7 +246,6 @@
 			children = (
 				32D44F59C648B8E2A77D51E2 /* AppPickerView.swift */,
 				8B55CD208879071A6C856A98 /* BlockOverlayWindow.swift */,
-				3B69CEE9C58F50E1E2E2C85D /* CelebrationView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -348,8 +342,6 @@
 				66E9A21B631F6C852C0284A7 /* BlockEvent.swift in Sources */,
 				825B5C7FC2A66D8E78B684A1 /* BlockOverlayWindow.swift in Sources */,
 				3AC57EA40E5187A0772DEDA6 /* BobAnimation.swift in Sources */,
-				05CBED7B23701F6587992964 /* CelebrationManager.swift in Sources */,
-				C697F8FBC42E8BC7521CCD8B /* CelebrationView.swift in Sources */,
 				CC13CDEDE4309E27EEF442C8 /* CompanionSceneView.swift in Sources */,
 				0929D8068C5C492570A7C93F /* DefaultModes.swift in Sources */,
 				34ECB2D598C72DE34CEFFCB3 /* FocusEngine.swift in Sources */,
