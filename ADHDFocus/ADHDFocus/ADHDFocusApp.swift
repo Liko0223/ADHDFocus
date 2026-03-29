@@ -13,8 +13,13 @@ struct ADHDFocusApp: App {
 
     var body: some Scene {
         Settings {
-            Text("请通过刘海面板打开设置")
-                .frame(width: 300, height: 100)
+            Color.clear
+                .frame(width: 0, height: 0)
+                .onAppear {
+                    // Close the empty settings window and open main window instead
+                    NSApp.windows.first { $0.title.contains("Settings") }?.close()
+                    appDelegate.openMainWindow()
+                }
         }
     }
 }
