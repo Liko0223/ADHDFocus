@@ -132,7 +132,7 @@ struct OnboardingView: View {
                     .padding(.top, 8)
             }
 
-            Spacer()
+            Spacer().frame(height: 32)
 
             primaryButton(title: "下一步") {
                 accessibilityTimer?.invalidate()
@@ -183,7 +183,7 @@ struct OnboardingView: View {
                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
             }
 
-            Spacer()
+            Spacer().frame(height: 32)
 
             primaryButton(title: "下一步") {
                 withAnimation(.easeInOut(duration: 0.25)) {
@@ -247,7 +247,7 @@ struct OnboardingView: View {
                     )
             )
 
-            Spacer()
+            Spacer().frame(height: 32)
 
             VStack(spacing: 10) {
                 primaryButton(title: "下一步") {
@@ -290,7 +290,50 @@ struct OnboardingView: View {
                 }
             }
 
-            Spacer()
+            Spacer().frame(height: 20)
+
+            // Notch hint with mini illustration
+            HStack(spacing: 10) {
+                // Mini notch illustration
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.primary.opacity(0.06))
+                        .frame(width: 60, height: 36)
+
+                    // Notch shape
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 0,
+                        bottomLeadingRadius: 4,
+                        bottomTrailingRadius: 4,
+                        topTrailingRadius: 0
+                    )
+                    .fill(Color.primary.opacity(0.7))
+                    .frame(width: 24, height: 10)
+                    .offset(y: -13)
+
+                    // Cat dot
+                    Circle()
+                        .fill(.orange)
+                        .frame(width: 4, height: 4)
+                        .offset(x: -8, y: -13)
+                }
+
+                Text("完成后，在屏幕顶部刘海区域找到我~ 点击即可展开控制面板")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(NSColor.controlBackgroundColor))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+                    )
+            )
+
+            Spacer().frame(height: 20)
 
             VStack(spacing: 10) {
                 primaryButton(
