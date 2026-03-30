@@ -3,6 +3,7 @@ import AppKit
 
 struct SettingsView: View {
     @State private var launchAtLogin = false
+    @State private var showInDock = false
 
     var body: some View {
         ScrollView {
@@ -13,6 +14,16 @@ struct SettingsView: View {
                 GroupBox("通用") {
                     VStack(alignment: .leading, spacing: 12) {
                         Toggle("登录时自动启动", isOn: $launchAtLogin)
+
+                        Toggle("在 Dock 中显示", isOn: $showInDock)
+                            .onChange(of: showInDock) { _, newValue in
+                                if newValue {
+                                    NSApp.setActivationPolicy(.regular)
+                                } else {
+                                    NSApp.setActivationPolicy(.accessory)
+                                }
+                                UserDefaults.standard.set(newValue, forKey: "showInDock")
+                            }
                     }
                     .padding(8)
                 }
@@ -74,6 +85,9 @@ struct SettingsView: View {
                 }
             }
             .padding(24)
+        }
+        .onAppear {
+            showInDock = UserDefaults.standard.bool(forKey: "showInDock")
         }
     }
 }

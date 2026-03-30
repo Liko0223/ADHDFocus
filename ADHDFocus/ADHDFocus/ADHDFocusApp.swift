@@ -73,6 +73,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func doSetup() {
+        // Apply Dock visibility preference
+        let showInDock = UserDefaults.standard.bool(forKey: "showInDock")
+        NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+
         setupEngine()
         InstalledAppsProvider.shared.preload()
 
